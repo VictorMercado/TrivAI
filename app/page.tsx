@@ -60,7 +60,7 @@ export default async function Home() {
             </tbody>
           </table>
         </div>
-        {/* <p className="ml-6 mt-6">Want to join the fun? Sign in!</p> */}
+        <p className="ml-6 mt-6">Want to join the fun? Sign in!</p>
       </div>
     </main>
   );
