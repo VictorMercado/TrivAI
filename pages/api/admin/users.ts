@@ -43,7 +43,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                             name: name,
                             role: role,
                             cheatUsed: cheatUsed,
-                            totalScore: parseInt(totalScore)
+                            totalScore: parseInt(totalScore ? totalScore : "0")
                         }
                     });
                 } else {
