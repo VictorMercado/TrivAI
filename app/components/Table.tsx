@@ -22,7 +22,7 @@ export default function Table({ title, data, thead} : {title: string, data: any,
                     {data.map((entry: any, index: number) => (
                     <tr key={index}>
                         { keys.map((key, index) => (
-                            key === "image" ? <td key={index}><a target="_blank" href={`${entry[key]}`}>{`${entry[key]}`}</a></td> : <td key={index}>{`${entry[key]}`}</td>
+                            key === "image" ? <td key={index}><a className="text-blue-500" target="_blank" href={`${entry[key]}`}>{`${entry[key]}`}</a></td> : <td key={index}>{`${entry[key]}`}</td>
                         ))}
                     </tr>
                     ))}

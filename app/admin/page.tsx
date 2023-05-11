@@ -41,7 +41,7 @@ export default async function Page() {
                     </th>
                     <td>{entry.id}</td>
                     <td>{entry.category}</td>
-                    <td>{entry.image}</td>
+                    <td><a className="text-blue-500" target="_blank" href={entry.image}>{entry.image}</a></td>
                     <td>{entry.dateDue}</td>
                   </tr>
                 ))}
