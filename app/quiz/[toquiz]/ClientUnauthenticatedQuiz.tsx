@@ -1,5 +1,7 @@
 "use client";
 import Image from "next/image";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
 import { useState, useEffect, useRef } from "react";
 // import QuestionOptions from '@/app/components/QuestionOptions';
 
@@ -85,6 +87,8 @@ export default function ClientUnauthenticatedQuiz({
                 );
               })}
             </div>
+            <button className="text-blue-500 border border-blue-500 m-2 p-2 lg:hover:bg-blue-500 lg:hover:text-black"
+            onClick={() => signIn()}> Sign in to record your score </button>
           </div>
         ) : (
           <div>
