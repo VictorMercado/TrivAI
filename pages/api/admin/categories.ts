@@ -27,6 +27,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
                                 basePrompt: basePrompt,
                                 category: category,
                                 sdPrompt: sdPrompt,
+                                isActive: isActive ? (isActive === 'true') : undefined
                             }
                         });
                     } else {
