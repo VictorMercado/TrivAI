@@ -5,7 +5,6 @@ import { getCurrentUser } from "@src/session";
 import { Prisma } from "@prisma/client";
 import { TabSwitcher } from "@ui/tab-switcher";
 import { QuizCompleted } from "@components/QuizCompleted";
-import { Object } from "aws-sdk/clients/appflow";
 import { shuffle } from "@src/utils";
 
 interface Routes {
