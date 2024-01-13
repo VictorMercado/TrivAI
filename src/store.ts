@@ -14,6 +14,7 @@ export type Actions = {
     removeCheat: () => void;
     resetScore: () => void;
     deleteAccount: () => void;
+    updateUserName: (name : string) => void;
 }
 
 const initialState: UserState = {
@@ -26,11 +27,20 @@ const initialState: UserState = {
 
 export const useStore = create<UserState & Actions>((set, get) => ({
     ...initialState,
-    id: '',
-    name: '',
-    totalScore: 0,
-    cheatUsed: false,
-    image: '',
+    updateUserName: async (name) => {
+        const response = await fetch(new URL("/api/updateName", checkEnvironment()), {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: get().id, name: name})
+        });
+        if (!response.ok) {
+            throw new Error(response.statusText);
+        }
+        let nameResponse = await response.json().then(data => data.name); 
+        set({name: nameResponse});
+    },
     incrementScore: async (pointAmount) => {
         const response = await fetch(new URL("/api/score", checkEnvironment()), {
             method: 'PUT',

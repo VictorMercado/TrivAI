@@ -1,4 +1,4 @@
-export default function StableDiffusionPreview() {
+export default function AdminStableDiffusionPreviewPage() {
     return (
       <div className="text-center flex flex-col justify-center items-center">
         <h1 className="text-3xl m-4 px-4">

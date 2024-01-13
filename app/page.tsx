@@ -1,65 +1,36 @@
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import { db } from '@/src/db';
+import { Inter } from "next/font/google";
+import { getCurrentUser } from "@/src/session";
+import { getTodayQuizzes, getUsersAnswerQuizzes } from "@/src/db/queries";
+import { getQuizIdsHelper, mergeQuizzes } from "@/src/db/helpers";
+import { PresentCategories } from "@components/PresentCategories";
+import { CoolHeader } from "@components/CoolHeader";
+import { Leaderboard } from "@components/LeaderBoard";
 
+// import { ColorPicker } from "@/src/components/ColorPicker";
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ subsets: ["latin"] });
 
+export default async function RootPage() {
+  const user = await getCurrentUser();
+  // if (!user) {
+  //   return notFound();
+  // }
+  const result = await getTodayQuizzes(new Date().getFullYear(), 1, 1, 1);
+  const quizzes = result?.months[0].weeks[0].days[0].quizzes;
+  const quizIds = getQuizIdsHelper(quizzes);
+  const userQuizzes = await getUsersAnswerQuizzes(user?.id, quizIds);
+  const finishedQuizzes = mergeQuizzes(quizzes, userQuizzes);
 
-async function getUsers() {
-  return await db.user.findMany({
-    select: {
-      id: true,
-      email: true,
-      name: true,
-      role: true,
-      cheatUsed: true,
-      totalScore: true,
-    },
-  });
-}
-
-
-export default async function Home() {
-  const usersHead = [
-    "Position",
-    "Name",
-    "Role",
-    "Cheat Used",
-    "Total Score",
-  ];
-  const users = await getUsers();
-  users.sort((a: any, b: any) => b.totalScore - a.totalScore);
   return (
-    <main className="">
-      <div className="flex justify-center flex-col">
-        <h1 className="text-3xl m-4 p-4 text-center">
-          <b>LEADERBOARD</b>
-        </h1>
-        <div className="overflow-x-auto">
-          <table className="table w-full mb-12" data-theme="">
-            {/* <!-- head --> */}
-            <thead>
-              <tr>
-                {usersHead.map((entry: string, index: number) => (
-                  <th key={index}>{entry}</th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="">
-              {/* <!-- row 1 --> */}
-              {users.map((row, index) => (
-                <tr key={row.id}>
-                  <th>{index + 1}</th>
-                  <td>{row.name}</td>
-                  <td>{row.role}</td>
-                  <td>{`${row.cheatUsed}`}</td>
-                  <td>{row.totalScore}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <main className="grid grid-cols-1 justify-center">
+      <CoolHeader routeLabel="Live Quizzes" />
+      <div className="flex flex-col gap-y-12 p-6">
+        <PresentCategories quizzes={finishedQuizzes} />
+        {/* @ts-expect-error Server Component */}
+        <Leaderboard />
+        {/* <div className='flex justify-center'>
+          <ColorPicker label="Primary" colorTheme="--color-primary" />
+        </div> */}
         <p className="ml-6 mt-6">Want to join the fun? Sign in!</p>
       </div>
     </main>

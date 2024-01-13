@@ -1,7 +1,7 @@
 'use client';
-
-import { useStore } from "@/src/store";
+import { useStore } from "@src/store";
 import { useState } from "react";
+import { Button } from "@ui/button";
 
 async function sendForm(obj : any) {
   let response : Response | undefined;
@@ -50,20 +50,21 @@ export default function ClientAbout() {
     }
 
     return (
-      <div className="flex justify-center items-center flex-col w-fit my-4 mx-auto">
+      <div className="my-4 flex flex-col items-center justify-center p-4 text-xl">
         <h1 className="m-4 text-2xl">Feed Back</h1>
         <form
-          className={
-            "flex flex-col " +
-            (hasSubmit && !error ? "border-green-400 border-4" : "") +
-            (error ? "border-red-400 border-4" : "")
-          }
+          id="feedback"
+          className={`
+            m-4 flex flex-col gap-4
+            ${hasSubmit && !error ? "border-4 border-green-400 p-4" : ""}
+            ${error ? "border-4 border-red-400" : ""}
+            `}
           onSubmit={submitForm}
         >
-          <label className="flex m-4 items-center justify-between">
-            <span>Name:</span>
+          <label className="flex flex-col items-center justify-between lg:flex-row">
+            <span className="">Name:</span>
             <input
-              className="ml-4 p-2 bg-[#364153]"
+              className="peer ml-4 bg-[#364153] p-2"
               type="text"
               name="name"
               disabled={false}
@@ -71,10 +72,10 @@ export default function ClientAbout() {
               required
             />
           </label>
-          <label className="flex m-4 items-center justify-between">
+          <label className="flex flex-col items-center justify-between lg:flex-row">
             <span>Email:</span>
             <input
-              className="ml-4 p-2 bg-[#364153]"
+              className="ml-4 resize bg-[#364153] p-2"
               type="email"
               name="email"
               disabled={false}
@@ -82,11 +83,10 @@ export default function ClientAbout() {
               required
             />
           </label>
-          <label className="flex m-4 items-center justify-between">
+          <label className="flex flex-col items-center justify-between lg:flex-row">
             <span>Message:</span>
-            <input
-              className="ml-4 p-2 bg-[#364153]"
-              type="text"
+            <textarea
+              className="ml-4 max-h-32 min-h-[150px] min-w-[200px] max-w-lg resize bg-[#364153] p-2 caret-blue-500"
               name="message"
               disabled={false}
               placeholder="This thing sucks..."
@@ -94,14 +94,12 @@ export default function ClientAbout() {
               required
             />
           </label>
-          <button
-            type="submit"
-            className="border border-blue-500 p-2 m-4 lg:hover:bg-blue-500 lg:hover:text-black"
-          >
+          <Button type="submit" variant="default" size="default">
             Submit
-          </button>
+          </Button>
         </form>
         {message.length > 0 ? <p>Your Message: {message}</p> : <p></p>}
+        <h1 className="coolText mb-2 text-3xl">Created By: Victor Mercado</h1>
       </div>
     );
 }
