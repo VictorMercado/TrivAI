@@ -1,0 +1,32 @@
+{
+  "name": "@trivai/prisma",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf .turbo && rm -rf node_modules",
+    "db-seed": "yarn prisma db seed",
+    "db-studio": "bunx prisma studio",
+    "db-up": "docker compose up -d || docker-compose up -d",
+    "db-push": "bunx prisma db push",
+    "db-gen": "prisma generate && prisma format",
+    "post-install": "bun run generate-schemas",
+    "seed-app-store": "ts-node --transpile-only ./seed-app-store.ts",
+    "delete-app": "ts-node --transpile-only ./delete-app.ts",
+    "seed-insights": "ts-node --transpile-only ./seed-insights.ts"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^8.4.0",
+    "@prisma/client": "latest",
+    "@types/node": "^20.11.16",
+    "prisma": "latest",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3",
+    "zod": "^3.22.4",
+    "zod-prisma": "^0.5.4"
+  },
+  "prisma": {
+    "seed": "bun ./seed.js"
+  },
+  "main": "./index.ts",
+  "types": "./index.ts"
+}

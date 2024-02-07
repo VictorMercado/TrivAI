@@ -1,0 +1,519 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+generator zod {
+  provider = "zod-prisma"
+  output   = "./zod" // (default) the directory where generated zod schemas will be saved
+
+  relationModel = true // (default) Create and export both plain and related models.
+  // relationModel         = "default" // Do not export model without relations.
+  // relationModel         = false // Do not generate related model
+
+  modelCase = "PascalCase" // (default) Output models using pascal case (ex. UserModel, PostModel)
+  // modelCase             = "camelCase" // Output models using camel case (ex. userModel, postModel)
+
+  modelSuffix = "Model" // (default) Suffix to apply to your prisma models when naming Zod schemas
+
+  // useDecimalJs          = false // (default) represent the prisma Decimal type using as a JS number
+  useDecimalJs = true // represent the prisma Decimal type using Decimal.js (as Prisma does)
+
+  // https://www.prisma.io/docs/concepts/components/prisma-client/working-with-fields/working-with-json-fields#filtering-by-null-values
+  prismaJsonNullability = true // (default) uses prisma's scheme for JSON field nullability
+  // prismaJsonNullability = false // allows null assignment to optional JSON fields
+}
+
+datasource db {
+  provider     = "mysql"
+  url          = env("DATABASE_URL")
+  relationMode = "prisma"
+}
+
+enum Role {
+  ADMIN
+  USER
+}
+
+enum AllegianceRole {
+  LEADER
+  MEMBER
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model User {
+  id             String    @id @default(cuid())
+  userName       String?   @unique
+  name           String?
+  primaryColor   String?
+  secondaryColor String?
+  credits        Int       @default(0)
+  email          String?   @unique
+  emailVerified  DateTime?
+  image          String?
+  prize          String?
+  accounts       Account[]
+  sessions       Session[]
+  role           Role      @default(USER)
+
+  cheatUsed       Boolean              @default(false)
+  cheatUsedAt     DateTime?
+  createdAt       DateTime             @default(now())
+  updatedAt       DateTime?
+  totalScore      Int                  @default(0)
+  categories      Category[]
+  userAnswers     UserAnswer[]
+  userAnswerQuiz  UserAnswerQuiz[]
+  allegiance      AllegianceMember?
+  collection      ItemUser[]
+  profilePictures ProfilePictureUser[]
+  quizzes         Quiz[]
+  likedQuizzes    LikedQuiz[]
+  savedQuizzes    SavedQuiz[]
+  sharedQuizzes   SharedQuiz[]         @relation(name: "owner")
+  assignedQuizzes SharedQuiz[]
+  friends         UserFriend[]         @relation(name: "owner")
+  friendOf        UserFriend[]         @relation(name: "friend")
+}
+
+model UserFriend {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(name: "owner", fields: [userId], references: [id], onDelete: Cascade)
+
+  friendId String
+  friend   User   @relation(name: "friend", fields: [friendId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([friendId])
+}
+
+model ProfilePictureUser {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  profilePictureId Int
+  profilePicture   ProfilePicture @relation(fields: [profilePictureId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([profilePictureId])
+  @@index([userId])
+}
+
+model ProfilePicture {
+  id        Int      @id @default(autoincrement())
+  name      String
+  gen       Int
+  shiny     Boolean  @default(false)
+  mega      Boolean  @default(false)
+  legendary Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  cost            Int                  @default(10)
+  image           String
+  profilePictures ProfilePictureUser[]
+
+  @@index([gen])
+}
+
+model ItemUser {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  itemId Int
+  item   Item @relation(fields: [itemId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([itemId])
+  @@index([userId])
+}
+
+model Item {
+  id    Int    @id @default(autoincrement())
+  name  String
+  numId Int?
+  data  Json
+  cost  Int    @default(30)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  image String
+  users ItemUser[]
+
+  @@index([numId])
+  @@index([name])
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime?
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  quizCategory   QuizCategory?
+  keywordPrompt  KeywordPrompt[]
+  allegianceQuiz AllegianceQuiz[]
+
+  @@index([userId])
+}
+
+// keyword for GPT prompt 
+model KeywordPrompt {
+  id         Int      @id @default(autoincrement())
+  keyword    String
+  daysLength Int      @default(1) // number of days
+  quizLength Int      @default(10) // number of questions
+  isUsed     Boolean  @default(false)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  QuizCategory QuizCategory[]
+
+  categoryId Int      @unique
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+}
+
+// will manage 
+model QuizCategory {
+  id         Int      @id @default(autoincrement())
+  basePrompt String
+  sdPrompt   String   @default(" ")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  isActive   Boolean  @default(true)
+  image      String?
+  quizzes    Quiz[]
+
+  keywordPromptId Int?
+  keywordPrompt   KeywordPrompt? @relation(fields: [keywordPromptId], references: [id])
+
+  categoryId Int      @unique
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([keywordPromptId])
+  @@index([categoryId])
+}
+
+model Year {
+  id   Int @id @unique @default(autoincrement())
+  year Int @db.Year
+
+  months Month[]
+}
+
+model Month {
+  id     Int  @id @unique @default(autoincrement())
+  month  Int  @db.TinyInt
+  yearId Int
+  year   Year @relation(fields: [yearId], references: [id], onDelete: Cascade)
+
+  weeks Week[]
+
+  @@index([yearId])
+}
+
+model Week {
+  id   Int @id @unique @default(autoincrement())
+  week Int @db.TinyInt
+
+  monthId Int
+  month   Month @relation(fields: [monthId], references: [id], onDelete: Cascade)
+
+  days Day[]
+
+  @@index([monthId])
+}
+
+model Day {
+  id  Int @id @unique @default(autoincrement())
+  day Int @db.TinyInt
+
+  weekId Int
+  week   Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
+
+  quizzes Quiz[]
+
+  @@index([weekId])
+}
+
+// todo: [Year -> Month -> Week -> Day -> Quiz]
+
+model Quiz {
+  id             Int              @id @default(autoincrement())
+  scoreAmt       Int              @default(3)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  dateDue        DateTime
+  likes          Int              @default(0) // linked to LikedQuiz
+  shares         Int              @default(0) // linked to SharedQuiz
+  completions    Int              @default(0) // linked to UserAnswerQuiz
+  saves          Int              @default(0) // linked to SavedQuiz
+  image          String?
+  // year           Int?            @db.TinyInt
+  // month          Int?            @db.TinyInt
+  // week           Int?            @db.TinyInt
+  // day            Int?            @db.TinyInt
+  questions      Question[]
+  userAnswers    UserAnswerQuiz[]
+  allegianceQuiz AllegianceQuiz?
+  likedQuiz      LikedQuiz[]
+  sharedQuiz     SharedQuiz[]
+  savedQuiz      SavedQuiz[]
+
+  ownerId String?
+  owner   User?   @relation(fields: [ownerId], references: [id])
+
+  dayId Int?
+  day   Day? @relation(fields: [dayId], references: [id])
+
+  quizCategoryId Int
+  quizCategory   QuizCategory @relation(fields: [quizCategoryId], references: [id])
+
+  @@index([ownerId])
+  @@index([quizCategoryId])
+  @@index([dayId])
+}
+
+model LikedQuiz {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@index([userId])
+}
+
+model SavedQuiz {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@index([userId])
+}
+
+model SharedQuiz {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  userId String
+  user   User   @relation(name: "owner", fields: [userId], references: [id], onDelete: Cascade)
+
+  recipientId String
+  recipient   User   @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId])
+  @@index([quizId])
+  @@index([userId])
+}
+
+model Question {
+  id            String       @id @default(cuid())
+  isUsed        Boolean      @default(false)
+  answer1       String
+  answer2       String
+  answer3       String
+  correctAnswer String
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+  image         String?
+  text          String?
+  userAnswers   UserAnswer[]
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  @@index([quizId])
+}
+
+model UserAnswer {
+  id             String   @id @default(cuid())
+  selectedAnswer String
+  correctAnswer  Boolean
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  questionId String
+  question   Question @relation(fields: [questionId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userAnswerQuizId String?
+  userAnswerQuiz   UserAnswerQuiz? @relation(fields: [userAnswerQuizId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([questionId])
+  @@index([userAnswerQuizId])
+}
+
+model UserAnswerQuiz {
+  id        String   @id @default(cuid())
+  completed Boolean  @default(false)
+  time      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  userAnswers UserAnswer[]
+
+  @@unique([quizId, userId])
+  @@index([quizId])
+  @@index([userId])
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String
+  message   String
+  createdAt DateTime @default(now())
+}
+
+model AllegianceQuiz {
+  id Int @id @default(autoincrement())
+
+  score      Int
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  assignedTo Int?
+
+  quizId Int  @unique
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  allegianceId Int
+  allegiance   Allegiance @relation(fields: [allegianceId], references: [id], onDelete: Cascade)
+  categoryId   Int        @unique
+  category     Category   @relation(fields: [categoryId], references: [id])
+
+  @@index([allegianceId])
+  @@index([quizId])
+}
+
+model Allegiance {
+  id          Int      @id @default(autoincrement())
+  leaderId    String
+  name        String   @unique
+  image       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  members AllegianceMember[]
+  quizzes AllegianceQuiz[]
+
+  @@index([leaderId])
+}
+
+model AllegianceMember {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  allegianceRole AllegianceRole @default(MEMBER)
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id])
+
+  allegianceId Int
+  allegiance   Allegiance @relation(fields: [allegianceId], references: [id])
+
+  @@index([allegianceId])
+}
+
+// model Leader {
+//   id          Int         @id @default(autoincrement())
+//   userId      String      @unique
+//   user        User        @relation(fields: [userId], references: [id])
+//   allegiance  Allegiance  @relation(fields: [allegianceId], references: [id])
+//   allegianceId Int
+
+//   @@index([userId])
+//   @@index([allegianceId])
+// }
+
+// model Member {
+//   id          Int         @id @default(autoincrement())
+//   userId      String      @unique
+//   user        User        @relation(fields: [userId], references: [id])
+//   allegiance  Allegiance  @relation(fields: [allegianceId], references: [id])
+//   allegianceId Int
+
+//   @@index([userId])
+//   @@index([allegianceId])
+// }

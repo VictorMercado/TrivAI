@@ -1,0 +1,40 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "pipeline": {
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "build": {
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
+    },
+    "start": {
+      "outputs": [
+        "dist/**",
+        "build/**"
+      ]
+    },
+    "db-push": {
+      "cache": false
+    },
+    "db-studio": {
+      "cache": false
+    },
+    "db-gen": {
+      "cache": false
+    },
+    "db-seed": {
+      "cache": false
+    },
+    "db-up": {
+      "cache": false
+    },
+    "db-down": {
+      "cache": false
+    },
+    "type-check": {}
+  }
+}

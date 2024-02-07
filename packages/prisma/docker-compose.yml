@@ -1,0 +1,17 @@
+# docker-compose for mysql
+
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:latest
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: itsasecret
+      MYSQL_DATABASE: trivai
+      MYSQL_USER: root
+      MYSQL_PASSWORD: itsasecret
+    ports:
+      - "3307:3306"  # Map container's port 3306 to host's port 3307
+    volumes:
+      - ./data:/var/lib/mysql

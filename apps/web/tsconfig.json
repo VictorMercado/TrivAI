@@ -1,0 +1,47 @@
+{
+  "compilerOptions": {
+    "allowImportingTsExtensions": true,
+    "downlevelIteration": true,
+    "target": "es5",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "typeRoots": ["@trivai/types/*.d.ts"],
+    "paths": {
+      "react": [ "../../node_modules/@types/react" ],
+      "@/*": ["./*"],
+      "@components/*": ["./src/components/*"],
+      "@ui/*": ["./src/components/ui/*"],
+      "@hooks/*": ["./src/hooks/*"],
+      "@src/*": ["./src/*"]
+    },
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/types/*.d.ts",
+    "../../packages/types/next-auth.d.ts",
+    "pages/about.jsx",
+    "apps/web/app/about/[...slug]",
+    "../../packages/prisma/seed.js"
+  ],
+  "exclude": ["node_modules"]
+}
