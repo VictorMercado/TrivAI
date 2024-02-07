@@ -14,16 +14,25 @@ export default async function RootPage() {
   // if (!user) {
   //   return notFound();
   // }
-  const result = await getTodayQuizzes(new Date().getFullYear(), 1, 1, 1);
-  const quizzes = result?.months[0].weeks[0].days[0].quizzes;
-  const quizIds = getQuizIdsHelper(quizzes);
-  const userQuizzes = await getUsersAnswerQuizzes(user?.id, quizIds);
-  const finishedQuizzes = mergeQuizzes(quizzes, userQuizzes);
+  let result;
+  let finishedQuizzes;
+  try {
+   result = await getTodayQuizzes(new Date().getFullYear(), 1, 1, 1);
+    const quizzes = result?.months[0].weeks[0].days[0].quizzes;
+    const quizIds = getQuizIdsHelper(quizzes);
+    const userQuizzes = await getUsersAnswerQuizzes(user?.id, quizIds);
+    finishedQuizzes = mergeQuizzes(quizzes, userQuizzes);
+  } catch (e) {
+    console.error(e);
+  }
+
 
   return (
     <main className="grid grid-cols-1 justify-center">
       <div className="flex flex-col gap-y-12 p-6">
-        <PresentCategories quizzes={finishedQuizzes} />
+        {
+          finishedQuizzes && <PresentCategories quizzes={finishedQuizzes} />
+        }
         {/* @ts-expect-error Server Component */}
         <Leaderboard />
         {/* <div className='flex justify-center'>
