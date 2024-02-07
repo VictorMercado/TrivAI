@@ -6,7 +6,7 @@ import type { Mesh } from 'three';
 import { TextGeometry } from 'three/examples/jsm/geometries/TextGeometry';
 import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 import { useSession } from 'next-auth/react';
-import { rgbToHex } from '@trivai/lib/color/rgbToHex';
+import { rgbToHex } from '@trivai/lib/color';
 import { useLocalStorage } from '@src/hooks/useLocalStorage';
 // import fontJson from '../../public/helvetiker_regular.typeface.json';
 

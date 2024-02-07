@@ -1,8 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { useLocalStorage } from "@src/hooks/useLocalStorage";
-import { rgbToHex } from "@trivai/lib/color/rgbToHex";
-import { hexToRgb } from "@trivai/lib/color/hexToRgb";
+import { rgbToHex, hexToRgb } from "@trivai/lib/color";
+
 
 const ColorPicker = ({ label, colorTheme }: { colorTheme: string, label: string }) => {
   const PRIMARY_COLOR = "59 130 246";
