@@ -50,6 +50,7 @@ export const useStore = create<UserState & Actions>((set, get) => ({
             body: JSON.stringify({id: get().id, totalScore: get().totalScore + pointAmount})
         });
         if (!response.ok) {
+            
             throw new Error(response.statusText);
         }
         let score = await response.json().then(data => data.totalScore); 

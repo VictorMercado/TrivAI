@@ -28,6 +28,10 @@ async function getQuiz(id: number) {
       sharedQuiz: true,
       owner: true,
       dateDue: true,
+      saves: true,
+      likes: true,
+      shares: true,
+      completions: true,
       quizCategory: {
         select: {
           category: true,
