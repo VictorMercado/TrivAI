@@ -68,7 +68,7 @@ function Box4() {
 }
 
 export default async function StorePage() {
-  const quiz = await getQuiz(336);
+  const quiz = await getQuiz(436);
   console.log(quiz);
   const charizardProduct: Product = {
     name: "Charizard",
