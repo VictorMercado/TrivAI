@@ -28,7 +28,7 @@ const initialState: UserState = {
 export const useStore = create<UserState & Actions>((set, get) => ({
     ...initialState,
     updateUserName: async (name) => {
-        const response = await fetch(new URL("/api/updateName"), {
+        const response = await fetch("/api/updateName", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -42,7 +42,7 @@ export const useStore = create<UserState & Actions>((set, get) => ({
         set({name: nameResponse});
     },
     incrementScore: async (pointAmount) => {
-        const response = await fetch(new URL("/api/score"), {
+        const response = await fetch("/api/score", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -56,7 +56,7 @@ export const useStore = create<UserState & Actions>((set, get) => ({
         set({totalScore: score});
     },
     removeCheat: async () => {
-        const response = await fetch(new URL("/api/cheat"), {
+        const response = await fetch("/api/cheat", {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'
@@ -71,7 +71,7 @@ export const useStore = create<UserState & Actions>((set, get) => ({
     resetScore: async () => {
         let response; 
         try {
-            response = await fetch(new URL("/api/resetScore"), {
+            response = await fetch("/api/resetScore", {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
@@ -91,7 +91,7 @@ export const useStore = create<UserState & Actions>((set, get) => ({
     deleteAccount: async () => {
         let response; 
         try {
-            response = await fetch(new URL(`/api/delete/${get().id}`), {
+            response = await fetch(`/api/delete/${get().id}`, {
                 method: 'DELETE',
             });
             if (!response.ok) {
