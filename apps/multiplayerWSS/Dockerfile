@@ -4,7 +4,7 @@ WORKDIR /app
 
 COPY package.json .
 COPY bun.lockb .
-COPY yarn.lock .
+
 
 RUN bun install --production
 
