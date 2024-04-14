@@ -73,7 +73,8 @@ const app = new Elysia()
   //   return new Response("good token: " + token + " and user id: " + userId);
   // })
 
-  .post("/ai/quiz/gen", async ({ body, cookie: { userToken } } : {body: string; cookie: TCookie}) => {
+  // .post("/ai/quiz/gen", async ({ body, cookie: { userToken } } : {body: string; cookie: TCookie}) => {
+  .post("/ai/quiz/gen", async ({ body,}: { body: string;}) => {
     requestNumber++;
     
     // const allToken: string = userToken.value;
