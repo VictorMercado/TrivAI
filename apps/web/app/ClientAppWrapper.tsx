@@ -49,28 +49,31 @@ export function ClientAppWrapper({
       const randUser = "anon" + randNum.current;
       // Connect to the WebSocket server
       try {
-        socket.current = new WebSocket(
-          `${process.env.WS_URL}?userName=${userName.current || randUser}`,
-          "chat",
-        );
+        if(process.env.WS_URL === undefined) {
+          console.log("No WS_URL found");
+          socket.current = new WebSocket(
+            `spotted-fall-production.up.railway.app?userName=${userName.current || randUser}`,
+            "chat",
+          );
+
+          socket.current.onopen = () => {
+            console.log("WebSocket Client Connected");
+            const msg: Message = {
+              action: "new user",
+              type: "subscribe",
+              topic: "chat",
+              user: {
+                userName: userName.current || randUser,
+                status: "online",
+                id: session?.user?.id || randUser,
+              },
+            };
+            socket.current?.send(JSON.stringify(msg));
+          };
+        }
       } catch (e) {
         console.log(e);
-        socket.current = new WebSocket(`${process.env.WS_URL}`, "chat");
       }
-      socket.current.onopen = () => {
-        console.log("WebSocket Client Connected");
-        const msg: Message = {
-          action: "new user",
-          type: "subscribe",
-          topic: "chat",
-          user: {
-            userName: userName.current || randUser,
-            status: "online",
-            id: session?.user?.id || randUser,
-          },
-        };
-        socket.current?.send(JSON.stringify(msg));
-      };
     }
     document.documentElement.style.setProperty("--color-primary", color);
     return () => {

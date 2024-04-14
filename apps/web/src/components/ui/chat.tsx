@@ -46,84 +46,89 @@ const Chat: React.FC = () => {
     const randUser = "anon" + randNum.current;
     // Connect to the WebSocket server
     try {
-      socket.current = new WebSocket(
-        `${process.env.WS_URL}?userName=${userName.current || randUser}`,
-        "chat",
-      ); // Replace with your server's address
+      if (process.env.WS_URL === undefined) {
+        console.log("No WS_URL found");
+        socket.current = new WebSocket(
+          `spotted-fall-production.up.railway.app?userName=${userName.current || randUser}`,
+          "chat",
+        );
+        // Connection opened -> Subscribe
+        socket.current.onopen = () => {
+          setUsers([]);
+          setMessages([]);
+          console.log("WebSocket Client Connected");
+          const msg: Message = {
+            action: "new user",
+            type: "subscribe",
+            topic: "chat",
+            user: {
+              userName: userName.current || randUser,
+              status: "online",
+              id: session?.user?.id || randUser,
+            },
+          };
+          socket.current?.send(JSON.stringify(msg));
+        };
+        // event handler for reconnecting
+        // Handle incoming messages
+        socket.current.onmessage = (event: MessageEvent) => {
+          console.log("");
+          const newChatServerMessageJson = event.data;
+          let chatServerMessage = JSON.parse(newChatServerMessageJson);
+          const action: Action = chatServerMessage.action;
+          if (action === "new user") {
+            const newUser = chatServerMessage.data;
+            setUsers((prevUsers) => [...newUser]);
+          } else if (action === "reconnect") {
+            const userArray = chatServerMessage.data;
+            const newUser = userArray[0];
+            setUsers((prevUsers) =>
+              prevUsers.map((user) => {
+                if (user.userName === newUser.userName) {
+                  return {
+                    ...user,
+                    status: "online",
+                  };
+                }
+                return user;
+              }),
+            );
+          } else if (action === "remove user") {
+            alert("remove user");
+            const userArray = chatServerMessage.data;
+            const removedUser = userArray[0];
+            setUsers((prevUsers) => userArray);
+          } else if (action === "new message") {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              ...chatServerMessage.data,
+            ]);
+            setScrollBottom(true);
+          } else if (action === "offline user") {
+            const userArray = chatServerMessage.data;
+            const offlineUser = userArray[0];
+            setUsers((prevUsers) =>
+              prevUsers.map((user) => {
+                if (user.userName === offlineUser.userName) {
+                  return {
+                    ...user,
+                    status: "offline",
+                  };
+                }
+                return user;
+              }),
+            );
+          }
+        };
+      }
+      // Replace with your server's address
       // socket.current.
     } catch (e) {
       console.log(e);
       socket.current = new WebSocket(`${process.env.WS_URL}`, "chat"); // Replace with your server's address
     }
 
-    // Connection opened -> Subscribe
-    socket.current.onopen = () => {
-      setUsers([]);
-      setMessages([]);
-      console.log("WebSocket Client Connected");
-      const msg: Message = {
-        action: "new user",
-        type: "subscribe",
-        topic: "chat",
-        user: {
-          userName: userName.current || randUser,
-          status: "online",
-          id: session?.user?.id || randUser,
-        },
-      };
-      socket.current?.send(JSON.stringify(msg));
-    };
-    // event handler for reconnecting
-    // Handle incoming messages
-    socket.current.onmessage = (event: MessageEvent) => {
-      console.log("");
-      const newChatServerMessageJson = event.data;
-      let chatServerMessage = JSON.parse(newChatServerMessageJson);
-      const action: Action = chatServerMessage.action;
-      if (action === "new user") {
-        const newUser = chatServerMessage.data;
-        setUsers((prevUsers) => [...newUser]);
-      } else if (action === "reconnect") {
-        const userArray = chatServerMessage.data;
-        const newUser = userArray[0];
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => {
-            if (user.userName === newUser.userName) {
-              return {
-                ...user,
-                status: "online",
-              };
-            }
-            return user;
-          }),
-        );
-      } else if (action === "remove user") {
-        alert("remove user");
-        const userArray = chatServerMessage.data;
-        const removedUser = userArray[0];
-        setUsers((prevUsers) => userArray);
-      } else if (action === "new message") {
-        setMessages((prevMessages) => [
-          ...prevMessages,
-          ...chatServerMessage.data,
-        ]);
-        setScrollBottom(true);
-      } else if (action === "offline user") {
-        const userArray = chatServerMessage.data;
-        const offlineUser = userArray[0];
-        setUsers((prevUsers) =>
-          prevUsers.map((user) => {
-            if (user.userName === offlineUser.userName) {
-              return {
-                ...user,
-                status: "offline",
-              };
-            }
-            return user;
-          }),
-        );
-      }
-    };
+
     // socket.current.onclose = (event: CloseEvent): any => {
     //   alert("Socket closed unexpectedly");
     //   console.log(
