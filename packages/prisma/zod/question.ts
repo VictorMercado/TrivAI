@@ -7,6 +7,7 @@ export const QuestionModel = z.object({
   answer1: z.string(),
   answer2: z.string(),
   answer3: z.string(),
+  answer4: z.string(),
   correctAnswer: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),

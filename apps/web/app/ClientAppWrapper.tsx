@@ -1,9 +1,8 @@
 "use client";
 
-import { SessionProvider, useSession } from "next-auth/react";
+import { SessionProvider } from "@trivai/auth/react";
 import StoreInitializer from "@src/components/StoreInitializer";
-
-import { UserState } from "@/src/store";
+import { UserState } from "@trivai/lib/server/queries/user";
 import { useEffect, useRef } from "react";
 import { useLocalStorage } from "@src/hooks/useLocalStorage";
 
@@ -51,12 +50,12 @@ export function ClientAppWrapper({
       // Connect to the WebSocket server
       try {
         socket.current = new WebSocket(
-          `ws://localhost:3005/chat?userName=${userName.current || randUser}`,
+          `${process.env.WS_URL}?userName=${userName.current || randUser}`,
           "chat",
         );
       } catch (e) {
         console.log(e);
-        socket.current = new WebSocket("ws:////localhost:3005", "chat");
+        socket.current = new WebSocket(`${process.env.WS_URL}`, "chat");
       }
       socket.current.onopen = () => {
         console.log("WebSocket Client Connected");

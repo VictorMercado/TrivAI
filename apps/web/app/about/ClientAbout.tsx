@@ -2,6 +2,8 @@
 import { useStore } from "@src/store";
 import { useState } from "react";
 import { Button } from "@ui/button";
+import { Input } from "@ui/input";
+import { Textarea } from "@ui/textarea";
 
 async function sendForm(obj : any) {
   let response : Response | undefined;
@@ -61,10 +63,10 @@ export default function ClientAbout() {
             `}
           onSubmit={submitForm}
         >
-          <label className="flex flex-col items-center justify-between lg:flex-row">
+          <label className="flex flex-col items-center justify-between gap-x-4 lg:flex-row">
             <span className="">Name:</span>
-            <input
-              className="peer ml-4 border border-primary bg-background p-2 caret-primary"
+            <Input
+              className="min-w-[200px] max-w-60"
               type="text"
               name="name"
               disabled={false}
@@ -72,10 +74,10 @@ export default function ClientAbout() {
               required
             />
           </label>
-          <label className="flex flex-col items-center justify-between lg:flex-row">
+          <label className="flex flex-col items-center justify-between gap-x-4 lg:flex-row">
             <span>Email:</span>
-            <input
-              className="ml-4 resize border border-primary bg-background p-2 caret-primary"
+            <Input
+              className="min-w-[200px] max-w-60"
               type="email"
               name="email"
               disabled={false}
@@ -83,10 +85,10 @@ export default function ClientAbout() {
               required
             />
           </label>
-          <label className="flex flex-col items-center justify-between lg:flex-row">
+          <label className="flex flex-col items-center justify-between gap-x-2 lg:flex-row">
             <span>Message:</span>
-            <textarea
-              className="ml-4 max-h-32 min-h-[150px] min-w-[200px] max-w-lg resize border border-primary bg-background p-2 caret-primary"
+            <Textarea
+              className="max-h-40 min-w-60 max-w-80 resize"
               name="message"
               disabled={false}
               placeholder="This thing sucks..."

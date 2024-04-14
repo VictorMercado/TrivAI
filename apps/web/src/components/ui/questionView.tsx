@@ -1,11 +1,173 @@
 "use client";
 import Image from "next/image";
-import React from "react";
-import { QuestionButtons } from "./questionButtons";
-import { NextButton } from "./next-button";
-import { QuestionCorrect } from "./questionCorrect";
-import { QuestionResults } from "./questionResults";
-import { QuestionText } from "./questionText";
+import React, { useLayoutEffect } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Button } from "@ui/button";
+import { cn } from "@src/utils";
+
+export type ReturnedAnswer = {
+  correct: boolean;
+  userAnswer: string;
+  correctAnswer: string;
+};
+
+type QuestionButtonsProps = {
+  answers: Array<string> | undefined;
+  handleCheckAnswer: (answer: string) => void;
+};
+
+const QuestionButtons = ({
+  answers,
+  handleCheckAnswer,
+}: QuestionButtonsProps) => {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (ref?.current) {
+      ref.current?.focus();
+    }
+  });
+  return (
+    <div className="my-10 grid grid-cols-2 gap-4 md:gap-8">
+      {answers?.map((answer, index) => {
+        return (
+          <Button
+            key={index}
+            variant="default"
+            size="default"
+            ref={index === 0 ? ref : null}
+            className="py-4"
+            onClick={() => handleCheckAnswer(answer)}
+          >
+            <b>{answer}</b>
+          </Button>
+        );
+      })}
+    </div>
+  );
+};
+
+type QuestionResultsProps = {
+  answers: Array<string> | undefined;
+  returnedAnswer: ReturnedAnswer;
+};
+
+const QuestionResults = ({ answers, returnedAnswer }: QuestionResultsProps) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const isUserAnswerCorrect =
+    returnedAnswer?.correct &&
+    returnedAnswer.correctAnswer == returnedAnswer.userAnswer;
+  useEffect(() => {
+    if (scrollRef?.current) {
+      scrollRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
+  });
+  return (
+    <div className="my-10 grid grid-cols-2 gap-4 text-center text-xl md:gap-8">
+      {answers?.map((answer, index) => {
+        const isCorrectAnswer = returnedAnswer.correctAnswer === answer;
+        const isCorrectUserAnswer = returnedAnswer.userAnswer === answer;
+        return (
+          <div
+            ref={scrollRef}
+            className={`border border-primary bg-primary/25 py-4 text-primary
+                ${
+                  isCorrectAnswer
+                    ? "!lg:hover:bg-green-500 !border-green-500 !bg-green-500 !text-black"
+                    : ""
+                }
+                ${
+                  !isUserAnswerCorrect && isCorrectUserAnswer
+                    ? "!lg:hover:bg-red-500 !border-red-500 !bg-red-500 !text-black"
+                    : ""
+                }
+                `}
+            key={index}
+          >
+            <b>{answer}</b>
+          </div>
+        );
+      })}
+    </div>
+  );
+};
+
+type QuestionShowCorrectProps = {
+  correct: boolean;
+};
+
+const QuestionShowCorrect = ({ correct }: QuestionShowCorrectProps) => {
+  return (
+    <>
+      {correct ? (
+        <div className="border-4 border-green-500 px-4 py-2">
+          <b className="text-green-500">CORRECT</b>
+        </div>
+      ) : (
+        <div className="border-4 border-red-500 px-4 py-2 font-bold">
+          <b className="text-red-500">INCORRECT</b>
+        </div>
+      )}
+    </>
+  );
+};
+
+type QuestionImageProps = {
+  image: string;
+  width: number;
+  height: number;
+  alt: string;
+  className?: string;
+};
+
+const QuestionImage = ({ image, width, height, alt, className, ...props }: QuestionImageProps) => {
+  return (
+    <Image
+      src={image}
+      width={width}
+      height={height}
+      alt={alt}
+      className={cn(className, "object-cover")}
+      {...props}
+    />
+  );
+};
+
+type QuestionTextProps = {
+  children: React.ReactNode;
+};
+
+const QuestionText = ({ children }: QuestionTextProps) => {
+  return (
+    <h1 className="px-4 text-center text-3xl">
+      <b>{children}</b>
+    </h1>
+  );
+};
+
+type QuestionNextButtonProps = {
+  nextAction: () => void;
+}
+
+const QuestionNextButton = ({ nextAction }: QuestionNextButtonProps) => {
+  const ref = React.useRef<HTMLButtonElement>(null);
+  useLayoutEffect(() => {
+    if (ref?.current) {
+      ref.current?.focus();
+    }
+  });
+  return (
+    <Button
+      variant="special"
+      size="default"
+      className="px-2 py-2 hover:shadow-[0px_0px_15px_.5px_#0ff] focus:shadow-[0px_0px_15px_.5px_#0ff]"
+      onClick={nextAction}
+      ref={ref}
+    >
+      NEXT &#9002;&#9002;
+    </Button>
+  );
+};
 
 export type Question = {
   id: string;
@@ -17,30 +179,9 @@ export type Question = {
 };
 
 type QuestionViewProps = {
-  imageWidth?: number;
-  imageHeight?: number;
-  /**
-   * @description image is needed for the user to guess
-   **/
-  image: string;
-  /**
-   * @description is optional because it will appear when the user has answered the question and is ready to move on
-   **/
-  next?: React.ReactNode;
-  /**
-   * @description conditionally render a component to either display the answer options or the results
-   **/
-  buttonsOrResults: React.ReactNode;
-  /**
-   * @description component to display correct/incorrect state
-   **/
-  correct?: React.ReactNode;
-
-  /**
-   * @param text - component only accepts strings
-   * @description component to display text
-   */
-  text?: React.ReactNode;
+  children: React.ReactNode;
+  className?: string;
+  ref?: React.RefObject<HTMLDivElement>;
 };
 
 // Implement 3 different views:
@@ -48,41 +189,24 @@ type QuestionViewProps = {
 // For Answering Question: normal view to select answer
 // For Question Answered: show correct/incorrect answer and next button
 const QuestionView = ({
-  imageWidth = 1500,
-  imageHeight = 1500,
-  image,
-  buttonsOrResults,
-  next,
-  correct,
-  text,
+  children,
+  className,
+  ref,
+  ...props
 }: QuestionViewProps) => {
   return (
-    <div className="flex flex-col gap-y-4">
-      <Image
-        src={image}
-        alt={"AI generated image to guess"}
-        width={imageWidth}
-        height={imageHeight}
-      />
-      <div className="grid grid-cols-1">
-        {text}
-        <div className="z-10 flex justify-between ">
-          <div className="flex items-center">{correct}</div>
-          <div className="flex items-center">{next}</div>
-        </div>
-      </div>
-      {buttonsOrResults}
+    <div className={cn(className, "flex flex-col gap-y-4")} ref={ref} {...props}>
+      {children}
     </div>
   );
 };
-QuestionView.Buttons = QuestionButtons;
 
-QuestionView.NextButton = NextButton;
-
-QuestionView.Correct = QuestionCorrect;
-
-QuestionView.Results = QuestionResults;
-
-QuestionView.Text = QuestionText;
-
-export { QuestionView };
+export { 
+  QuestionView, 
+  QuestionButtons,
+  QuestionResults,
+  QuestionShowCorrect,
+  QuestionImage,
+  QuestionText,
+  QuestionNextButton,
+ };

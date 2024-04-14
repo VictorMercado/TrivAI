@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteQuiz, RelatedQuizModel, CompleteKeywordPrompt, RelatedKeywordPromptModel, CompleteCategory, RelatedCategoryModel } from "./index"
+import { CompleteQuiz, RelatedQuizModel, CompleteUser, RelatedUserModel, CompleteAllegiance, RelatedAllegianceModel, CompleteTheme, RelatedThemeModel, CompleteCategory, RelatedCategoryModel } from "./index"
 
 export const QuizCategoryModel = z.object({
   id: z.number().int(),
@@ -7,15 +7,17 @@ export const QuizCategoryModel = z.object({
   sdPrompt: z.string(),
   createdAt: z.date(),
   updatedAt: z.date(),
-  isActive: z.boolean(),
-  image: z.string().nullish(),
-  keywordPromptId: z.number().int().nullish(),
+  userId: z.string().nullish(),
+  allegianceId: z.string().nullish(),
+  themeId: z.number().int().nullish(),
   categoryId: z.number().int(),
 })
 
 export interface CompleteQuizCategory extends z.infer<typeof QuizCategoryModel> {
   quizzes: CompleteQuiz[]
-  keywordPrompt?: CompleteKeywordPrompt | null
+  user?: CompleteUser | null
+  allegiance?: CompleteAllegiance | null
+  theme?: CompleteTheme | null
   category: CompleteCategory
 }
 
@@ -26,6 +28,8 @@ export interface CompleteQuizCategory extends z.infer<typeof QuizCategoryModel> 
  */
 export const RelatedQuizCategoryModel: z.ZodSchema<CompleteQuizCategory> = z.lazy(() => QuizCategoryModel.extend({
   quizzes: RelatedQuizModel.array(),
-  keywordPrompt: RelatedKeywordPromptModel.nullish(),
+  user: RelatedUserModel.nullish(),
+  allegiance: RelatedAllegianceModel.nullish(),
+  theme: RelatedThemeModel.nullish(),
   category: RelatedCategoryModel,
 }))

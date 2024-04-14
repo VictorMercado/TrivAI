@@ -49,299 +49,155 @@ async function loadUsers(data) {
   }
 }
 
-// CARS
-// POKEMON
-// GENERAL
-// SPORTS
-// HISTORY
-// GEOGRAPHY
-// ENTERTAINMENT
-// SCIENCE
-// ART
-// MUSIC
-// FILMS
-// LITERATURE
-// MATHS
-// TECHNOLOGY
-// ANIMALS
-// VEHICLES
-// FOOD
-// NATURE
-// TRAVEL
-// POLITICS
-// CELEBRITIES
-// COMICS
-// GAMES
-// ANIME
-// CARTOONS
 
-function createCategories() {
-  let categories = [];
-  const categoryNames = ["FILMS", "GEOGRAPHY", "CARS", "GAMES"];
-  for (let i = 0; i < categoryNames.length; i++) {
-    const category = {
-      name: categoryNames[i],
-      createdAt: new Date(),
-    };
-    categories.push(category);
-  }
-  return categories;
-}
+// async function createThemes() {
+//   let themes = [];
+//   let keywords = ["Halloween", "American States", "Super", "Nintendo"];
+//   const categories = await prisma.category.findMany({
+//     select: {
+//       id: true,
+//     },
+//   });
+//   for (let i = 0; i < categories.length; i++) {
+//     const keyword = {
+//       keyword: keywords[i],
+//       categoryId: categories[i].id,
+//     };
+//     keywordPrompts.push(keyword);
+//   }
+//   return keywordPrompts;
+// }
 
-async function loadCategories(data) {
-  await prisma.$queryRaw`ALTER TABLE Category AUTO_INCREMENT = 1`;
-  try {
-    const createdCategories = await prisma.category.createMany({
-      data: data,
-      skipDuplicates: true,
-    });
-    console.log(`Seeded ${createdCategories.count} new categories.`);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+// async function loadKeywords(data) {
+//   await prisma.$queryRaw`ALTER TABLE KeywordPrompt AUTO_INCREMENT = 1`;
+//   try {
+//     const createdKeywords = await prisma.keywordPrompt.createMany({
+//       data: data,
+//       skipDuplicates: true,
+//     });
+//     console.log(`Seeded ${createdKeywords.count} new keyword prompts.`);
+//   } catch (err) {
+//     console.error(err);
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
 
-async function createKeywordPrompts() {
-  let keywordPrompts = [];
-  let keywords = ["Halloween", "American States", "Super", "Nintendo"];
-  const categories = await prisma.category.findMany({
-    select: {
-      id: true,
-    },
-  });
-  for (let i = 0; i < categories.length; i++) {
-    const keyword = {
-      keyword: keywords[i],
-      categoryId: categories[i].id,
-    };
-    keywordPrompts.push(keyword);
-  }
-  return keywordPrompts;
-}
+// let quizCategoryShape = {
+//   basePrompt: "",
+//   sdPrompt: "",
+//   categoryId: 0,
+//   quiz: {
+//     create: [],
+//   },
+// };
+// let quizShape = {};
 
-async function loadKeywords(data) {
-  await prisma.$queryRaw`ALTER TABLE KeywordPrompt AUTO_INCREMENT = 1`;
-  try {
-    const createdKeywords = await prisma.keywordPrompt.createMany({
-      data: data,
-      skipDuplicates: true,
-    });
-    console.log(`Seeded ${createdKeywords.count} new keyword prompts.`);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
+// async function createQuizCategories() {
+//   const quizCategories = [];
 
-let quizCategoryShape = {
-  basePrompt: "",
-  sdPrompt: "",
-  categoryId: 0,
-  quiz: {
-    create: [],
-  },
-};
-let quizShape = {};
+//   const categories = await prisma.category.findMany({
+//     select: {
+//       id: true,
+//       name: true,
+//     },
+//   });
+//   const keywords = await prisma.keywordPrompt.findMany({
+//     select: {
+//       id: true,
+//       categoryId: true,
+//     },
+//   });
+//   // TODO:: create an intersection of the two arrays to match the correct category id with
+//   for (let i = 0; i < categories.length; i++) {
+//     const quizCategory = {
+//       basePrompt: `70 _ ${categories[i].name.toLowerCase()}`,
+//       sdPrompt: `an image of ${categories[i].name.toLowerCase()}`,
+//       categoryId: keywords[i].id,
+//       keywordPromptId: keywords[i].id,
+//     };
 
-async function createQuizCategories() {
-  const quizCategories = [];
+//     quizCategories.push(quizCategory);
+//   }
 
-  const categories = await prisma.category.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-  });
-  const keywords = await prisma.keywordPrompt.findMany({
-    select: {
-      id: true,
-      categoryId: true,
-    },
-  });
-  // TODO:: create an intersection of the two arrays to match the correct category id with
-  for (let i = 0; i < categories.length; i++) {
-    const quizCategory = {
-      basePrompt: `70 _ ${categories[i].name.toLowerCase()}`,
-      sdPrompt: `an image of ${categories[i].name.toLowerCase()}`,
-      categoryId: keywords[i].id,
-      keywordPromptId: keywords[i].id,
-    };
+//   return quizCategories;
+// }
 
-    quizCategories.push(quizCategory);
-  }
+// async function loadQuizCategories(data) {
+//   await prisma.$queryRaw`ALTER TABLE QuizCategory AUTO_INCREMENT = 1`;
+//   try {
+//     const createdCategories = await prisma.quizCategory.createMany({
+//       data: data,
+//       skipDuplicates: true,
+//     });
+//     console.log(`Seeded ${createdCategories.count} new quiz categories.`);
+//   } catch (err) {
+//     console.error(err);
+//   } finally {
+//     await prisma.$disconnect();
+//   }
+// }
 
-  return quizCategories;
-}
-
-async function loadQuizCategories(data) {
-  await prisma.$queryRaw`ALTER TABLE QuizCategory AUTO_INCREMENT = 1`;
-  try {
-    const createdCategories = await prisma.quizCategory.createMany({
-      data: data,
-      skipDuplicates: true,
-    });
-    console.log(`Seeded ${createdCategories.count} new quiz categories.`);
-  } catch (err) {
-    console.error(err);
-  } finally {
-    await prisma.$disconnect();
-  }
-}
-
-async function createYearMonthWeekDays() {
-  await prisma.$queryRaw`ALTER TABLE Year AUTO_INCREMENT = 1`;
-  const year = await prisma.year.create({
-    data: {
-      year: 2023,
-    },
-  });
-  await prisma.$queryRaw`ALTER TABLE Month AUTO_INCREMENT = 1`;
-  let months = await prisma.month.createMany({
-    data: [
-      {
-        month: 1,
-        yearId: year.id,
-      },
-      {
-        month: 2,
-        yearId: year.id,
-      },
-      {
-        month: 3,
-        yearId: year.id,
-      },
-    ],
-  });
-  months = await prisma.month.findMany();
-  await prisma.$queryRaw`ALTER TABLE Week AUTO_INCREMENT = 1`;
-  let weeks = await prisma.week.createMany({
-    data: [
-      {
-        week: 1,
-        monthId: months[0].id,
-      },
-      {
-        week: 2,
-        monthId: months[0].id,
-      },
-      {
-        week: 3,
-        monthId: months[0].id,
-      },
-      {
-        week: 4,
-        monthId: months[0].id,
-      },
-      {
-        week: 1,
-        monthId: months[1].id,
-      },
-      {
-        week: 2,
-        monthId: months[1].id,
-      },
-      {
-        week: 3,
-        monthId: months[1].id,
-      },
-      {
-        week: 4,
-        monthId: months[1].id,
-      },
-      {
-        week: 1,
-        monthId: months[2].id,
-      },
-      {
-        week: 2,
-        monthId: months[2].id,
-      },
-      {
-        week: 3,
-        monthId: months[2].id,
-      },
-      {
-        week: 4,
-        monthId: months[2].id,
-      },
-    ],
-  });
-  weeks = await prisma.week.findMany();
-  await prisma.$queryRaw`ALTER TABLE Day AUTO_INCREMENT = 1`;
-  for (const week of weeks) {
-    for (let i = 0; i < 7; i++) {
-      await prisma.day.create({
-        data: {
-          day: i + 1,
-          weekId: week.id,
-        },
-      });
-    }
-  }
-}
 
 // and create QUIZ here too
-async function createQuiz() {
-  let allQuestions = [];
-  let quizQuestions = [];
-  await prisma.quiz.deleteMany();
-  await prisma.$queryRaw`ALTER TABLE Quiz AUTO_INCREMENT = 1`;
+// async function createQuiz() {
+//   let allQuestions = [];
+//   let quizQuestions = [];
+//   await prisma.quiz.deleteMany();
+//   await prisma.$queryRaw`ALTER TABLE Quiz AUTO_INCREMENT = 1`;
 
-  const quizCategories = await prisma.quizCategory.findMany();
-  const days = await prisma.day.findMany();
+//   const quizCategories = await prisma.quizCategory.findMany();
+//   const days = await prisma.day.findMany();
 
-  for (const day of days) {
-    for (const quizCategory of quizCategories) {
-      const quiz = await prisma.quiz.create({
-        data: {
-          dateDue: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
-          // quizCategoryId: quizCategory.id,
-          quizCategory: {
-            connect: {
-              id: quizCategory.id,
-            },
-          },
-          day: {
-            connect: {
-              id: day.id,
-            },
-          },
-        },
-        select: {
-          id: true,
-          quizCategoryId: true,
-        },
-      });
-      console.log(quiz);
-      for (let i = 0; i < 10; i++) {
-        quizQuestions.push({
-          isUsed: false,
-          answer1: "answer 1",
-          answer2: "answer 2",
-          answer3: "answer 3",
-          correctAnswer: "correct Answer",
-          image:
-            "https://storage.googleapis.com/trivai-images/5-19-2023/ANIMALS/grid-0040.png",
-        });
-      }
-      await prisma.quiz.update({
-        where: {
-          id: quiz.id,
-        },
-        data: {
-          questions: {
-            create: quizQuestions,
-          },
-        },
-      });
-      quizQuestions.splice(0, quizQuestions.length);
-    }
-  }
-  return allQuestions;
-}
+//   for (const day of days) {
+//     for (const quizCategory of quizCategories) {
+//       const quiz = await prisma.quiz.create({
+//         data: {
+//           dateDue: new Date(new Date().setUTCHours(0, 0, 0, 0)).toISOString(),
+//           // quizCategoryId: quizCategory.id,
+//           quizCategory: {
+//             connect: {
+//               id: quizCategory.id,
+//             },
+//           },
+//           day: {
+//             connect: {
+//               id: day.id,
+//             },
+//           },
+//         },
+//         select: {
+//           id: true,
+//           quizCategoryId: true,
+//         },
+//       });
+//       console.log(quiz);
+//       for (let i = 0; i < 10; i++) {
+//         quizQuestions.push({
+//           isUsed: false,
+//           answer1: "answer 1",
+//           answer2: "answer 2",
+//           answer3: "answer 3",
+//           correctAnswer: "correct Answer",
+//           image:
+//             "https://storage.googleapis.com/trivai-images/5-19-2023/ANIMALS/grid-0040.png",
+//         });
+//       }
+//       await prisma.quiz.update({
+//         where: {
+//           id: quiz.id,
+//         },
+//         data: {
+//           questions: {
+//             create: quizQuestions,
+//           },
+//         },
+//       });
+//       quizQuestions.splice(0, quizQuestions.length);
+//     }
+//   }
+//   return allQuestions;
+// }
 
 // async function loadQuestions(data) {
 //   try {
@@ -382,8 +238,6 @@ async function dumpJSON() {
 }
 
 async function main() {
-  const deleteYears = await prisma.year.deleteMany();
-  console.log(`Deleted ${deleteYears.count} years.`);
   // Call the function to generate the user data
   const deletedQuestions = await prisma.question.deleteMany();
   console.log(`Deleted ${deletedQuestions.count} old questions.`);
@@ -391,9 +245,6 @@ async function main() {
   console.log(`Deleted ${deletedQuizzes.count} old quizzes.`);
   const deletedQuizCategories = await prisma.quizCategory.deleteMany();
   console.log(`Deleted ${deletedQuizCategories.count} old quiz categories.`);
-
-  const deletedKeywords = await prisma.keywordPrompt.deleteMany();
-  console.log(`Deleted ${deletedKeywords.count} old keyword prompts.`);
 
   const deletedCategories = await prisma.category.deleteMany();
   console.log(`Deleted ${deletedCategories.count} old categories.`);
@@ -406,21 +257,35 @@ async function main() {
     },
   });
   console.log(`Deleted ${deletedUsers.count} old users.`);
+  try {
+    await prisma.user.create({
+      data: {
+        id: "0000000000",
+        name: "GalacticNet",
+        userName: "GalacticNet",
+        image: "https://storage.googleapis.com/trivai-images/aioverlord.svg",
+        role: "ADMIN",
+        totalScore: 999999,
+        credits: 999999,
+      },
+    });
+  } catch (err) {
+    console.error(err);
+  }
 
   const seedUserData = createUsers();
   await loadUsers(seedUserData);
 
-  const categories = createCategories();
-  await loadCategories(categories);
+  // const categories = createCategories();
+  // await loadCategories(categories);
 
-  const keywords = await createKeywordPrompts();
-  await loadKeywords(keywords);
-  // Call the function to generate the seed data
-  const seedCategoriesData = await createQuizCategories();
-  await loadQuizCategories(seedCategoriesData);
+  // const keywords = await createKeywordPrompts();
+  // await loadKeywords(keywords);
+  // // Call the function to generate the seed data
+  // const seedCategoriesData = await createQuizCategories();
+  // await loadQuizCategories(seedCategoriesData);
 
-  await createYearMonthWeekDays();
-  await createQuiz();
+  // await createQuiz();
   // loadQuestions(seedQuestionsData);
   // dumpJSON();
 }

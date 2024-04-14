@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 type Message = {
   id: number;
   message: string;
+  type: "success" | "error" | "warning" | "info";
 }
 const MESSAGE_TIMEOUT = 3000;
 
@@ -51,7 +52,15 @@ const Toast = ({message} : {message: Message}) => {
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -100 }}
         transition={{ duration: 0.2 }}
-        className="pointer-events-auto h-fit border border-primary p-4 text-primary bg-background"
+        className={`pointer-events-auto h-fit border bg-background p-4 
+        ${message.type === "success" ? 
+          "text-primary border-primary" : 
+          message.type === "error" ? 
+          " border-red-500 text-red-500" : 
+          message.type === "warning" ? 
+          " border-amber-500 text-amber-500" : 
+          " border-blue-500 text-blue-500"
+        }`}
         onClick={() => {
           removeToast(message.id);
         }}

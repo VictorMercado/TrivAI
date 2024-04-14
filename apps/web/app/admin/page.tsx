@@ -1,4 +1,4 @@
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { prisma } from "@trivai/prisma";
 
 async function getLiveQuestions() {

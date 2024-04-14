@@ -1,10 +1,9 @@
-import { authOptions } from "@/src/auth";
 import { prisma } from "@trivai/prisma";
 import { Session } from "next-auth";
-import { getServerSession } from "next-auth/next";
+import { getSession } from "@trivai/auth/lib/getSession";
 
 export async function POST(request: Request) {
-  const session: Session | null = await getServerSession(authOptions);
+  const session: Session | null = await getSession();
   if (!session) {
     return new Response(JSON.stringify({ message: "Forbidden" }), { status: 403 });
   }

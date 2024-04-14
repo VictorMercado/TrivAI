@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteItemUser, RelatedItemUserModel } from "./index"
+import { CompleteUserItem, RelatedUserItemModel } from "./index"
 
 // Helper schema for JSON fields
 type Literal = boolean | number | string
@@ -19,7 +19,7 @@ export const ItemModel = z.object({
 })
 
 export interface CompleteItem extends z.infer<typeof ItemModel> {
-  users: CompleteItemUser[]
+  users: CompleteUserItem[]
 }
 
 /**
@@ -28,5 +28,5 @@ export interface CompleteItem extends z.infer<typeof ItemModel> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedItemModel: z.ZodSchema<CompleteItem> = z.lazy(() => ItemModel.extend({
-  users: RelatedItemUserModel.array(),
+  users: RelatedUserItemModel.array(),
 }))

@@ -1,10 +1,4 @@
-'use client';
+"use client";
+import { ErrorPage } from "@components/ErrorPage";
 
-export default function Error() {
-    return(
-        <div>
-            <h1>Error</h1>
-            <p>This is the error page</p>
-        </div>
-    );
-}
+export default ErrorPage;

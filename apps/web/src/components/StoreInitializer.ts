@@ -1,7 +1,7 @@
 "use client";
 import { useRef } from "react";
 import { useStore } from "../store"; 
-import type { UserState } from "../store";
+import { UserState } from "@trivai/lib/server/queries/user";
 
 
 export default function StoreInitializer({user} : {user: undefined | UserState }) {

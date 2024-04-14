@@ -8,7 +8,7 @@ export const AllegianceQuizModel = z.object({
   updatedAt: z.date(),
   assignedTo: z.number().int().nullish(),
   quizId: z.number().int(),
-  allegianceId: z.number().int(),
+  allegianceId: z.string(),
   categoryId: z.number().int(),
 })
 

@@ -1,13 +1,12 @@
-import { authOptions } from "@/src/auth";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { prisma } from "@trivai/prisma";
-import { parse } from "url";
+import { getSessionWithReqRes } from "@trivai/auth/lib/getSessionWithReqRes";
+import { CREDITSPERQUESTION } from "@/src/config/constants";
 
 // this route is only accessible by admin users
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session: Session | null = await getServerSession(req, res, authOptions);
+  const session: Session | null = await getSessionWithReqRes(req, res);
   if (session) {
     if (req.method == 'PUT') {
       let { quizId, questionId, userId, answer, completed } = JSON.parse(req.body);
@@ -15,6 +14,11 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       let user = await prisma.user.findFirst({
         where: {
           id: userId
+        }, 
+        select: {
+          id: true,
+          totalScore: true,
+          creditsMultiplier: true,
         }
       });
       let question = await prisma.question.findUnique({
@@ -25,6 +29,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           correctAnswer: true,
         }
       });
+      let quiz = await prisma.quiz.findUnique({
+        where: {
+          id: parseInt(quizId)
+        }
+      });
+      if (!quiz) {
+        res.status(404).json({ message: "Quiz Not Found" });
+        return;
+      }
       if (question && user) {
         // findFirst returns undefined if no record is found
         const isAnswered = await prisma.userAnswer.findFirst({
@@ -40,7 +53,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         }
 
         if (question.correctAnswer === answer) {
-          await prisma.userAnswerQuiz.upsert({
+          await prisma.userAnsweredQuiz.upsert({
             where: {
               // this is a unique field in schema
               quizId_userId: {
@@ -75,11 +88,24 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               }
             }
           });
+          await prisma.user.update({
+            where: {
+              id: userId
+            },
+            data: {
+              totalScore: {
+                increment: quiz?.scoreAmt
+              },
+              credits: {
+                increment: CREDITSPERQUESTION * user.creditsMultiplier
+              }
+            }
+          });
           res.status(200).json({ correct: true, correctAnswer: question.correctAnswer, answer: answer });
           return;
         }
         else {
-          await prisma.userAnswerQuiz.upsert({
+          await prisma.userAnsweredQuiz.upsert({
             where: {
               quizId_userId: {
                 userId: userId,

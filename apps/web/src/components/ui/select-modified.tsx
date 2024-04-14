@@ -17,15 +17,16 @@ type SelectModifiedProps = {
   options: string[];
   label: string;
   onChange: (value: string) => void;
+  onSubmit: (value: string) => void;
 };
 
-const SelectModified = ( {label, options, onChange} : SelectModifiedProps ) => {
-
+const SelectModified = ( {label, options, onChange, onSubmit} : SelectModifiedProps ) => {
+  const [input, setInput] = useState("");
 
   return (
     <div className="mx-auto w-full max-w-md">
       <Select onValueChange={(value) => onChange(value)}>
-        <SelectTrigger className="w-full rounded-none bg-primary/25">
+        <SelectTrigger className="w-full rounded-none bg-primary/25 ">
           <SelectValue placeholder={label} />
         </SelectTrigger>
         <SelectContent className="rounded-none border">
@@ -40,17 +41,21 @@ const SelectModified = ( {label, options, onChange} : SelectModifiedProps ) => {
             })}
           </SelectGroup>
           <SelectSeparator />
-          <SelectGroup>
-            <div className="flex items-center space-x-2 p-2">
-              <Input
-                className="group flex-1 rounded-none dark:focus-visible:ring-primary"
-                placeholder="Enter new option"
-              />
-              <Button size="default" variant="default">
-                Add Option
-              </Button>
-            </div>
-          </SelectGroup>
+          <div className="flex items-center space-x-2 p-2">
+            <Input
+              className="group flex-1 rounded-none dark:focus-visible:ring-primary"
+              placeholder="Enter new option"
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+            />
+            <Button
+              size="default"
+              variant="default"
+              onClick={() => onSubmit(input)}
+            >
+              Add Option
+            </Button>
+          </div>
         </SelectContent>
       </Select>
     </div>

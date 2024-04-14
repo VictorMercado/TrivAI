@@ -1,0 +1,21 @@
+{
+  "extends": "@trivai/tsconfig/react-library.json",
+  "include": [
+    "client",
+    "next",
+    "react",
+    "server",
+    "../../packages/types/*.d.ts",
+    "../../packages/types/next-auth.d.ts",
+  ],
+  "compilerOptions": {
+    "paths": {
+      "@t/*" : [
+        "./*"
+      ],
+      "@tserver/*": [
+        "./server/*"
+      ],
+    },
+  }
+}

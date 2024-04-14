@@ -4,33 +4,41 @@ import { CheatCode } from "@components/CheatCode";
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { QuestionView } from "@ui/questionView";
 import { getDate } from "@src/utils";
 import { QuizCompleted } from "@components/QuizCompleted";
 import { QuizMetaDataView } from "@ui/quizMetaDataView";
-import { Clock } from "@components/Clock";
 import { useUnmount } from "@/src/hooks/useUnmount";
+import type { TQuestionView } from "@trivai/lib/server/queries/quiz";
+import { 
+  QuestionView, 
+  QuestionButtons, 
+  QuestionResults,
+  QuestionImage,
+  QuestionText,
+  QuestionShowCorrect,
+  QuestionNextButton,
+  type ReturnedAnswer,
+} from "@ui/questionView";
+import { useToast } from "@ui/toast";
+import { shuffle } from "@src/utils";
 // import QuestionOptions from '@/app/components/QuestionOptions';
 
-export type ReturnedAnswer = {
-  correct: boolean;
-  userAnswer: string;
-  correctAnswer: string;
-};
+
 
 const QuizController = ({
   quizId,
   activeQuestions,
 }: {
   quizId: number | undefined;
-  activeQuestions: any;
+  activeQuestions: Array<TQuestionView>;
 }) => {
-  console.log(getDate());
+  // console.log(getDate());
   let router = useRouter();
+  let { addToast } = useToast();
   const { data: session } = useSession();
   const userId = session?.user.id;
-  const { totalScore, incrementScore, cheatUsed } = useStore((state) => state);
-  const [questions, setQuestions] = useState<any[]>(activeQuestions);
+  const { totalScore, cheatUsed } = useStore((state) => state);
+  const [questions, setQuestions] = useState<Array<TQuestionView>>(activeQuestions);
   let question = questions[0] || null;
   const questionId = question?.id;
   const answers = [
@@ -64,7 +72,11 @@ const QuizController = ({
     if (res?.status === 200) {
       const data: ReturnedAnswer = await res.json();
       if (data.correct) {
-        incrementScore(3);
+        addToast({
+          id: Math.random(),
+          message: "Credits added!",
+          type: "success",
+        });
       }
       setReturnedAnswer({
         correct: data.correct,
@@ -101,47 +113,55 @@ const QuizController = ({
   return (
     <>
       {!cheatUsed ? <CheatCode /> : ""}
-      <div className="container flex flex-col items-center justify-center">
-        <Clock text="sdf" />
-        <QuizMetaDataView
-          totalScore={totalScore}
-          questionsLength={questions.length}
-        />
-        {question ? (
-          <QuestionView
-            image={question.image}
-            text={<QuestionView.Text text="Can you guess the image⁉️" />}
-            correct={
-              hasAnswered && returnedAnswer ? (
-                <QuestionView.Correct correct={returnedAnswer.correct} />
-              ) : null
-            }
-            next={
-              hasAnswered &&
-              userId && (
-                <QuestionView.NextButton nextAction={handleQuestionsSlice} />
-              )
-            }
-            buttonsOrResults={
-              hasAnswered && returnedAnswer ? (
-                <QuestionView.Results
+      {question ? (
+        <div className="container flex grow flex-col items-center justify-center p-4">
+          <QuizMetaDataView
+            totalScore={totalScore}
+            questionsLength={questions.length}
+            className="text-sm "
+          />
+          <QuestionView className="h-3/4">
+            {question.image && (
+              <QuestionImage
+                image={question.image}
+                width={1500}
+                height={1500}
+                alt={"Question image"}
+              />
+            )}
+            <div className="flex h-1/2 flex-col items-center justify-center">
+              <QuestionText>{question.text}</QuestionText>
+            </div>
+            <div>
+              <div className="flex w-full justify-between">
+                {hasAnswered && returnedAnswer && (
+                  <QuestionShowCorrect correct={returnedAnswer.correct} />
+                )}
+                {hasAnswered && userId && (
+                  <QuestionNextButton nextAction={handleQuestionsSlice} />
+                )}
+              </div>
+              {hasAnswered && returnedAnswer ? (
+                <QuestionResults
                   returnedAnswer={returnedAnswer}
                   answers={answers}
                 />
               ) : (
-                <QuestionView.Buttons
+                <QuestionButtons
                   answers={answers}
                   handleCheckAnswer={
                     userId ? handleCheckAnswer : handleQuestionsSlice
                   }
                 />
-              )
-            }
-          />
-        ) : (
+              )}
+            </div>
+          </QuestionView>
+        </div>
+      ) : (
+        <div className="container flex grow flex-col items-center justify-center p-4">
           <QuizCompleted />
-        )}
-      </div>
+        </div>
+      )}
     </>
   );
 };

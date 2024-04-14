@@ -47,13 +47,13 @@ const Chat: React.FC = () => {
     // Connect to the WebSocket server
     try {
       socket.current = new WebSocket(
-        `ws://localhost:3005/chat?userName=${userName.current || randUser}`,
+        `${process.env.WS_URL}?userName=${userName.current || randUser}`,
         "chat",
       ); // Replace with your server's address
       // socket.current.
     } catch (e) {
       console.log(e);
-      socket.current = new WebSocket("ws://192.168.4.53:3005", "chat"); // Replace with your server's address
+      socket.current = new WebSocket(`${process.env.WS_URL}`, "chat"); // Replace with your server's address
     }
 
     // Connection opened -> Subscribe

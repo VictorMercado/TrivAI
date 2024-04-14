@@ -4,7 +4,6 @@ import { CompleteQuiz, RelatedQuizModel, CompleteUser, RelatedUserModel } from "
 export const LikedQuizModel = z.object({
   id: z.number().int(),
   createdAt: z.date(),
-  updatedAt: z.date(),
   quizId: z.number().int(),
   userId: z.string(),
 })

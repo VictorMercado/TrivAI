@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteQuestion, RelatedQuestionModel, CompleteUser, RelatedUserModel, CompleteUserAnswerQuiz, RelatedUserAnswerQuizModel } from "./index"
+import { CompleteQuestion, RelatedQuestionModel, CompleteUser, RelatedUserModel, CompleteUserAnsweredQuiz, RelatedUserAnsweredQuizModel } from "./index"
 
 export const UserAnswerModel = z.object({
   id: z.string(),
@@ -9,13 +9,13 @@ export const UserAnswerModel = z.object({
   updatedAt: z.date(),
   questionId: z.string(),
   userId: z.string(),
-  userAnswerQuizId: z.string().nullish(),
+  userAnsweredQuizId: z.string().nullish(),
 })
 
 export interface CompleteUserAnswer extends z.infer<typeof UserAnswerModel> {
   question: CompleteQuestion
   user: CompleteUser
-  userAnswerQuiz?: CompleteUserAnswerQuiz | null
+  userAnsweredQuiz?: CompleteUserAnsweredQuiz | null
 }
 
 /**
@@ -26,5 +26,5 @@ export interface CompleteUserAnswer extends z.infer<typeof UserAnswerModel> {
 export const RelatedUserAnswerModel: z.ZodSchema<CompleteUserAnswer> = z.lazy(() => UserAnswerModel.extend({
   question: RelatedQuestionModel,
   user: RelatedUserModel,
-  userAnswerQuiz: RelatedUserAnswerQuizModel.nullish(),
+  userAnsweredQuiz: RelatedUserAnsweredQuizModel.nullish(),
 }))

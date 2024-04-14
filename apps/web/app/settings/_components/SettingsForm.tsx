@@ -1,16 +1,16 @@
 "use client";
 import Image from "next/image"
 import { ColorPicker } from "@components/ColorPicker";
-import { signOut, useSession } from "next-auth/react";
+import { useSession } from "@trivai/auth/react";
 import { PokemonComboBox } from "./PokemonComboBox";
 import { useState } from "react";
 import { Button } from "@ui/button";
-import { useToast } from "@components/ui/toast";
-import type { ProfilePicture } from '../page';
-import { revalidatePath } from "next/cache";
+import { useToast } from "@ui/toast";
 import { useRouter } from "next/navigation";
-import { stringExtractor } from "@/src/utils";
+import { stringExtractor } from "@src/utils";
 import { Save } from "lucide-react";
+import { Input } from "@ui/input";
+import type { ProfilePicture } from "../page";
 
 function rgbToHex(color: string) {
   let r = parseInt(color.split(" ")[0]);
@@ -70,18 +70,18 @@ const SettingsForm = (props : SettingsFormProps) => {
       });
       if (!res.ok) {
         if (res.status === 409) {
-          addToast({ id: Math.floor(Math.random() * 1000), message: "Username already exists" });
+          addToast({ id: Math.floor(Math.random() * 1000), message: "Username already exists", type: "error"});
           return;
         }
-        addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR" });
+        addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR", type: "error"});
         return;
       }
       const data = await res.json();
       // update the users session JWT
       update({ userName: userName, image: userImage.image });
-      addToast({ id: Math.floor(Math.random() * 1000), message: "Success" });
+      addToast({ id: Math.floor(Math.random() * 1000), message: "Success", type: "success"});
     } catch (e) {
-      addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR" });
+      addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR", type: "error"});
       console.error(e);
     }
     // need to refresh the page to see the changes in all routes
@@ -94,7 +94,7 @@ const SettingsForm = (props : SettingsFormProps) => {
         <label className="" htmlFor="userName">
           UserName:{" "}
         </label>
-        <input
+        <Input
           className="border border-primary bg-background p-2 text-center caret-primary"
           type="text"
           name="userName"
@@ -137,7 +137,7 @@ const SettingsForm = (props : SettingsFormProps) => {
             saveSettingsClick();
           }}
         >
-          <Save 
+          <Save
             size={32}
             className="absolute left-24 group-hover:stroke-black"
           />

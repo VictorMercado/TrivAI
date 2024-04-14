@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 
 export default async function Layout({
   children,

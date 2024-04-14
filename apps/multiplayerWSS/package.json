@@ -1,0 +1,23 @@
+{
+  "name": "@trivai/mwss",
+  "module": "index.ts",
+  "type": "module",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.ts",
+  "scripts": {
+    "start": "bun run src/index.ts",
+    "dev": "bun run --watch src/index.ts"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.6",
+    "bun-types": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "figlet": "^1.6.0",
+    "@trivai/auth": "*"
+  }
+}

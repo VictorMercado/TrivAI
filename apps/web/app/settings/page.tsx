@@ -1,8 +1,8 @@
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { prisma } from "@trivai/prisma";
 import { SettingsActions } from "./_components/SettingsActions";
 import { SettingsForm } from "./_components/SettingsForm";
-import { getUserWithProperties } from "@src/db/queries";
+import { getUserWithProperties } from "@trivai/lib/server/queries/user";
 
 async function getProfilePictures() {
   return await prisma.profilePicture.findMany({

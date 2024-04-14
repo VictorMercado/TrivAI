@@ -1,8 +1,8 @@
 import * as z from "zod"
-import { CompleteAllegianceMember, RelatedAllegianceMemberModel, CompleteAllegianceQuiz, RelatedAllegianceQuizModel } from "./index"
+import { CompleteQuizCategory, RelatedQuizCategoryModel, CompleteCategory, RelatedCategoryModel, CompleteAllegianceMember, RelatedAllegianceMemberModel, CompleteAllegianceQuiz, RelatedAllegianceQuizModel } from "./index"
 
 export const AllegianceModel = z.object({
-  id: z.number().int(),
+  id: z.string(),
   leaderId: z.string(),
   name: z.string(),
   image: z.string(),
@@ -12,6 +12,8 @@ export const AllegianceModel = z.object({
 })
 
 export interface CompleteAllegiance extends z.infer<typeof AllegianceModel> {
+  quizCategories: CompleteQuizCategory[]
+  categories: CompleteCategory[]
   members: CompleteAllegianceMember[]
   quizzes: CompleteAllegianceQuiz[]
 }
@@ -22,6 +24,8 @@ export interface CompleteAllegiance extends z.infer<typeof AllegianceModel> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedAllegianceModel: z.ZodSchema<CompleteAllegiance> = z.lazy(() => AllegianceModel.extend({
+  quizCategories: RelatedQuizCategoryModel.array(),
+  categories: RelatedCategoryModel.array(),
   members: RelatedAllegianceMemberModel.array(),
   quizzes: RelatedAllegianceQuizModel.array(),
 }))

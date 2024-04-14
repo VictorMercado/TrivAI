@@ -42,6 +42,30 @@ enum AllegianceRole {
   MEMBER
 }
 
+enum Status {
+  SUCCESS
+  PENDING
+  FAILED
+}
+
+enum FriendStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+}
+
+enum GeneratedStatus {
+  DONE
+  PENDING
+  FAILED
+}
+
+enum QuizAccess {
+  PUBLIC
+  PRIVATE
+  FRIENDS
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -75,9 +99,10 @@ model Session {
 model VerificationToken {
   identifier String
   token      String   @unique
-  expires    DateTime
+  expires    DateTime?
 
   @@unique([identifier, token])
+  @@index([token])
 }
 
 model User {
@@ -87,38 +112,56 @@ model User {
   primaryColor   String?
   secondaryColor String?
   credits        Int       @default(0)
+  creditsMultiplier Float  @default(1)
   email          String?   @unique
   emailVerified  DateTime?
   image          String?
   prize          String?
+  status         String?
   accounts       Account[]
   sessions       Session[]
   role           Role      @default(USER)
 
-  cheatUsed       Boolean              @default(false)
-  cheatUsedAt     DateTime?
-  createdAt       DateTime             @default(now())
-  updatedAt       DateTime?
-  totalScore      Int                  @default(0)
-  categories      Category[]
-  userAnswers     UserAnswer[]
-  userAnswerQuiz  UserAnswerQuiz[]
-  allegiance      AllegianceMember?
-  collection      ItemUser[]
-  profilePictures ProfilePictureUser[]
-  quizzes         Quiz[]
-  likedQuizzes    LikedQuiz[]
-  savedQuizzes    SavedQuiz[]
-  sharedQuizzes   SharedQuiz[]         @relation(name: "owner")
-  assignedQuizzes SharedQuiz[]
-  friends         UserFriend[]         @relation(name: "owner")
-  friendOf        UserFriend[]         @relation(name: "friend")
+  cheatUsed           Boolean              @default(false)
+  cheatUsedAt         DateTime?
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime?
+  totalScore          Int                  @default(0)
+
+  profilePictures     UserProfilePicture[]
+  allegiance          AllegianceMember?
+  collection          UserItem[]
+  // -------quizzes relations
+  quizCategories      QuizCategory[]
+  categories          Category[]
+  userAnswers         UserAnswer[]
+  userAnsweredQuizzes UserAnsweredQuiz[]
+  ownedQuizzes        Quiz[]
+  assignedQuizzes     UserAssignedQuiz[]       @relation(name: "owner")
+  assignedToMeQuizzes UserAssignedQuiz[]
+  likedQuizzes        UserLikedQuiz[]
+  // this relation is for saving public quizzes
+  savedQuizzes        UserSavedQuiz[]          
+  // these relations are for sharing quizzes with friends
+  sharedQuizzes       UserSharedQuiz[]         @relation(name: "owner")
+  sharedWithQuizzes   UserSharedQuiz[]
+  // -------quizzes relations
+  
+  // need 2 relations for friends
+  // one for the user that initiated the friend request
+  // one for the user that received the friend request
+  friends             UserFriend[]         @relation(name: "owner")
+  friendOf            UserFriend[]         @relation(name: "friend")
 }
 
 model UserFriend {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  status    FriendStatus @default(PENDING) // pending, accepted, declined
+
+  // the user that initiated the friend request is the userId
+  // the user that received the friend request is the friendId
 
   userId String
   user   User   @relation(name: "owner", fields: [userId], references: [id], onDelete: Cascade)
@@ -126,11 +169,12 @@ model UserFriend {
   friendId String
   friend   User   @relation(name: "friend", fields: [friendId], references: [id], onDelete: Cascade)
 
+  @@unique([userId, friendId])
   @@index([userId])
   @@index([friendId])
 }
 
-model ProfilePictureUser {
+model UserProfilePicture {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -156,12 +200,12 @@ model ProfilePicture {
 
   cost            Int                  @default(10)
   image           String
-  profilePictures ProfilePictureUser[]
+  profilePictures UserProfilePicture[]
 
   @@index([gen])
 }
 
-model ItemUser {
+model UserItem {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -187,7 +231,7 @@ model Item {
   updatedAt DateTime @updatedAt
 
   image String
-  users ItemUser[]
+  users UserItem[]
 
   @@index([numId])
   @@index([name])
@@ -196,142 +240,146 @@ model Item {
 model Category {
   id        Int       @id @default(autoincrement())
   name      String
+  daysLength Int      @default(1) // number of days
+  quizLength Int      @default(10) // number of questions
   createdAt DateTime  @default(now())
   updatedAt DateTime?
 
-  userId String?
-  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId    String?
+  user      User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  quizCategory   QuizCategory?
-  keywordPrompt  KeywordPrompt[]
+  allegianceId String?
+  allegiance   Allegiance? @relation(fields: [allegianceId], references: [id], onDelete: Cascade)
+
+  quizCategory   QuizCategory[]
+  theme          Theme[]
   allegianceQuiz AllegianceQuiz[]
 
+  @@unique([name, allegianceId])
+  @@unique([name, userId])
   @@index([userId])
+  @@index([allegianceId])
 }
 
-// keyword for GPT prompt 
-model KeywordPrompt {
+// specific theme for a category
+model Theme {
   id         Int      @id @default(autoincrement())
-  keyword    String
+  name       String
   daysLength Int      @default(1) // number of days
   quizLength Int      @default(10) // number of questions
   isUsed     Boolean  @default(false)
+  beginDate  DateTime @default(now())
+  
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
   QuizCategory QuizCategory[]
 
-  categoryId Int      @unique
+  categoryId Int
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
+  @@unique([name, categoryId])
   @@index([categoryId])
 }
 
-// will manage 
+// acts as a pointer to all the quizzes that are related to a specific category and theme
 model QuizCategory {
   id         Int      @id @default(autoincrement())
   basePrompt String
   sdPrompt   String   @default(" ")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
-  isActive   Boolean  @default(true)
-  image      String?
+  
   quizzes    Quiz[]
 
-  keywordPromptId Int?
-  keywordPrompt   KeywordPrompt? @relation(fields: [keywordPromptId], references: [id])
+  userId      String?
+  user        User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  categoryId Int      @unique
+  allegianceId String?
+  allegiance   Allegiance? @relation(fields: [allegianceId], references: [id], onDelete: Cascade)
+
+  themeId Int?
+  theme   Theme? @relation(fields: [themeId], references: [id], onDelete: Cascade)
+
+  categoryId Int      
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
-  @@index([keywordPromptId])
+  @@index([userId])
+  @@index([themeId])
   @@index([categoryId])
+  @@index([allegianceId])
 }
-
-model Year {
-  id   Int @id @unique @default(autoincrement())
-  year Int @db.Year
-
-  months Month[]
-}
-
-model Month {
-  id     Int  @id @unique @default(autoincrement())
-  month  Int  @db.TinyInt
-  yearId Int
-  year   Year @relation(fields: [yearId], references: [id], onDelete: Cascade)
-
-  weeks Week[]
-
-  @@index([yearId])
-}
-
-model Week {
-  id   Int @id @unique @default(autoincrement())
-  week Int @db.TinyInt
-
-  monthId Int
-  month   Month @relation(fields: [monthId], references: [id], onDelete: Cascade)
-
-  days Day[]
-
-  @@index([monthId])
-}
-
-model Day {
-  id  Int @id @unique @default(autoincrement())
-  day Int @db.TinyInt
-
-  weekId Int
-  week   Week @relation(fields: [weekId], references: [id], onDelete: Cascade)
-
-  quizzes Quiz[]
-
-  @@index([weekId])
-}
-
-// todo: [Year -> Month -> Week -> Day -> Quiz]
 
 model Quiz {
   id             Int              @id @default(autoincrement())
   scoreAmt       Int              @default(3)
-  createdAt      DateTime         @default(now())
-  updatedAt      DateTime         @updatedAt
-  dateDue        DateTime
+  public         QuizAccess       @default(PUBLIC)
+  dateDue        DateTime?
   likes          Int              @default(0) // linked to LikedQuiz
   shares         Int              @default(0) // linked to SharedQuiz
   completions    Int              @default(0) // linked to UserAnswerQuiz
   saves          Int              @default(0) // linked to SavedQuiz
   image          String?
-  // year           Int?            @db.TinyInt
-  // month          Int?            @db.TinyInt
-  // week           Int?            @db.TinyInt
-  // day            Int?            @db.TinyInt
+  genStatus      GeneratedStatus           @default(PENDING) 
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
   questions      Question[]
-  userAnswers    UserAnswerQuiz[]
+  userAnswers    UserAnsweredQuiz[]
   allegianceQuiz AllegianceQuiz?
-  likedQuiz      LikedQuiz[]
-  sharedQuiz     SharedQuiz[]
-  savedQuiz      SavedQuiz[]
+  assignedQuiz   UserAssignedQuiz[]
+  likedQuiz      UserLikedQuiz[]
+  sharedQuiz     UserSharedQuiz[]
+  savedQuiz      UserSavedQuiz[]
 
   ownerId String?
   owner   User?   @relation(fields: [ownerId], references: [id])
 
-  dayId Int?
-  day   Day? @relation(fields: [dayId], references: [id])
-
   quizCategoryId Int
-  quizCategory   QuizCategory @relation(fields: [quizCategoryId], references: [id])
+  quizCategory   QuizCategory @relation(fields: [quizCategoryId], references: [id], onDelete: Cascade)
 
   @@index([ownerId])
   @@index([quizCategoryId])
-  @@index([dayId])
 }
 
-model LikedQuiz {
+model UserAssignedQuiz {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  year      Int?            @db.TinyInt
+  month     Int?            @db.TinyInt
+  day       Int?            @db.TinyInt
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id])
+
+  userId String
+  user   User   @relation(name: "owner", fields: [userId], references: [id], onDelete: Cascade)
+
+  assigneeId String
+  assignee   User   @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@index([userId])
+  @@index([assigneeId])
+}
+
+model UserLikedQuiz {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([quizId])
+  @@index([userId])
+}
+
+model UserSavedQuiz {
+  id        Int      @id @default(autoincrement())
+  createdAt DateTime @default(now())
 
   quizId Int
   quiz   Quiz @relation(fields: [quizId], references: [id])
@@ -343,25 +391,9 @@ model LikedQuiz {
   @@index([userId])
 }
 
-model SavedQuiz {
+model UserSharedQuiz {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  quizId Int
-  quiz   Quiz @relation(fields: [quizId], references: [id])
-
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([quizId])
-  @@index([userId])
-}
-
-model SharedQuiz {
-  id        Int      @id @default(autoincrement())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
   quizId Int
   quiz   Quiz @relation(fields: [quizId], references: [id])
@@ -383,6 +415,7 @@ model Question {
   answer1       String
   answer2       String
   answer3       String
+  answer4       String       
   correctAnswer String
   createdAt     DateTime     @default(now())
   updatedAt     DateTime     @updatedAt
@@ -391,7 +424,7 @@ model Question {
   userAnswers   UserAnswer[]
 
   quizId Int
-  quiz   Quiz @relation(fields: [quizId], references: [id])
+  quiz   Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@index([quizId])
 }
@@ -400,24 +433,25 @@ model UserAnswer {
   id             String   @id @default(cuid())
   selectedAnswer String
   correctAnswer  Boolean
+
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
   questionId String
-  question   Question @relation(fields: [questionId], references: [id])
+  question   Question @relation(fields: [questionId], references: [id], onDelete: Cascade)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  userAnswerQuizId String?
-  userAnswerQuiz   UserAnswerQuiz? @relation(fields: [userAnswerQuizId], references: [id], onDelete: Cascade)
+  userAnsweredQuizId String?
+  userAnsweredQuiz  UserAnsweredQuiz? @relation(fields: [userAnsweredQuizId], references: [id], onDelete: Cascade)
 
   @@index([userId])
   @@index([questionId])
-  @@index([userAnswerQuizId])
+  @@index([userAnsweredQuizId])
 }
 
-model UserAnswerQuiz {
+model UserAnsweredQuiz {
   id        String   @id @default(cuid())
   completed Boolean  @default(false)
   time      Int      @default(0)
@@ -440,8 +474,8 @@ model UserAnswerQuiz {
 model Feedback {
   id        Int      @id @default(autoincrement())
   name      String
-  email     String
-  message   String
+  email     String?
+  message   String  @db.VarChar(350)
   createdAt DateTime @default(now())
 }
 
@@ -456,8 +490,9 @@ model AllegianceQuiz {
   quizId Int  @unique
   quiz   Quiz @relation(fields: [quizId], references: [id])
 
-  allegianceId Int
+  allegianceId String
   allegiance   Allegiance @relation(fields: [allegianceId], references: [id], onDelete: Cascade)
+  
   categoryId   Int        @unique
   category     Category   @relation(fields: [categoryId], references: [id])
 
@@ -466,7 +501,7 @@ model AllegianceQuiz {
 }
 
 model Allegiance {
-  id          Int      @id @default(autoincrement())
+  id          String    @id @default(cuid())
   leaderId    String
   name        String   @unique
   image       String
@@ -474,6 +509,8 @@ model Allegiance {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  quizCategories      QuizCategory[]
+  categories          Category[]
   members AllegianceMember[]
   quizzes AllegianceQuiz[]
 
@@ -490,7 +527,7 @@ model AllegianceMember {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  allegianceId Int
+  allegianceId String
   allegiance   Allegiance @relation(fields: [allegianceId], references: [id])
 
   @@index([allegianceId])

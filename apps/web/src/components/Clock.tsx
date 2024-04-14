@@ -18,6 +18,7 @@ export const Clock = ({text}: {text: string}) => {
       });
     }, 1000) as any;
   }, []);
+  
   const stopTimer = () => {
     buttonRef.current ? (buttonRef.current.className = "bg-green-500") : null;
     buttonRef.current
@@ -31,13 +32,6 @@ export const Clock = ({text}: {text: string}) => {
       <p>
         timer: {minutes}:{seconds} {text}
       </p>
-      <button
-        className="bg-red-500 px-4 py-2 text-black"
-        ref={buttonRef}
-        onClick={stopTimer}
-      >
-        Stop
-      </button>
     </div>
   );
 }

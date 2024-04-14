@@ -1,11 +1,13 @@
-import { authOptions } from "@/src/auth";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { prisma } from "@trivai/prisma";
-import { parse } from "url";
+import { getSessionWithReqRes } from "@trivai/auth/lib/getSessionWithReqRes";
 
-export type Answers = {
+export type Answer = {
+  question: {
+    image: string;
+    text?: string;
+  },
   answers: Array<string>;
   returnedAnswer: {
     image: string;
@@ -17,7 +19,7 @@ export type Answers = {
 
 // this route is only accessible by admin users
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-  const session: Session | null = await getServerSession(req, res, authOptions);
+  const session: Session | null = await getSessionWithReqRes(req, res);
   if (session) {
     if (req.method == 'GET') {
       const { answerId } = req.query!;
@@ -39,13 +41,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
               answer1: true,
               answer2: true,
               answer3: true,
+              answer4: true,
+              text: true,
             }
           }
         }
       });
       if (answer) {
-        let answers: Answers = {
-          answers: [answer.question.answer1, answer.question.answer2, answer.question.answer3, answer.question.correctAnswer],
+        let returnedAnswer: Answer = {
+          question: {image: answer.question.image ? answer.question.image : "", text: answer.question.text ? answer.question.text : ""},
+          answers: [answer.question.answer1, answer.question.answer2, answer.question.answer3, answer.question.answer4],
           returnedAnswer: {
             image: answer.question.image ? answer.question.image : "",
             correct: answer.correctAnswer,
@@ -53,7 +58,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
             correctAnswer: answer.question.correctAnswer,
           }
         };
-        res.status(200).json(answers);
+        res.status(200).json(returnedAnswer);
         return;
       }
     }

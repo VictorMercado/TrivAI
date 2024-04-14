@@ -1,14 +1,13 @@
 import { Box } from "./_components/box";
-import { QuizCard } from "@ui/quiz-card";
-import { prisma } from "@trivai/prisma";
 import { TabSwitcher } from "@ui/tab-switcher";
-import { FuturisticBox } from "@ui/futuristic-box";
-import { useLocalStorage } from "@/src/hooks/useLocalStorage";
 import Image from "next/image";
-import { Button } from "@/src/components/ui/button";
-import { Boxes, Heart, Share, Check } from "lucide-react";
+import { Button } from "@ui/button";
 import { ProfilePictureCard } from "@components/ProfilePictureCard";
 import { ItemCard } from "@components/ItemCard";
+import { prisma } from "@trivai/prisma";
+import { serverRouter } from "@/app/_trpc/serverRouter";
+import { Suspense } from "react";
+
 
 type Product = {
   name: string;
@@ -18,30 +17,6 @@ type Product = {
   imageUrl: string;
 };
 
-async function getQuiz(id: number) {
-  const quiz = await prisma.quiz.findUnique({
-    where: { id },
-    select: {
-      id: true,
-      scoreAmt: true,
-      allegianceQuiz: true,
-      sharedQuiz: true,
-      owner: true,
-      dateDue: true,
-      saves: true,
-      likes: true,
-      shares: true,
-      completions: true,
-      quizCategory: {
-        select: {
-          category: true,
-          keywordPrompt: true,
-        },
-      },
-    },
-  });
-  return quiz;
-}
 
 function Box4() {
   return (
@@ -68,8 +43,9 @@ function Box4() {
 }
 
 export default async function StorePage() {
-  const quiz = await getQuiz(436);
-  console.log(quiz);
+  const router = await serverRouter();
+  const users = await router.userList();
+
   const charizardProduct: Product = {
     name: "Charizard",
     identifier: "Gen 1 Pokemon",
@@ -94,11 +70,11 @@ export default async function StorePage() {
       {/* <Box itemsCount={10} />
       <Box itemsCount={5} />
       <Box4 /> */}
-      {/* <pre>{JSON.stringify(quiz, null, 2)}</pre> */}
-      <QuizCard quiz={quiz} />
-      <QuizCard quiz={quiz} />
       {/* <QuizCard quiz={quiz} /> */}
       {/* <QuizCard quiz={quiz} /> */}
+      {users.map((user) => (
+        <div key={user.id}>{user.userName}</div>
+      ))}
       <div className="grid hidden grid-cols-2 gap-x-1 gap-y-1">
         <ItemCard product={charizardProduct} />
         <ItemCard product={RayquezaProduct} />

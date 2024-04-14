@@ -1,9 +1,42 @@
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 import { prisma } from "@trivai/prisma";
-import { UserState } from "./store";
+
 import { string } from "zod";
+
+export const replaceURL = (key: string, value: string) => {
+  let search = new URLSearchParams(window.location.search);
+  let arr = Array.from(search.entries());
+  arr = arr.filter(([k, v]) => k !== key);
+  arr.push([key, value]);
+  window.history.replaceState({}, "", `?${new URLSearchParams(arr)}`);
+}
+
+export const removeURL = (key: string) => {
+  let search = new URLSearchParams(window.location.search);
+  let arr = Array.from(search.entries());
+  arr = arr.filter(([k, v]) => k !== key);
+  window.history.replaceState({}, "", `?${new URLSearchParams(arr)}`);
+}
+
+export const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  // reference for vercel.com
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // // reference for render.com
+  if (process.env.RENDER_INTERNAL_HOSTNAME) {
+    return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
+  }
+
+  // assume localhost
+  return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
+}
 
 export const shortenNumber = (num: number) => {
   if (num < 1000) return num;
@@ -24,32 +57,6 @@ export const stringExtractor = (stringToModify: string | undefined, substring: s
   return stringToModify.slice(0, index) + stringToModify.slice(index + substring.length);
 };
 
-// move this to queries
-export const getUser = async () => {
-  let dbUser;
-  const currentUser = await getCurrentUser() as any;
-  if (currentUser) {
-    try {
-      dbUser = (await prisma.user.findUnique({
-        where: {
-          id: currentUser?.id,
-        },
-        select: {
-          id: true,
-          name: true,
-          totalScore: true,
-          cheatUsed: true,
-          image: true,
-        },
-      })) as UserState;
-    } catch (error) {
-      console.log(error);
-    }
-  } else {
-    console.log("no dbUser from layout");
-  }
-  return dbUser;
-};
 
 export const removeTrailingS = (str: string) => {
   return str.replace(/s$/, '');
@@ -58,6 +65,10 @@ export const removeTrailingS = (str: string) => {
 export const getDate = () => {
   let timeZoneOffset = new Date().getTimezoneOffset() * 60000;
   return new Date(Date.now() - timeZoneOffset).toLocaleDateString();
+};
+
+export const isDigit = (str: string) => {
+  return /^\d+$/.test(str);
 };
 
 export const shuffle = (array: string[]) => {

@@ -1,0 +1,14 @@
+{
+  "name": "@trivai/tsconfig",
+  "sideEffects": false,
+  "version": "0.0.0",
+  "private": true,
+  "main": "index.js",
+  "files": [
+    "base.json",
+    "nextjs.json"
+  ],
+  "devDependencies": {
+    "tsconfig-paths": "^4.1.0"
+  }
+}

@@ -1,37 +1,19 @@
 import { QuizController } from "./QuizController";
 import { notFound } from "next/navigation";
 import { prisma } from "@trivai/prisma";
-import { getCurrentUser } from "@src/session";
-import { Prisma } from "@prisma/client";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { TabSwitcher } from "@ui/tab-switcher";
 import { QuizCompleted } from "@components/QuizCompleted";
-import { shuffle } from "@src/utils";
+import { shuffle, isDigit } from "@src/utils";
+import {
+  PrismaQuestionSelectView,
+  getQuizWithQuestions,
+} from "@trivai/lib/server/queries/quiz";
 
 interface Routes {
   [key: string]: JSX.Element;
 }
 
-async function getQuiz(quizId: number) {
-  return await prisma.quiz.findUnique({
-    where: {
-      id: quizId,
-    },
-    select: {
-      id: true,
-      questions: {
-        select: {
-          id: true,
-          image: true,
-          answer1: true,
-          answer2: true,
-          answer3: true,
-          correctAnswer: true,
-        },
-        take: 5,
-      },
-    },
-  });
-}
 
 async function getUserQuiz(
   quizId: number,
@@ -44,14 +26,7 @@ async function getUserQuiz(
     select: {
       id: true,
       questions: {
-        select: {
-          id: true,
-          image: true,
-          answer1: true,
-          answer2: true,
-          answer3: true,
-          correctAnswer: true,
-        },
+        select: PrismaQuestionSelectView,
         where: {
           NOT: filterAnswersArray,
         },
@@ -65,7 +40,7 @@ async function getUserAnswerQuizCompleted(userId: string, quizId: number) {
     return;
   }
   // TODO: HANDLE ERROR
-  const quizCompleted = await prisma.userAnswerQuiz.findFirst({
+  const quizCompleted = await prisma.userAnsweredQuiz.findFirst({
     where: {
       userId: userId,
       quizId: quizId,
@@ -77,19 +52,7 @@ async function getUserAnswerQuizCompleted(userId: string, quizId: number) {
   });
   return quizCompleted;
 }
-const isDigit = (str: string) => {
-  return /^\d+$/.test(str);
-};
 
-export type Quiz = Prisma.PromiseReturnType<typeof getQuiz>;
-export type Question = {
-  id: string;
-  image: string | null;
-  answer1: string;
-  answer2: string;
-  answer3: string;
-  answer4: string;
-};
 type QuizIdPageProps = {
   params: { quizId: string };
 };
@@ -99,11 +62,14 @@ export default async function QuizIdPage({
   if (isDigit(quizId) === false) {
     return notFound();
   }
+  
   const quizIdInt = parseInt(quizId);
-  let quiz = await getQuiz(quizIdInt);
+  let quiz = await getQuizWithQuestions(quizIdInt);
+  
   if (!quiz) {
     return notFound();
   }
+
   const user = await getCurrentUser();
   if (user) {
     let quizCompleted;
@@ -116,10 +82,7 @@ export default async function QuizIdPage({
     if (quizCompleted?.completed) {
       return <QuizCompleted />;
     }
-    // get user answers[] or undefined
     const userQuizAnswers = quizCompleted?.userAnswers;
-    // start timer
-    // console.time();
 
     // make array of question ids that the user has already answered or empty array
     const userAnswers = userQuizAnswers
@@ -130,39 +93,20 @@ export default async function QuizIdPage({
     // get quiz with questions that the user has not answered
     quiz = await getUserQuiz(quizIdInt, userAnswers);
   }
+  // see if there is a better way to do this
+  if (!quiz) {
+    return notFound();
+  }
+  
+  let questions = quiz.questions.map((question) => {
+    let answers = [question.answer1, question.answer2, question.answer3, question.answer4];
+    answers = shuffle(answers);
+    return { ...question, answer1: answers[0], answer2: answers[1], answer3: answers[2], answer4: answers[3]};
+  });
 
-  const questions: Array<Question> = quiz!.questions.map(
-    ({ correctAnswer, answer1, answer2, answer3, ...question }) => {
-      let answer4 = correctAnswer;
-      const newArr = shuffle([answer1, answer2, answer3, answer4]);
-      answer1 = newArr[0];
-      answer2 = newArr[1];
-      answer3 = newArr[2];
-      answer4 = newArr[3];
-      return { ...question, answer1, answer2, answer3, answer4 };
-    },
-  );
-  // end timer
-  // console.timeEnd();
   return (
-    // <>
-    //   <TabSwitcher routes={activeCategoriesArray} />
-    //   <main className="">
-    //     {user ? (
-    //       <ClientAuthenticatedQuiz activeQuestions={activeQuestions} />
-    //     ) : (
-    //       // give the guest less questions
-    //       <ClientUnauthenticatedQuiz
-    //         activeQuestions={activeQuestions.slice(
-    //           Math.floor(activeQuestions.length * .5)
-    //         )}
-    //       />
-    //     )}
-    //   </main>
-    // </>
     <>
       <QuizController quizId={quiz?.id} activeQuestions={questions} />
-      {/* <pre>{JSON.stringify(quiz?.questions, null, 2)}</pre> */}
     </>
   );
 }

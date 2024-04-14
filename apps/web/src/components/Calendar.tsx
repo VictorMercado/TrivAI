@@ -46,7 +46,7 @@ const Calendar = ({ onDayClick, years, months } : CalendarProps) => {
           const theDay = day;
           week.push(
             <td
-              className={`h-24 hover:bg-primary/25 ${
+              className={`h-24 text-sm hover:bg-primary/25 ${
                 isCurrentDay ? "bg-primary/25 text-primary" : ""
               }`}
               key={`${i}-${j}`}
@@ -56,13 +56,15 @@ const Calendar = ({ onDayClick, years, months } : CalendarProps) => {
               onClick={() => handleDayClick(theDay)}
               onKeyDown={(e) => handleKeyDown(e, theDay)}
             >
-              <div className="flex flex-col items-center justify-center">
-                {day}
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-1">
-                  <div className={`h-3 w-3 bg-emerald-500 md:mx-[4px]`}></div>
-                  <div className={`h-3 w-3 bg-amber-500 md:mx-[4px]`}></div>
-                  <div className={`h-3 w-3 bg-blue-500 md:mx-[4px]`}></div>
-                  <div className={`h-3 w-3 bg-blue-500 md:mx-[4px]`}></div>
+              <div className="flex h-full flex-col p-2">
+                <span className="text-left">{day}</span>
+                <div className="flex flex-1 items-center justify-center">
+                  <div className="grid grid-cols-2 gap-1 md:grid-cols-4">
+                    <div className={`h-3 w-3 bg-emerald-500 md:mx-[4px]`}></div>
+                    <div className={`h-3 w-3 bg-amber-500 md:mx-[4px]`}></div>
+                    <div className={`h-3 w-3 bg-blue-500 md:mx-[4px]`}></div>
+                    <div className={`h-3 w-3 bg-blue-500 md:mx-[4px]`}></div>
+                  </div>
                 </div>
               </div>
             </td>,
@@ -142,7 +144,7 @@ const Calendar = ({ onDayClick, years, months } : CalendarProps) => {
   // }, [selectedDay]);
 
   return (
-    <div className="calendar overflow-x-auto shadow">
+    <div className="calendar overflow-x-auto">
       <div className="mb-4 flex flex-row justify-between">
         <div className="space-x-2">
           <YearSelect

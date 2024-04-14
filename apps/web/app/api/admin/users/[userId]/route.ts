@@ -1,8 +1,7 @@
-import { authOptions } from "@/src/auth";
 import { prisma } from "@trivai/prisma";
 import { Session } from "next-auth";
-import { getServerSession } from "next-auth/next";
 import * as z from "zod";
+import { getSession } from "@trivai/auth/lib/getSession";
 
 const routeContextSchema = z.object({
   params: z.object({
@@ -11,7 +10,7 @@ const routeContextSchema = z.object({
 });
 
 export async function DELETE(request: Request, context: z.infer<typeof routeContextSchema>) {
-  const session: Session | null = await getServerSession(authOptions);
+  const session: Session | null = await getSession();
   if (!session) {
     return new Response(JSON.stringify({ message: "Forbidden" }), { status: 403 });
   }

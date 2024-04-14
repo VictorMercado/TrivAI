@@ -1,5 +1,3 @@
-import { getCurrentUser } from "@/src/session";
-import { Session } from "next-auth";
 import Image from "next/image";
 
 type ProfilePictureProps = {

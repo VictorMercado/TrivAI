@@ -1,12 +1,10 @@
-import { authOptions } from "@/src/auth";
 import { NextApiRequest, NextApiResponse } from "next";
-import { getServerSession } from "next-auth";
 import type { Session } from "next-auth";
 import { prisma } from "@trivai/prisma";
-
+import { getSessionWithReqRes } from "@trivai/auth/lib/getSessionWithReqRes";
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
-    const session: Session | null = await getServerSession(req, res, authOptions);
+    const session: Session | null = await getSessionWithReqRes(req, res);
     if (session) {
         if (req.method == 'DELETE') {
             let query = req.query;

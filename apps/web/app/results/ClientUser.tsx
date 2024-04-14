@@ -3,9 +3,8 @@
 //TODO: Refactor component
 import Link from "next/link";
 import React, { useEffect, useRef, useState } from "react";
-import { SVGGoodCheck, SVGError } from "@ui/SVG";
-import { type MergedUserAssignedQuiz, mergeQuizzes } from "@src/db/helpers";
-import { SVGPercentage } from "@ui/SVG";
+import { SVGGoodCheck, SVGError, SVGPercentage } from "@ui/SVG";
+import { type MergedUserAssignedQuiz } from "@trivai/lib/server/queries/quiz/helpers";
 import { QuestionAnswerViewController } from "@components/QuestionAnswerViewController";
 import { Button } from "@ui/button";
 import { Calendar } from "@components/Calendar";
@@ -15,6 +14,7 @@ import {
   CollapsibleTrigger,
 } from "@ui/collapsible";
 import { ChevronsUpDown } from "lucide-react";
+import { useToast } from "@ui/toast";
 
 interface ClientUserProps {
   years?: Array<number>;
@@ -22,14 +22,15 @@ interface ClientUserProps {
   initQuizzes: Array<MergedUserAssignedQuiz>;
 }
 
-export const ClientUser = (props: ClientUserProps) => {
+export const ClientUser = ({ initQuizzes }: ClientUserProps) => {
+  const { addToast } = useToast();
   const scrollToQuizRef = useRef<HTMLDivElement>(null);
   const dialogRef = useRef<HTMLDialogElement>(null);
   const quizRef = useRef<HTMLDivElement>(null);
   const [callbackFn, setCallbackFn] = useState<any>([]);
   const [userAnswerId, setUserAnswerId] = useState<string>();
 
-  const [quizzes, setQuizzes] = useState(props.initQuizzes);
+  const [quizzes, setQuizzes] = useState(initQuizzes);
 
   useEffect(() => {
     if (callbackFn?.length > 0) {
@@ -67,9 +68,9 @@ export const ClientUser = (props: ClientUserProps) => {
         },
       ]);
     } else if (res.status === 404) {
-      alert("No quiz found!");
+      addToast({id: Math.random(), message: "No quiz found!", type: "error"});
     } else {
-      alert("Something went wrong!" + res.status);
+      addToast({id: Math.random(), message: "Something went wrong! " + res.status, type: "error"});
     }
   };
   return (
@@ -104,56 +105,56 @@ export const ClientUser = (props: ClientUserProps) => {
           // using a tag instead of Link because Link does not refresh cache on dynamic routes yet
           return (
             <a
-              className="group mx-2 my-6 flex flex-col shadow-lg shadow-primary/50 transition-all ease-out hover:text-black"
+              className="group mx-2 my-6 flex flex-col shadow shadow-primary/50 backdrop-blur-sm  transition-all ease-out"
               key={quiz.id}
               href={`/quizzes/${quiz.id}`}
             >
               <h1 className={`text-xl text-primary`}>
                 {quiz.quizCategory.category.name}
               </h1>
-              <div className="flex h-full flex-col gap-y-2 border-y-2 border-primary bg-primary/20 p-2 shadow-sm shadow-primary/50 group-hover:bg-primary">
+              <div className="flex h-full flex-col gap-y-2 border-y-2 border-primary p-2  group-hover:bg-primary/20">
                 <div
                   ref={index === 0 ? quizRef : null}
                   className="grid grid-cols-1 gap-y-4"
                 >
                   <span className="flex flex-col md:flex-row md:justify-between">
-                    <p className="text-primary group-hover:text-black">
+                    <p className="text-primary">
                       <b>Quiz ID:</b>
                     </p>
                     <p>{quiz.id}</p>
                   </span>
                   <span className="flex flex-col md:flex-row md:justify-between">
-                    <p className="text-primary group-hover:text-black">
+                    <p className="text-primary">
                       <b>Quiz Status:</b>
                     </p>
                     <p
-                      className={`text-left group-hover:text-sm md:text-right ${
+                      className={`text-left md:text-right ${
                         quiz.status === "Completed"
                           ? "text-green-500"
                           : quiz.status === "Incomplete"
-                          ? "text-yellow-500"
-                          : "text-blue-500"
+                            ? "text-yellow-500"
+                            : "text-blue-500"
                       }`}
                     >
-                      <span className="group-hover:bg-black group-hover:p-1">{`${quiz.status}`}</span>
+                      <span className="">{`${quiz.status}`}</span>
                     </p>
                   </span>
                   <span className="flex flex-col md:flex-row md:justify-between">
-                    <p className="text-primary group-hover:text-black">
+                    <p className="text-primary">
                       <b>Theme:</b>
                     </p>
                     <p className="text-left md:text-right">
-                      {quiz.quizCategory.keywordPrompt.keyword}
+                      {quiz.quizCategory.theme.name}
                     </p>
                   </span>
                   <span className="flex flex-col md:flex-row md:justify-between">
-                    <p className="text-primary group-hover:text-black">
+                    <p className="text-primary">
                       <b>Score:</b>
                     </p>
                     <p>{quiz.scoreAmt}</p>
                   </span>
                   <span className="flex flex-col md:flex-row md:justify-between">
-                    <p className="text-primary group-hover:text-black">
+                    <p className="text-primary">
                       <b>Grade %:</b>
                     </p>
                     <p>
@@ -162,13 +163,13 @@ export const ClientUser = (props: ClientUserProps) => {
                   </span>
                 </div>
                 <div
-                  className="flex flex-col hover:ring-2 hover:ring-black"
+                  className="flex flex-col p-1 hover:ring-2 hover:ring-primary"
                   onClick={(e) => e.preventDefault()}
                 >
                   <Collapsible className="">
                     <CollapsibleTrigger className="w-full">
                       <div className="flex justify-between">
-                        <p className="text-primary group-hover:text-black">
+                        <p className="text-primary">
                           <b>Answers ({quiz.userAnswers.length}):</b>
                         </p>
                         <ChevronsUpDown />
@@ -179,7 +180,7 @@ export const ClientUser = (props: ClientUserProps) => {
                       {quiz.userAnswers.map((answer: any, index: number) => (
                         <button
                           key={answer.id}
-                          className="w-full p-2 group-data-[state=closed]:hidden group-data-[state=open]:animate-fadeIn md:hover:text-black md:hover:ring-2 md:hover:ring-black"
+                          className="w-full p-2 group-data-[state=closed]:hidden group-data-[state=open]:animate-fadeIn md:hover:ring-2 md:hover:ring-primary"
                           onClick={(e) => {
                             e.preventDefault();
                             setUserAnswerId(answer.id);
@@ -221,8 +222,6 @@ export const ClientUser = (props: ClientUserProps) => {
       >
         <p className="m-2 font-bold">Your Result</p>
         <QuestionAnswerViewController
-          imageWidth={1200}
-          imageHeight={800}
           answerId={userAnswerId}
         />
         <form method="dialog" className="flex justify-center">

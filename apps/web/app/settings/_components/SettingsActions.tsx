@@ -1,10 +1,23 @@
 "use client";
 import { Button } from "@ui/button";
-import { LetterModel } from "@/src/components/ui/letter-model";
+import { LetterModel } from "@ui/letter-model";
 import { useStore } from "@src/store";
-import { signOut, } from "next-auth/react";
+import { signOut, } from "@trivai/auth/react";
+import { useRouter } from "next/navigation";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@ui/alert-dialog";
 
 const SettingsActions = () => {
+  const router = useRouter();
   const { totalScore, incrementScore, resetScore, deleteAccount } = useStore(
     (state) => state,
   );
@@ -16,30 +29,47 @@ const SettingsActions = () => {
         variant="danger"
         size="lg"
         onClick={() => {
-          totalScore > 0 ? resetScore() : "";
+          if (totalScore > 0) {
+            resetScore();
+            router.refresh();
+          }
         }}
       >
         THIS BUTTON IS DANGEROUS
       </Button>
       <LetterModel userSession={true} />
-      <Button
-        title="Delete account"
-        aria-label="Delete account"
-        variant="delete"
-        size="lg"
-        className=""
-        onClick={() => {
-          try {
-            deleteAccount();
-          } catch (e) {
-            console.error(e);
-          }
-          signOut({ callbackUrl: `/` });
-          alert("Successfully deleted account");
-        }}
-      >
-        DELETE YOUR ACCOUNT NO GOING BACK
-      </Button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <Button
+            aria-label="Delete account"
+            title="Delete account"
+            variant="delete"
+            size="lg"
+          >
+            DELETE YOUR ACCOUNT NO GOING BACK
+          </Button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete your account</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            Are you sure you want to delete your account? This action is
+            irreversible.
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction
+              onClick={() => {
+                deleteAccount();
+                signOut({ callbackUrl: `/` });
+              }}
+            >
+              Delete account
+            </AlertDialogAction>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

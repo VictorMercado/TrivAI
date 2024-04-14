@@ -1,6 +1,6 @@
 import { prisma } from '@trivai/prisma';
 import { z } from 'zod';
-import { getCurrentUser } from '@src/session';
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 
 
 const schema = z.object({

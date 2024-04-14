@@ -21,9 +21,9 @@ const TrivaiLogo = () => {
         animate={{ pathLength: 1 }}
         transition={{ duration: 2 }}
         d="M115.382 29.504L113.51 38H109.238L117.35 4.4H122.87L130.838 38H126.566L124.742 29.504H115.382ZM123.974 25.904L120.038 7.568L116.15 25.904H123.974ZM143.848 34.496V7.904H139.528V4.4H152.344V7.904H148.024V34.496H152.344V38H139.528V34.496H143.848Z"
-        fill="url(#paint0_linear_62_10)"
+        fill="url(#animatedGradient)"
       />
-      <defs>
+      {/* <defs>
         <linearGradient
           id="paint0_linear_62_10"
           x1="127.971"
@@ -36,6 +36,48 @@ const TrivaiLogo = () => {
           <stop offset="0.364583" stopColor="#46DEFF" />
           <stop offset="0.682292" stopColor="#84FF86" />
           <stop offset="1" stopColor="#FFAD32" stopOpacity="0.71" />
+        </linearGradient>
+      </defs> */}
+      <defs>
+        <linearGradient
+          id="animatedGradient"
+          x1="0%"
+          y1="0%"
+          x2="100%"
+          y2="100%"
+        >
+          <stop offset=".2" stopColor="#B349CD">
+            <animate
+              attributeName="stop-color"
+              values="#B349CD; #46DEFF; #84FF86; #FFAD32; #B349CD; #FFAD32; #84FF86; #46DEFF;"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </stop>
+          <stop offset=".5" stopColor="#46DEFF">
+            <animate
+              attributeName="stop-color"
+              values="#46DEFF; #84FF86; #FFAD32; #B349CD: #FFAD32; #84FF86; #46DEFF;"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </stop>
+          <stop offset=".75" stopColor="#84FF86">
+            <animate
+              attributeName="stop-color"
+              values="#84FF86; #FFAD32; #B349CD; #46DEFF; #B349CD; #FFAD32; #84FF86;"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </stop>
+          <stop offset=".90" stopColor="#FFAD32">
+            <animate
+              attributeName="stop-color"
+              values="#FFAD32; #B349CD; #46DEFF; #84FF86; #46DEFF; #B349CD;"
+              dur="10s"
+              repeatCount="indefinite"
+            />
+          </stop>
         </linearGradient>
       </defs>
     </svg>

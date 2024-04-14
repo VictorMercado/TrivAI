@@ -1,6 +1,6 @@
+"use client";
 import Link from "next/link";
 import { Button } from "@ui/button";
-import { Eye, Home, LineChart, Scroll, Settings } from "lucide-react";
 import {
   HoverCard,
   HoverCardContent,
@@ -9,13 +9,16 @@ import {
 import { cn } from "@src/utils";
 import { Suspense } from "react";
 import { siteRoutes } from "@src/config/site.tsx";
+import { usePathname } from "next/navigation";
 
 type SiteNavProps = {
   className?: string;
 };
 
 const SiteNav = ({ className } : SiteNavProps) => {
-
+  const pathname = usePathname();
+  const firstLevelPath = "/" + pathname?.split("/")[1];
+  
   return (
     <div
       className={cn("flex md:flex-col ", className)}
@@ -37,6 +40,7 @@ const SiteNav = ({ className } : SiteNavProps) => {
                   <Button
                     variant="default"
                     size="default"
+                    active={firstLevelPath === route.route}
                     // shadow-[0px_0px_7px_1px_rgb(var(--color-primary))]
                     className="w-full"
                     tabIndex={-1}

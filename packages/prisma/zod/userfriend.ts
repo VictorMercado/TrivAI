@@ -1,10 +1,12 @@
 import * as z from "zod"
+import { FriendStatus } from "@prisma/client"
 import { CompleteUser, RelatedUserModel } from "./index"
 
 export const UserFriendModel = z.object({
   id: z.number().int(),
   createdAt: z.date(),
   updatedAt: z.date(),
+  status: z.nativeEnum(FriendStatus),
   userId: z.string(),
   friendId: z.string(),
 })

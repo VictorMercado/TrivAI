@@ -1,0 +1,15 @@
+{
+  "extends": "@trivai/tsconfig/base.json",
+  "compilerOptions": {
+    "target": "es5",
+    "resolveJsonModule": true,
+  },
+  "include": [
+    "react",
+    "jwt",
+    ".", 
+    "../types/next-auth.d.ts", 
+    "../types/window.d.ts"
+  ],
+  "exclude": ["dist", "build", "node_modules"],
+}

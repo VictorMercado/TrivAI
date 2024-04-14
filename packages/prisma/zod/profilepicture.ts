@@ -1,5 +1,5 @@
 import * as z from "zod"
-import { CompleteProfilePictureUser, RelatedProfilePictureUserModel } from "./index"
+import { CompleteUserProfilePicture, RelatedUserProfilePictureModel } from "./index"
 
 export const ProfilePictureModel = z.object({
   id: z.number().int(),
@@ -14,7 +14,7 @@ export const ProfilePictureModel = z.object({
 })
 
 export interface CompleteProfilePicture extends z.infer<typeof ProfilePictureModel> {
-  profilePictures: CompleteProfilePictureUser[]
+  profilePictures: CompleteUserProfilePicture[]
 }
 
 /**
@@ -23,5 +23,5 @@ export interface CompleteProfilePicture extends z.infer<typeof ProfilePictureMod
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedProfilePictureModel: z.ZodSchema<CompleteProfilePicture> = z.lazy(() => ProfilePictureModel.extend({
-  profilePictures: RelatedProfilePictureUserModel.array(),
+  profilePictures: RelatedUserProfilePictureModel.array(),
 }))

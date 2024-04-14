@@ -8,47 +8,104 @@ import {
   DropdownMenuTrigger,
 } from "@ui/dropdown-menu";
 import { MoreVertical } from "lucide-react";
+import { Button } from "@ui/button";
+import { Input } from "@ui/input";
+import { FriendRequest } from "@components/FriendRequest";
+import { serverRouter } from "@/app/_trpc/serverRouter";
+import Image from "next/image";
 
+export default async function FriendsPage() {
+  const router = await serverRouter();
+  const pendingFriends = await router.authViewer.friend.getPending();
+  const requestedFriends = await router.authViewer.friend.getRequested();
 
-interface Friend {
-  id: number;
-  name: string;
-}
-
-const friends: Friend[] = [
-  { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" },
-  { id: 3, name: "Charlie" },
-];
-
-export default function FriendsPage() {
   return (
-    <main className="flex grow border border-red-500">
-      <div className="grid w-full grid-cols-1 lg:grid-cols-4">
-        <SideBar
-          items={friends}
-          renderItem={(friend) => (
-            <div className="m-2 flex items-center justify-between gap-4">
-              <div className="h-20 w-20 bg-gray-500">
-                {/* <img src="" alt="" /> */}
+    <main className="flex size-full flex-col p-2">
+      <div className="flex w-full justify-center">
+        <FriendRequest />
+      </div>
+      <div>
+        <h1 className="text-2xl">Pending Friends</h1>
+        <div className="flex w-full flex-col space-y-4 p-2">
+          {pendingFriends.map(({ friend }) => {
+            return (
+              <div className="flex justify-between" key={friend.id}>
+                <div className="flex">
+                  <Image
+                    src={friend.image || "/default.png"}
+                    alt={friend.name || "friend"}
+                    width={80}
+                    height={80}
+                    className="size-16 md:size-24"
+                  />
+                  <div className="px-2">
+                    <h1>{friend.name}</h1>
+                    <h2 className="text-slate-500">{friend.userName}</h2>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center">
+                  <Button
+                    size="default"
+                    variant="default"
+                    // onClick={() => {
+                    //   router.authViewer.friend.cancel({ friendId: friend.id });
+                    // }}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </div>
-              {friend.name}
-              <img src="/ho-oh.gif" alt="" width={50} height={50} />
-              <DropdownMenu>
-                <DropdownMenuTrigger>
-                  <MoreVertical />
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                  <DropdownMenuItem>Invite to Quiz</DropdownMenuItem>
-                  <DropdownMenuItem>Send Quiz</DropdownMenuItem>
-                  <DropdownMenuItem>Invite to Allegiance</DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-          )}
-        />
-        <div className="col-span-3 border border-blue-500"></div>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <h1 className="text-2xl">Requested Friends</h1>
+        <div className="flex w-full flex-col space-y-4 p-2">
+          {requestedFriends.map(({ user }) => {
+            return (
+              <div className="flex justify-between" key={user.id}>
+                <div className="flex">
+                  <img
+                    src={user.image || "/default.png"}
+                    alt={user.name || "friend"}
+                    width={80}
+                    height={80}
+                    className="size-16 md:size-24"
+                  />
+                  <div className="px-2">
+                    <h1>{user.name}</h1>
+                    <h2 className="text-slate-500">{user.userName}</h2>
+                  </div>
+                </div>
+                <div className="flex items-center justify-center space-x-4">
+                  <Button
+                    size="default"
+                    variant="default"
+                    // onClick={() => {
+                    //   router.authViewer.friend.accept({ friendId: friend.id });
+                    // }}
+                  >
+                    Accept
+                  </Button>
+                  <Button
+                    size="default"
+                    variant="default"
+                    // onClick={() => {
+                    //   router.authViewer.friend.reject({ friendId: friend.id });
+                    // }}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+      <div>
+        <h1 className="text-2xl">Recommended Friends</h1>
+        <div className="border border-primary/50 bg-primary/25 py-6 text-center">Coming Soon...</div>
       </div>
     </main>
   );

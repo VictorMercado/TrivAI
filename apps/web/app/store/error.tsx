@@ -1,6 +1,4 @@
 "use client";
-export default function ErrorPage() {
-  return (
-    <h1>Error page!</h1>
-  );
-}
+import { ErrorPage } from "@components/ErrorPage";
+
+export default ErrorPage;

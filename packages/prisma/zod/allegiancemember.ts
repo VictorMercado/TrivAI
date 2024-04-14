@@ -8,7 +8,7 @@ export const AllegianceMemberModel = z.object({
   updatedAt: z.date(),
   allegianceRole: z.nativeEnum(AllegianceRole),
   userId: z.string(),
-  allegianceId: z.number().int(),
+  allegianceId: z.string(),
 })
 
 export interface CompleteAllegianceMember extends z.infer<typeof AllegianceMemberModel> {

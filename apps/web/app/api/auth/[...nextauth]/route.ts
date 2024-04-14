@@ -1,6 +1,3 @@
-import NextAuth from "next-auth";
-import { authOptions } from "@/src/auth";
+import NextAuth from "@trivai/auth";
 
-const handler = NextAuth(authOptions);
-
-export { handler as GET, handler as POST};
+export { NextAuth as GET, NextAuth as POST};

@@ -1,14 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { QuestionView } from "./ui/questionView";
-import type { Answers } from "@/pages/api/getAnswer";
+import {
+  QuestionView, 
+  QuestionResults,
+  QuestionShowCorrect,
+  QuestionImage,
+  QuestionText,
+ } from "./ui/questionView";
+import type { Answer } from "@/pages/api/getAnswer";
 
 type QuestionViewControllerProps = {
-  imageWidth?: number;
-  imageHeight?: number;
   answerId: string | undefined;
 };
 
-async function getAnswer(answerId: string): Promise<Answers> {
+async function getAnswer(answerId: string): Promise<Answer> {
   let res;
   try {
     res = await fetch(`api/getAnswer?answerId=${answerId}`);
@@ -24,12 +28,10 @@ async function getAnswer(answerId: string): Promise<Answers> {
   }
 }
 
-const QuestionAnswerViewController: React.FC<QuestionViewControllerProps> = ({
-  imageHeight,
-  imageWidth,
+const QuestionAnswerViewController = ({
   answerId,
 }: QuestionViewControllerProps) => {
-  const [answerObj, setAnswerObj] = useState<Answers>();
+  const [answerObj, setAnswerObj] = useState<Answer>();
   const [error, setError] = useState<string | null>(null);
   useEffect(() => {
     if (answerId) {
@@ -52,24 +54,32 @@ const QuestionAnswerViewController: React.FC<QuestionViewControllerProps> = ({
     <div>
       {error ? <div>{error}</div> : null}
       {answerObj ? (
-        <QuestionView
-          imageWidth={imageWidth}
-          imageHeight={imageHeight}
-          image={answerObj.returnedAnswer.image}
-          correct={
-            <QuestionView.Correct correct={answerObj.returnedAnswer.correct} />
-          }
-          next={<div>report</div>}
-          buttonsOrResults={
-            <QuestionView.Results
-              answers={answerObj.answers}
+        <>
+          <QuestionView className="h-3/4">
+            {answerObj.question.image && (
+              <QuestionImage
+                image={answerObj.question.image}
+                width={1500}
+                height={1500}
+                alt={"Question image"}
+              />
+            )}
+            <div className="flex h-1/2 flex-col items-center justify-center">
+              <QuestionText>{answerObj.question.text}</QuestionText>
+            </div>
+            <div className="flex w-full justify-between">
+              <QuestionShowCorrect correct={answerObj.returnedAnswer.correct} />
+            </div>
+            <QuestionResults
               returnedAnswer={answerObj.returnedAnswer}
+              answers={answerObj.answers}
             />
-          }
-        />
+          </QuestionView>
+        </>
       ) : null}
     </div>
   );
 };
+
 
 export { QuestionAnswerViewController };

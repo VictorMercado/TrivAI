@@ -1,26 +1,31 @@
 "use client";
 import { usePathname } from "next/navigation";
+import { Clock } from "@components/Clock";
+import { cn } from "@src/utils";
 
-interface QuizViewProps {
+type QuizViewProps = {
   totalScore: number;
   questionsLength: number;
   assignedFrom?: string;
+  className?: string;
 }
 interface Routes {
   [key: string]: JSX.Element;
 }
 
-const QuizMetaDataView = ({ totalScore, questionsLength, assignedFrom }: QuizViewProps) => {
+const QuizMetaDataView = ({ totalScore, questionsLength, assignedFrom, className }: QuizViewProps) => {
   const routes: Routes = {
-    "quizzes": (
+    quizzes: (
       <>
         <p>Current Score: {totalScore}</p>
+        <Clock text="" />
         <p>Questions left: {questionsLength}</p>
       </>
     ),
-    "allegianceQuiz": (
+    allegianceQuiz: (
       <>
         <p>Allegiance Score: 10</p>
+        <Clock text="sdf" />
         <p>Assigned From: {assignedFrom}</p>
       </>
     ),
@@ -31,7 +36,12 @@ const QuizMetaDataView = ({ totalScore, questionsLength, assignedFrom }: QuizVie
   if (!currentRoute) return null;
   
   return (
-    <div className="font-bold py-4 flex flex-nowrap justify-between w-full">
+    <div
+      className={cn(
+        className,
+        "flex w-full flex-nowrap justify-between py-4 font-bold",
+      )}
+    >
       {routes[currentRoute]}
     </div>
   );

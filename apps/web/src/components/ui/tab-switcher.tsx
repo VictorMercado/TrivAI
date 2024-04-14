@@ -1,4 +1,6 @@
 "use client";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/tabs";
+
 import { usePathname } from "next/navigation";
 import { NavLink } from "./nav-link";
 import { motion } from "framer-motion";

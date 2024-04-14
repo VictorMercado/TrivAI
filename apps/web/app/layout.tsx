@@ -1,17 +1,18 @@
 import "./globals.css";
 import { Roboto } from "next/font/google";
 import { ClientAppWrapper } from "./ClientAppWrapper";
-import { getSession } from "@src/session";
+import { getSession } from "@trivai/auth/lib/getSession";
 import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
 import { Nav } from "@components/Nav";
 import { Toaster } from "@ui/toast";
-import { getUser } from "@src/utils";
+import { getUser } from "@trivai/lib/server/queries/user";
 import localFont from "next/font/local";
 import { ClientDimensions } from "@components/ClientDimensions";
 import { SiteNav } from "./_components/SiteNav";
-
-
+import TRPCProvider from "./_trpc/TRPCProvider";
+import { cookies } from "next/headers";
+import { SetCookie } from "./_components/SetCookie";
 // Font files can be colocated inside of `app`
 const overseer = localFont({
   src: "../public/fonts/overseer/Overseer.otf",
@@ -41,15 +42,20 @@ const roboto = Roboto({
   display: "swap",
 });
 
-
 export default async function RootLayout({ children }: IProps) {
   const session = await getSession();
-  let dbUser = await getUser();
-
+  let dbUser;
+  if (session) {
+    dbUser = await getUser();
+  }
+  const cookieStore = cookies();
+  const cookie = cookieStore.get("userToken");
+  
   return (
     <html
       className={
-        shareTechMono.className + " coolBackground flex min-h-screen font-light text-sm md:text-base"
+        shareTechMono.className +
+        " coolBackground flex min-h-screen text-sm font-light md:text-base"
       }
       lang="en"
     >
@@ -62,22 +68,25 @@ export default async function RootLayout({ children }: IProps) {
         className="flex w-screen grow flex-col "
         data-atr="this is the body"
       >
-        <ClientAppWrapper
-          session={session}
-          //TODO Check if this is the best way to do this
-          // strictly selecting the data we need from the dbUser object and avoiding the functions because they are not serializable
-          user={dbUser}
-        >
-          {/* <ClientDimensions /> */}
-          <Nav user={dbUser} />
-          <div className="flex grow flex-col justify-between md:flex-row md:justify-start">
-            <div className="fixed bottom-0 left-0 z-50 order-last flex w-screen justify-center border-r border-primary/25 bg-background pb-5 md:static md:order-first md:w-24 md:items-start">
-              <SiteNav />
+        <TRPCProvider>
+          {!cookie && session ? <SetCookie /> : null}
+          <ClientAppWrapper
+            session={session}
+            //TODO Check if this is the best way to do this
+            // strictly selecting the data we need from the dbUser object and avoiding the functions because they are not serializable
+            user={dbUser}
+          >
+            {/* <ClientDimensions /> */}
+            <Nav user={dbUser} />
+            <div className="flex grow flex-col justify-between md:flex-row md:justify-start">
+              <div className="fixed bottom-0 left-0 z-50 order-last flex w-screen justify-center border-r border-primary/25 bg-background pb-5 md:static md:order-first md:w-24 md:items-start">
+                <SiteNav />
+              </div>
+              <div className="flex w-full h-full flex-col">{children}</div>
+              <div className="h-32 lg:h-2"></div>
             </div>
-            <div className="flex w-full flex-col">{children}</div>
-            <div className="h-32 lg:h-2"></div>
-          </div>
-        </ClientAppWrapper>
+          </ClientAppWrapper>
+        </TRPCProvider>
 
         {/* temporary fix to add spacing so pages dont get covered by bottom nav on mobile */}
         <Toaster />

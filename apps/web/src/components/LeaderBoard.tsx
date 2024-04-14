@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "./ui/hover-card";
 import { prisma } from "@trivai/prisma";
+import { use } from "react";
 
 async function getUsers() {
   return await prisma.user.findMany({
@@ -11,15 +12,29 @@ async function getUsers() {
       email: false,
       userName: true,
       role: true,
+      allegiance: {
+        select: {
+          allegiance: {
+            select: {
+              name: true,
+            },
+          },
+        },
+      },
       cheatUsed: true,
       totalScore: true,
       image: true,
       primaryColor: true,
       _count: {
         select: {
-          quizzes: true,
-          friends: true,
-          userAnswerQuiz: {
+          ownedQuizzes: true,
+          friendOf: true,
+          friends: {
+            where: {
+              status: "ACCEPTED",
+            },
+          },
+          userAnsweredQuizzes: {
             where: {
               completed: true,
             },
@@ -30,18 +45,21 @@ async function getUsers() {
   });
 }
 
-const Leaderboard = async () => {
-  const user = await getCurrentUser();
+const Leaderboard = () => {
+  let user = use(getCurrentUser());
+
   const usersHead = [
     "Position",
     "Image",
     "User Name",
-    "Role",
+    "Allegiance",
     "Cheat Used",
-    "Total Score",
+    "KP",
   ];
-  const users = await getUsers();
-  users.sort((a: any, b: any) => b.totalScore - a.totalScore);
+  let users = use(getUsers());
+  if (users.length > 0) {
+    users.sort((a: any, b: any) => b.totalScore - a.totalScore);
+  }
 
   return (
     <div className="overflow-x-auto">
@@ -66,7 +84,7 @@ const Leaderboard = async () => {
               }`}
               key={row.id}
             >
-              <th className="border-b-gray-800">{index + 1}</th>
+              <th className="border-b-gray-800 ">{index + 1}</th>
               <td className="border-b-gray-800">
                 <div className="flex">
                   <HoverCard
@@ -90,12 +108,33 @@ const Leaderboard = async () => {
                       </Link>
                     </HoverCardTrigger>
                     <HoverCardContent className="w-64 rounded-none">
-                      <div className="flex flex-col">
-                        <p className="underline">{row.userName}</p>
-                        <p>quizzes: {row._count.quizzes}</p>
-                        <p>friends: {row._count.friends}</p>
-                        <p>quizzes completed: {row._count.userAnswerQuiz}</p>
-                      </div>
+                      {row.role === "ADMIN" ? (
+                        <div className="coolBorder group flex flex-col ">
+                          <p className="coolText underline group-hover:text-black">
+                            {row.userName}
+                          </p>
+                          <p className="coolText group-hover:text-black">
+                            quizzes: {row._count.ownedQuizzes}
+                          </p>
+                          <p className="coolText group-hover:text-black">
+                            friends: {row._count.friendOf + row._count.friends}
+                          </p>
+                          <p className="coolText group-hover:text-black">
+                            quizzes completed: {row._count.userAnsweredQuizzes}
+                          </p>
+                        </div>
+                      ) : (
+                        <div className="flex flex-col">
+                          <p className="underline">{row.userName}</p>
+                          <p className="">quizzes: {row._count.ownedQuizzes}</p>
+                          <p className="">
+                            friends: {row._count.friendOf + row._count.friends}
+                          </p>
+                          <p className="">
+                            quizzes completed: {row._count.userAnsweredQuizzes}
+                          </p>
+                        </div>
+                      )}
                     </HoverCardContent>
                   </HoverCard>
                 </div>
@@ -103,9 +142,15 @@ const Leaderboard = async () => {
               <td className="border-b-gray-800">
                 <Link href={"/profile/" + row.userName}>{row.userName}</Link>
               </td>
-              <td className="border-b-gray-800">{row.role}</td>
+              <td className="border-b-gray-800">
+                {row.allegiance?.allegiance.name
+                  ? row.allegiance?.allegiance.name
+                  : "N/A"}
+              </td>
               <td className="border-b-gray-800">{`${row.cheatUsed}`}</td>
-              <td className="border-b-gray-800">{row.totalScore}</td>
+              <td className="border-b-gray-800">
+                {row.userName === "GalacticNet" ? "???" : row.totalScore}
+              </td>
             </tr>
           ))}
         </tbody>

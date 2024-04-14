@@ -1,5 +1,5 @@
 import { prisma } from "@trivai/prisma";
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 
 export async function GET(request: Request) {
   const user = await getCurrentUser();

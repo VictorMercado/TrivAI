@@ -1,0 +1,15 @@
+{
+  "name": "@trivai/auth",
+  "sideEffects": false,
+  "private": true,
+  "description": "Trivai's main auth code",
+  "authors": "Victor Mercado",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "dependencies": {
+    "next-auth": "^4.24.5",
+    "bcryptjs": "^2.4.3",
+    "jose": "^4.13.1",
+    "@trivai/prisma": "*"
+  }
+}

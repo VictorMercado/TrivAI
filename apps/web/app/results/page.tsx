@@ -1,13 +1,15 @@
-import { prisma } from "@trivai/prisma";
 import { Prisma } from "@prisma/client";
-import { getCurrentUser } from "@src/session";
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { notFound } from "next/navigation";
 import { ClientUser } from "./ClientUser";
-import { getTodayQuizzes, getUsersAnswerQuizzes } from "@src/db/queries";
-import { getQuizIdsHelper } from "@src/db/helpers";
+import {
+  getUserAssignedQuizzesForPresentation,
+  getUsersAnsweredQuizzesWithAnswers,
+} from "@trivai/lib/server/queries/quiz";
+import { getQuizIdsHelper, mergeQuizzesWithAnswers } from "@trivai/lib/server/queries/quiz/helpers";
 import { Suspense } from "react";
-import { mergeQuizzes } from "@/src/db/helpers";
 import { LoadingCalendar } from "./_components/LoadingCalendar";
+import type { TUserAnsweredQuizzesWithAnswers } from "@trivai/lib/server/queries/quiz";
 
 const CurvedLine = () => {
   return (
@@ -22,28 +24,11 @@ const CurvedLine = () => {
   );
 };
 
-export type UserQuizzes = Prisma.PromiseReturnType<
-  typeof getUsersAnswerQuizzes
+
+export type UserAssignedQuizzes = Prisma.PromiseReturnType<
+  typeof getUserAssignedQuizzesForPresentation
 >;
-export type TodayQuizzes = Prisma.PromiseReturnType<typeof getTodayQuizzes>;
 
-// TODO pull this type out of TodayQuizzes
-
-export type AssignedQuizzes =
-  | {
-      id: number;
-      scoreAmt: number;
-      quizCategory: {
-        image: string | null;
-        keywordPrompt: {
-          keyword: string;
-        } | null;
-        category: {
-          name: string;
-        };
-      };
-    }[]
-  | undefined;
 
 export default async function ResultsPage() {
   const user = await getCurrentUser();
@@ -54,42 +39,24 @@ export default async function ResultsPage() {
   // when ready to deploy remove the:   1 ||
   const year = date.getFullYear();
   const month = 1 || date.getMonth();
-  const week = 1 || Math.floor(date.getDate() / 7) + 1;
   const day = 1 || date.getDate();
 
-  let results: TodayQuizzes | undefined;
-  // try {
-  //   results = await getTodayQuizzes(
-  //     date.getFullYear(),
-  //     date.getMonth() - 1,
-  //     Math.floor(date.getDate() / 7) + 1,
-  //     date.getDate(),
-  //   );
-  //   console.log(results);
+  let results: UserAssignedQuizzes | undefined;
 
-  // }
-  // catch (error) {
-  //   console.log(error);
-  //   console.log("stuff going on");
+  results = await getUserAssignedQuizzesForPresentation(user?.id);
 
-  // }
-
-  results = await getTodayQuizzes(year, month, week, day);
-
-  const quizzes: AssignedQuizzes = results?.months[0].weeks[0].days[0].quizzes;
+  const quizzes = results?.map((result) => result.quiz);
   const quizIds = getQuizIdsHelper(quizzes);
-  const userQuizzes: UserQuizzes = await getUsersAnswerQuizzes(
-    user?.id,
-    quizIds,
-  );
+  const userQuizzes: TUserAnsweredQuizzesWithAnswers =
+    await getUsersAnsweredQuizzesWithAnswers(user?.id, quizIds);
 
-  const mergedQuizzes = mergeQuizzes(quizzes, userQuizzes);
+  const mergedQuizzes = mergeQuizzesWithAnswers(quizzes, userQuizzes);
 
   return (
     <main id="main" className="h-fit">
       {user ? (
         <Suspense fallback={<LoadingCalendar />}>
-          {/* turn component into composition component that why u can pass year data, month data and day data quizzes */}
+          {/* turn component into composition component that way u can pass year data, month data and day data quizzes */}
           <ClientUser initQuizzes={mergedQuizzes} />
         </Suspense>
       ) : (
