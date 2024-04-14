@@ -11,6 +11,6 @@
   },
   "aliases": {
     "components": "@src/components",
-    "utils": "@src/utils.ts"
+    "utils": "@trivai/lib/utils.ts"
   }
 }

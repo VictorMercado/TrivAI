@@ -26,7 +26,11 @@ type Message = {
   type: string;
 };
 
-const Chat: React.FC = () => {
+type ChatProps = {
+  URL: string | undefined;
+};
+
+const Chat = ({ URL } : ChatProps) => {
   const { data: session } = useSession();
   const [messages, setMessages] = useState<string[]>([]);
   const [message, setMessage] = useState<string>("");
@@ -46,10 +50,10 @@ const Chat: React.FC = () => {
     const randUser = "anon" + randNum.current;
     // Connect to the WebSocket server
     try {
-      if (process.env.WS_URL === undefined) {
+      if (URL !== undefined) {
         console.log("No WS_URL found");
         socket.current = new WebSocket(
-          `spotted-fall-production.up.railway.app?userName=${userName.current || randUser}`,
+          `${URL}?userName=${userName.current || randUser}`,
           "chat",
         );
         // Connection opened -> Subscribe
@@ -125,7 +129,7 @@ const Chat: React.FC = () => {
       // socket.current.
     } catch (e) {
       console.log(e);
-      socket.current = new WebSocket(`${process.env.WS_URL}`, "chat"); // Replace with your server's address
+      // socket.current = new WebSocket(`${process.env.WS_URL}`, "chat"); // Replace with your server's address
     }
 
 

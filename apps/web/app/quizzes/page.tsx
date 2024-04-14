@@ -1,6 +1,6 @@
 import Link from "next/link";
 const routes = ["Pokemon", "Movies", "Games", "Geography", "Cars"];
-import { getDueDate } from "@src/utils";
+import { getDueDate } from "@trivai/lib/utils";
 import {
   getUserAIAssignedQuizzesForPresentation,
   getUsersAnsweredQuizzesWithAnswers,
@@ -24,14 +24,16 @@ import { ArrowDown, Plus, SlidersHorizontal } from "lucide-react";
 import { QuizCard } from "@/src/components/ui/quiz-card";
 import { HorizontalScroll } from "@ui/horizontal-scroll";
 
-
 export default async function QuizPage() {
   const user = await getCurrentUser();
   let quizzesToDisplay: TQuizzesView = [];
   let userAssignedQuizzes;
   let userAssignedQuizIds: Array<number>;
   let userAssignedToFriendsQuizzes;
-  let userAssignedToFriendsQuizzesIds: Array<{quizId: number; assigneeId: string}>;
+  let userAssignedToFriendsQuizzesIds: Array<{
+    quizId: number;
+    assigneeId: string;
+  }>;
   let friendAssignedQuizzes;
   let friendAssignedQuizzesIds: Array<number>;
 
@@ -76,21 +78,21 @@ export default async function QuizPage() {
 
   userAssignedToFriendsQuizzes = await getUserAssignedQuizzesToFriends(user.id);
   // console.log("Logging started");
-  
+
   // console.log(userAssignedToFriendsQuizzes);
   // console.log("Logging ended");
 
-  userAssignedToFriendsQuizzesIds = userAssignedToFriendsQuizzes.map(
-    (quiz) => {return ({ quizId: quiz.quiz.id, assigneeId: quiz.assigneeId })},
-  );
+  userAssignedToFriendsQuizzesIds = userAssignedToFriendsQuizzes.map((quiz) => {
+    return { quizId: quiz.quiz.id, assigneeId: quiz.assigneeId };
+  });
   const userAssignedToFriendsAnsweredQuizzes = await Promise.all(
     userAssignedToFriendsQuizzesIds.map(async (userToFriend) => {
       let res = await getUserAnsweredQuiz(
         userToFriend.assigneeId,
         userToFriend.quizId,
       );
-      return {...res, assigneeId: userToFriend.assigneeId};
-    })
+      return { ...res, assigneeId: userToFriend.assigneeId };
+    }),
   );
   const userToFriendQuizzesDisplay = mergeQuizzesByQuizIdAndAssigneeId(
     userAssignedToFriendsQuizzes,
@@ -114,8 +116,6 @@ export default async function QuizPage() {
     userAssignedQuizzes,
     userQuizzes,
   ) as TQuizzesView;
-
-
 
   return (
     <main className="container grid grid-cols-1 justify-center gap-y-4 p-4">

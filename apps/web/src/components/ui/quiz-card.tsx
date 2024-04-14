@@ -1,17 +1,11 @@
 "use client";
 import Image from "next/image";
 import { FuturisticBox } from "./futuristic-box";
-import {
-  Check,
-  Heart,
-  Save,
-  Share,
-  createLucideIcon,
-} from "lucide-react";
+import { Check, Heart, Save, Share, createLucideIcon } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
 import Link from "next/link";
-import { shortenNumber } from "@src/utils";
+import { shortenNumber } from "@trivai/lib/utils";
 import { TQuizView } from "@trivai/lib/server/queries/quiz";
 import { useState, useRef, useEffect } from "react";
 
@@ -45,12 +39,11 @@ function dateFormat(date: Date | null | undefined) {
   return isoDate.slice(5) + "-" + isoDate.slice(2).slice(0, 2);
 }
 
-
-// TODO: 
-// add more stats: 
-  // - who the quiz is assigned to
-  // - when it was created
-  // - how many questions are completed
+// TODO:
+// add more stats:
+// - who the quiz is assigned to
+// - when it was created
+// - how many questions are completed
 const QuizCard = ({ quiz }: QuizCardProps) => {
   const [parentDimensions, setParentDimensions] = useState({
     width: 0,

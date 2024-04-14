@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { getPrismaErrorDescription } from "@trivai/prisma";
 import { TRPCError } from "@trivai/trpc/server";
 import { revalidatePath } from "next/cache";
+import { getBaseUrl } from "@trivai/lib/utils";
 
 type GetQuizOptions = {
   ctx: Context;
@@ -21,14 +22,14 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
   let questionLength = input.questionLength || 10;
   let questionType = input.questionType || 'text';
 
-  let quiz; 
+  let quiz;
   let quizCategory;
   let quizJSON;
   let prompt = systemMessage + " " + `Give me a ${questionLength} question quiz about ${input.category.name} ${input.theme?.name ? 'with a focus of ' + input.theme.name : ''} ${input.userDescription ? "be sure to consider : " + input.userDescription : ''}`;
   let res;
   // create a quiz record but will not have questions connected yet this will be done in a webhook
   // quiz id will be sent to the AI API to be sent to the webhook
-  
+
   try {
     if (input.theme?.id && input.theme?.name) {
       quizCategory = await prisma.quizCategory.findFirst({
@@ -82,7 +83,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
         quizId: quiz.id,
       },
     });
-  } catch(e) {
+  } catch (e) {
     throw new TRPCError({
       code: "BAD_REQUEST",
       message: getPrismaErrorDescription(e)
@@ -92,27 +93,35 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
   try {
     if (AI_URL) {
       console.log(prompt);
-      fetch(AI_URL, {
+      let res = await fetch(AI_URL, {
         method: 'POST',
         body: JSON.stringify({
           prompt: prompt,
-          webhook: process.env.WEBHOOK_URL! + "/" + quiz.id,
+          webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
           quizId: quiz.id,
         }),
       });
-
-      // if (res.ok) {
-      //   quizJSON = await res.json();
-      // } else {
-      //   throw new TRPCError({
-      //     code: "BAD_REQUEST",
-      //     message: "AI API failed",
-      //   });
-      // }
+      if (res.ok) {
+        quizJSON = await res.json();
+        console.log(quizJSON);
+      } else {
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "AI API failed",
+        });
+      }
     } else {
       console.log("No AI URL");
     }
   } catch (e) {
+    await prisma.quiz.update({
+      where: {
+        id: quiz.id,
+      },
+      data: {
+        genStatus: "FAILED",
+      }
+    });
     throw new Error('AI API is not available');
   }
   // revalidatePath("/quizzes/dashboard");

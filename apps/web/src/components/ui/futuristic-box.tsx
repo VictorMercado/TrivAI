@@ -1,6 +1,6 @@
 "use client";
 import { motion } from "framer-motion";
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 
 type FuturisticBoxProps = {
   titleLabel: string;
@@ -126,10 +126,10 @@ const FuturisticBox = ({
   );
 };
 
-
 export { FuturisticBox };
 
-{/* <svg
+{
+  /* <svg
   width="572"
   height="310"
   viewBox="0 0 572 310"
@@ -147,4 +147,5 @@ export { FuturisticBox };
     d="M571 127.5V308.5L131 309L1 222V33M571 127.5V25L542 1H409M571 127.5L542.5 97.5317V45.5L526.5 31.5H448.5L409 1M1 33V1H332M1 33H262L332 1M332 1H409"
     stroke="#0094FF"
   />
-</svg>; */}
+</svg>; */
+}

@@ -4,14 +4,14 @@ import { CheatCode } from "@components/CheatCode";
 import { useState, useEffect, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { getDate } from "@src/utils";
+import { getDate } from "@trivai/lib/utils";
 import { QuizCompleted } from "@components/QuizCompleted";
 import { QuizMetaDataView } from "@ui/quizMetaDataView";
 import { useUnmount } from "@/src/hooks/useUnmount";
 import type { TQuestionView } from "@trivai/lib/server/queries/quiz";
-import { 
-  QuestionView, 
-  QuestionButtons, 
+import {
+  QuestionView,
+  QuestionButtons,
   QuestionResults,
   QuestionImage,
   QuestionText,
@@ -20,10 +20,8 @@ import {
   type ReturnedAnswer,
 } from "@ui/questionView";
 import { useToast } from "@ui/toast";
-import { shuffle } from "@src/utils";
+import { shuffle } from "@trivai/lib/utils";
 // import QuestionOptions from '@/app/components/QuestionOptions';
-
-
 
 const QuizController = ({
   quizId,
@@ -38,7 +36,8 @@ const QuizController = ({
   const { data: session } = useSession();
   const userId = session?.user.id;
   const { totalScore, cheatUsed } = useStore((state) => state);
-  const [questions, setQuestions] = useState<Array<TQuestionView>>(activeQuestions);
+  const [questions, setQuestions] =
+    useState<Array<TQuestionView>>(activeQuestions);
   let question = questions[0] || null;
   const questionId = question?.id;
   const answers = [
@@ -105,7 +104,9 @@ const QuizController = ({
     fetch(`/api/quizzes/${quizId}`)
       .then((res) => res.json())
       .then((data) => {
-        alert(data);
+        console.log(data);
+      }).catch((e) => {
+        console.log("error occured cause this needs to be in TRPC in QuizController.tsx");
       });
     alert("dismounted");
   });

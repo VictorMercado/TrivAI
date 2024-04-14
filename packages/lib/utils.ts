@@ -1,9 +1,5 @@
-import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
-import { prisma } from "@trivai/prisma";
-
-import { string } from "zod";
 
 export const replaceURL = (key: string, value: string) => {
   let search = new URLSearchParams(window.location.search);
@@ -11,14 +7,14 @@ export const replaceURL = (key: string, value: string) => {
   arr = arr.filter(([k, v]) => k !== key);
   arr.push([key, value]);
   window.history.replaceState({}, "", `?${new URLSearchParams(arr)}`);
-}
+};
 
 export const removeURL = (key: string) => {
   let search = new URLSearchParams(window.location.search);
   let arr = Array.from(search.entries());
   arr = arr.filter(([k, v]) => k !== key);
   window.history.replaceState({}, "", `?${new URLSearchParams(arr)}`);
-}
+};
 
 export const getBaseUrl = () => {
   if (typeof window !== 'undefined') {
@@ -36,7 +32,7 @@ export const getBaseUrl = () => {
 
   // assume localhost
   return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
-}
+};
 
 export const shortenNumber = (num: number) => {
   if (num < 1000) return num;

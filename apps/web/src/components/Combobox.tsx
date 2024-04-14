@@ -2,8 +2,8 @@
 
 import * as React from "react";
 import { Check, ChevronsUpDown } from "lucide-react";
-import Image  from "next/image";
-import { cn } from "@src/utils";
+import Image from "next/image";
+import { cn } from "@trivai/lib/utils";
 import { Button } from "@components/ui/button";
 import {
   Command,
@@ -24,14 +24,13 @@ export type ProfilePicture = {
   image: string;
 };
 
-
 type ComboboxProps = {
   children?: React.ReactNode;
   value: ProfilePicture;
   setValue: ({ name, image }: ProfilePicture) => void;
   listItems: Array<ProfilePicture>;
 };
-const Combobox = ({value, setValue, listItems, children} : ComboboxProps) => {
+const Combobox = ({ value, setValue, listItems, children }: ComboboxProps) => {
   const [open, setOpen] = React.useState(false);
   // const [value, setValue] = React.useState("");
   // const strippedValue = value.slice(1, value.length - 5);
@@ -39,7 +38,7 @@ const Combobox = ({value, setValue, listItems, children} : ComboboxProps) => {
   let height = "h-[50vh]";
   if (screenH > 1500) {
     height = "h-[55vh]";
-  } 
+  }
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -56,10 +55,9 @@ const Combobox = ({value, setValue, listItems, children} : ComboboxProps) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverAnchor className="absolute left-1/2">
-      </PopoverAnchor>
+      <PopoverAnchor className="absolute left-1/2"></PopoverAnchor>
       <PopoverContent
-        className={`p-0 w-screen lg:w-[95vw] ${height} overflow-scroll md:overflow-hidden`}
+        className={`w-screen p-0 lg:w-[95vw] ${height} overflow-scroll md:overflow-hidden`}
       >
         {/* additional filtering */}
         {children}
@@ -100,6 +98,6 @@ const Combobox = ({value, setValue, listItems, children} : ComboboxProps) => {
       </PopoverContent>
     </Popover>
   );
-}
+};
 
 export { Combobox };

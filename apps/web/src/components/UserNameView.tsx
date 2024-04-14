@@ -1,4 +1,4 @@
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 
 interface UserViewProps {
   role: string | undefined | null;
@@ -6,11 +6,7 @@ interface UserViewProps {
   className?: string;
 }
 
-const UserNameView = ({
-  className,
-  role,
-  name,
-}: UserViewProps) => {
+const UserNameView = ({ className, role, name }: UserViewProps) => {
   if (role) {
     return (
       <>
@@ -22,6 +18,6 @@ const UserNameView = ({
     );
   }
   return null;
-}
+};
 
 export { UserNameView };

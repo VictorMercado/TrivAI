@@ -1,5 +1,5 @@
 "use client";
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 import { motion } from "framer-motion";
 
 export const SVGAdd = ({ size }: { size: number }) => {

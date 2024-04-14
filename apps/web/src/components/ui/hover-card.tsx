@@ -3,7 +3,7 @@
 import * as React from "react"
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card"
 import { useIsMobile } from "@hooks/useIsMobile"
-import { cn } from "@src/utils.ts"
+import { cn } from "@trivai/lib/utils.ts"
 
 const HoverCard = HoverCardPrimitive.Root
 

@@ -1,5 +1,5 @@
 "use client";
-import Image from "next/image"
+import Image from "next/image";
 import { ColorPicker } from "@components/ColorPicker";
 import { useSession } from "@trivai/auth/react";
 import { PokemonComboBox } from "./PokemonComboBox";
@@ -7,7 +7,7 @@ import { useState } from "react";
 import { Button } from "@ui/button";
 import { useToast } from "@ui/toast";
 import { useRouter } from "next/navigation";
-import { stringExtractor } from "@src/utils";
+import { stringExtractor } from "@trivai/lib/utils";
 import { Save } from "lucide-react";
 import { Input } from "@ui/input";
 import type { ProfilePicture } from "../page";
@@ -35,13 +35,15 @@ function rgbToHex(color: string) {
 type SettingsFormProps = {
   profilePictures: Array<ProfilePicture>;
 };
-const SettingsForm = (props : SettingsFormProps) => {
+const SettingsForm = (props: SettingsFormProps) => {
   const router = useRouter();
   const { data: session, update } = useSession();
   const [userImage, setUserImage] = useState<ProfilePicture>({
     name:
-      stringExtractor(session?.user.userImage?.split("/")[5]?.split("-")[1], '.png') ||
-      "default",
+      stringExtractor(
+        session?.user.userImage?.split("/")[5]?.split("-")[1],
+        ".png",
+      ) || "default",
     image: session?.user.userImage || "/default.png",
   });
 
@@ -70,18 +72,34 @@ const SettingsForm = (props : SettingsFormProps) => {
       });
       if (!res.ok) {
         if (res.status === 409) {
-          addToast({ id: Math.floor(Math.random() * 1000), message: "Username already exists", type: "error"});
+          addToast({
+            id: Math.floor(Math.random() * 1000),
+            message: "Username already exists",
+            type: "error",
+          });
           return;
         }
-        addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR", type: "error"});
+        addToast({
+          id: Math.floor(Math.random() * 1000),
+          message: "ERROR",
+          type: "error",
+        });
         return;
       }
       const data = await res.json();
       // update the users session JWT
       update({ userName: userName, image: userImage.image });
-      addToast({ id: Math.floor(Math.random() * 1000), message: "Success", type: "success"});
+      addToast({
+        id: Math.floor(Math.random() * 1000),
+        message: "Success",
+        type: "success",
+      });
     } catch (e) {
-      addToast({ id: Math.floor(Math.random() * 1000), message: "ERROR", type: "error"});
+      addToast({
+        id: Math.floor(Math.random() * 1000),
+        message: "ERROR",
+        type: "error",
+      });
       console.error(e);
     }
     // need to refresh the page to see the changes in all routes

@@ -459,7 +459,7 @@ model UserAnsweredQuiz {
   updatedAt DateTime @updatedAt
 
   quizId Int
-  quiz   Quiz @relation(fields: [quizId], references: [id])
+  quiz   Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)

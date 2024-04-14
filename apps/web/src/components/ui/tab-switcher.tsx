@@ -4,7 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/tabs";
 import { usePathname } from "next/navigation";
 import { NavLink } from "./nav-link";
 import { motion } from "framer-motion";
-import { cn } from "@/src/utils";
+import { cn } from "@trivai/lib/utils";
 
 type TabSwitcherProps = {
   routes: string[];
@@ -16,11 +16,11 @@ const TabSwitcher = ({ routes, className }: TabSwitcherProps) => {
   let conditionalStyle = "!text-blue-500";
   const baseRoute = usePathname();
   console.log(baseRoute);
-  
+
   return (
     <div
       data-theme=""
-      className="mx-auto my-6 grid grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10 w-max"
+      className="mx-auto my-6 grid w-max grid-cols-3 gap-4 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10"
     >
       {routes.map((route) => {
         return (
@@ -37,6 +37,6 @@ const TabSwitcher = ({ routes, className }: TabSwitcherProps) => {
       })}
     </div>
   );
-}
+};
 
-export { TabSwitcher }
+export { TabSwitcher };

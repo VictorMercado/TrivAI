@@ -4,7 +4,7 @@ import { prisma } from "@trivai/prisma";
 import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { TabSwitcher } from "@ui/tab-switcher";
 import { QuizCompleted } from "@components/QuizCompleted";
-import { shuffle, isDigit } from "@src/utils";
+import { shuffle, isDigit } from "@trivai/lib/utils";
 import {
   PrismaQuestionSelectView,
   getQuizWithQuestions,
@@ -13,7 +13,6 @@ import {
 interface Routes {
   [key: string]: JSX.Element;
 }
-
 
 async function getUserQuiz(
   quizId: number,
@@ -62,10 +61,10 @@ export default async function QuizIdPage({
   if (isDigit(quizId) === false) {
     return notFound();
   }
-  
+
   const quizIdInt = parseInt(quizId);
   let quiz = await getQuizWithQuestions(quizIdInt);
-  
+
   if (!quiz) {
     return notFound();
   }
@@ -97,11 +96,22 @@ export default async function QuizIdPage({
   if (!quiz) {
     return notFound();
   }
-  
+
   let questions = quiz.questions.map((question) => {
-    let answers = [question.answer1, question.answer2, question.answer3, question.answer4];
+    let answers = [
+      question.answer1,
+      question.answer2,
+      question.answer3,
+      question.answer4,
+    ];
     answers = shuffle(answers);
-    return { ...question, answer1: answers[0], answer2: answers[1], answer3: answers[2], answer4: answers[3]};
+    return {
+      ...question,
+      answer1: answers[0],
+      answer2: answers[1],
+      answer3: answers[2],
+      answer4: answers[3],
+    };
   });
 
   return (

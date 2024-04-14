@@ -7,7 +7,7 @@ import { PopoverClose, PopoverContent } from "@ui/popover";
 import { Input } from "@ui/input";
 import { Button } from "@ui/button";
 import { useSearchParams } from "next/navigation";
-import { removeURL, replaceURL } from "@src/utils";
+import { removeURL, replaceURL } from "@trivai/lib/utils";
 import { useSession } from "@trivai/auth/react";
 import { Edit, X } from "lucide-react";
 import type { GetAllCategories } from "@trivai/trpc/server/routers/AuthViewer/category/getAll.handler";
@@ -67,7 +67,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
   const [textThemeInput, setTextThemeInput] = useState("");
   const [generateCategoryInput, setGenerateCategoryInput] = useState("");
   const [generateThemeInput, setGenerateThemeInput] = useState("");
-  
+
   const themes = categories.flatMap((category) => category.theme);
   const selectedCategory = searchParams?.get("category") || "";
   const selectedTheme = searchParams?.get("theme") || "";
@@ -271,9 +271,11 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                     />
                   </TabsContent>
                   <TabsContent value="select">
-                    <Select onValueChange={(e)=> {
-                      setGenerateCategoryInput(e)
-                    }}>
+                    <Select
+                      onValueChange={(e) => {
+                        setGenerateCategoryInput(e);
+                      }}
+                    >
                       <SelectTrigger className="w-52">
                         <SelectValue placeholder="Category" />
                       </SelectTrigger>

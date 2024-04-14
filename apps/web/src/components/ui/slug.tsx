@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 import { useSession } from "next-auth/react";
 
 type SlugProps = {

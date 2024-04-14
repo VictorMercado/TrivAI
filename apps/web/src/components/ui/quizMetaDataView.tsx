@@ -1,19 +1,24 @@
 "use client";
 import { usePathname } from "next/navigation";
 import { Clock } from "@components/Clock";
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 
 type QuizViewProps = {
   totalScore: number;
   questionsLength: number;
   assignedFrom?: string;
   className?: string;
-}
+};
 interface Routes {
   [key: string]: JSX.Element;
 }
 
-const QuizMetaDataView = ({ totalScore, questionsLength, assignedFrom, className }: QuizViewProps) => {
+const QuizMetaDataView = ({
+  totalScore,
+  questionsLength,
+  assignedFrom,
+  className,
+}: QuizViewProps) => {
   const routes: Routes = {
     quizzes: (
       <>
@@ -34,7 +39,7 @@ const QuizMetaDataView = ({ totalScore, questionsLength, assignedFrom, className
   const pathname = usePathname();
   const currentRoute = pathname?.split("/")[1];
   if (!currentRoute) return null;
-  
+
   return (
     <div
       className={cn(

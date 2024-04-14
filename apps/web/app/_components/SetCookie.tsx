@@ -1,5 +1,5 @@
 "use client";
-import { getBaseUrl } from "@/src/utils";
+import { getBaseUrl } from "@trivai/lib/utils";
 import { useToast } from "@/src/components/ui/toast";
 import { useEffect } from "react";
 
@@ -31,6 +31,6 @@ const SetCookie = () => {
     });
   }, []);
   return null;
-}
+};
 
 export { SetCookie };

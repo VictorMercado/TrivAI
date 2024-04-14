@@ -3,7 +3,7 @@ import Image from "next/image";
 import React, { useLayoutEffect } from "react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@ui/button";
-import { cn } from "@src/utils";
+import { cn } from "@trivai/lib/utils";
 
 export type ReturnedAnswer = {
   correct: boolean;
@@ -120,7 +120,14 @@ type QuestionImageProps = {
   className?: string;
 };
 
-const QuestionImage = ({ image, width, height, alt, className, ...props }: QuestionImageProps) => {
+const QuestionImage = ({
+  image,
+  width,
+  height,
+  alt,
+  className,
+  ...props
+}: QuestionImageProps) => {
   return (
     <Image
       src={image}
@@ -147,7 +154,7 @@ const QuestionText = ({ children }: QuestionTextProps) => {
 
 type QuestionNextButtonProps = {
   nextAction: () => void;
-}
+};
 
 const QuestionNextButton = ({ nextAction }: QuestionNextButtonProps) => {
   const ref = React.useRef<HTMLButtonElement>(null);
@@ -195,18 +202,22 @@ const QuestionView = ({
   ...props
 }: QuestionViewProps) => {
   return (
-    <div className={cn(className, "flex flex-col gap-y-4")} ref={ref} {...props}>
+    <div
+      className={cn(className, "flex flex-col gap-y-4")}
+      ref={ref}
+      {...props}
+    >
       {children}
     </div>
   );
 };
 
-export { 
-  QuestionView, 
+export {
+  QuestionView,
   QuestionButtons,
   QuestionResults,
   QuestionShowCorrect,
   QuestionImage,
   QuestionText,
   QuestionNextButton,
- };
+};
