@@ -4,7 +4,6 @@ import { encrypt } from "@trivai/auth/lib/encrypt";
 import crypto from 'crypto';
 import { getPrismaErrorDescription } from "@trivai/prisma";
 import { TRPCError } from "@trivai/trpc/server";
-import { revalidatePath } from "next/cache";
 import { getBaseUrl } from "@trivai/lib/utils";
 
 type GetQuizOptions = {
@@ -92,9 +91,15 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
 
   try {
     if (AI_URL) {
+      console.log("AI URL:", AI_URL);
+      console.log("vercel url:", getBaseUrl());
+      
       console.log(prompt);
       let res = await fetch(AI_URL, {
         method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           prompt: prompt,
           webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
@@ -127,7 +132,6 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       message: "Something went wrong with the AI API",
     });
   }
-  // revalidatePath("/quizzes/dashboard");
   return {
     status: "success",
     message: "Quiz created",
