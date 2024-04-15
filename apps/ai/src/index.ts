@@ -147,7 +147,7 @@ const app = new Elysia()
     // return new Response(JSON.stringify({ message: `request number: ${requestNumber} \n ${response}` }));
     return new Response(JSON.stringify({ message: "Processing started", type: "Success" }));
   })
-  .listen(3001);
+  .listen(process.env.PORT || 3000);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
