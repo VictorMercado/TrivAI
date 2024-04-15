@@ -87,6 +87,9 @@ const app = new Elysia()
     requestNumber++;
     async function hitWebhook(body: string) {
       console.log("hitWebhook is running");
+      console.log("hitWebhook is running");
+      console.log("hitWebhook is running");
+      console.log("hitWebhook is running");
       let parsedBody: TBody;
       try {
         parsedBody = ZBody.parse(JSON.parse(body as string));
