@@ -10,7 +10,7 @@ export async function GET(request: Request, { params } : {params: {quizId: strin
   return new Response(JSON.stringify({ message: "Hello World" }), { status: 200 });
 }
 
-export async function POST(request: Request, { params } : {params: {quizId: string}}) {
+export async function POST(request: Request, { params } : {params: { quizId: string }}) {
   console.log(`quizzes/${params.quizId} api hit`);
   // const user = await getCurrentUser();
   let body; 
@@ -38,7 +38,7 @@ export async function POST(request: Request, { params } : {params: {quizId: stri
       answer2: question.answer2,
       answer3: question.answer3,
       answer4: question.answer4,
-      correctAnswer: question[question.correctAnswer],
+      correctAnswer: question[question.correctAnswer] || question.correctAnswer,
     }
   });
   try {

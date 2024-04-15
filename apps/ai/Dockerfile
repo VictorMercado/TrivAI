@@ -1,18 +1,17 @@
-FROM oven/bun
+# use the official Bun image
+# see all versions at https://hub.docker.com/r/oven/bun/tags
+FROM oven/bun:1 as base
 
-WORKDIR /app
+# this will cache them and speed up future builds
+FROM base AS install
 
 COPY package.json .
-COPY bun.lockb .
-COPY yarn.lock .
 
-RUN bun install --production
+RUN  bun install --frozen-lockfile --production
 
-COPY src src
-COPY tsconfig.json .
+COPY . .
 
-ENV NODE_ENV production
-
-CMD ["bun", "src/index.ts"]
-
-EXPOSE 3001
+# run the app
+USER bun
+EXPOSE 3001/tcp
+ENTRYPOINT [ "bun", "run", "src/index.ts" ]

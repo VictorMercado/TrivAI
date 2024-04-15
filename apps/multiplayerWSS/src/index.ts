@@ -16,9 +16,7 @@ const arrayOfMessages = [
   "anon: This is a tenth message from the server",
   "anon: This is a eleventh message from the server",
   "anon: This is a twelfth message from the server",
-  
 ];
-
 
 type User = {
   id: string;
@@ -44,7 +42,7 @@ type WebSocketData = {
 };
 
 const server = Bun.serve({
-  port: 3000,
+  port: 3002,
   fetch(req, server) {
     const url = new URL(req.url);
     let res = new Response("Hello World");
