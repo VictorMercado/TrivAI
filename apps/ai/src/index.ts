@@ -30,7 +30,14 @@ async function hitWebhook(body: string) {
     return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
   }
 
-  let response = await run(parsedBody.prompt);
+  let response = "";
+  try {
+    response = await run(parsedBody.prompt);
+  }
+  catch (e) {
+    console.log("error in run");
+    console.log(e);
+  }
   // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
 
   const match = backticksRegex.exec(response);
@@ -42,11 +49,20 @@ async function hitWebhook(body: string) {
   response = stringExtractor(response, "json");
   console.log(response);
 
-  const webhookResponse = await fetch(parsedBody.webhook, {
-    method: "POST",
-    body: response,
-  });
-  const webhookResponseJson = await webhookResponse.json();
+  let webhookResponse;
+  try {
+    webhookResponse = await fetch(parsedBody.webhook, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: response,
+    });
+  } catch (e) {
+    console.log(e);
+  }
+
+  const webhookResponseJson = await webhookResponse?.json();
   console.log(webhookResponseJson.status);
 }
 
