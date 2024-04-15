@@ -162,7 +162,7 @@ const app = new Elysia()
     // }
     console.log("about to run hitWebhook");
     
-    hitWebhook(body);
+    await hitWebhook(body);
 
     console.log("hitWebhook ran");
     
