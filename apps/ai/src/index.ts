@@ -79,6 +79,9 @@ let requestNumber = 1;
 
 const app = new Elysia()
   .use(cors())
+  .get("/", () => {
+    return new Response("Hello World");
+  })
   // .get("/", async ({ cookie: { userToken }, request }) => {
   //   const allToken: string = userToken.value;
   //   if (!allToken) {

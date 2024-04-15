@@ -44,9 +44,12 @@ type WebSocketData = {
 };
 
 const server = Bun.serve({
-  port: 3005,
+  port: 3000,
   fetch(req, server) {
     const url = new URL(req.url);
+    let res = new Response("Hello World");
+    res.headers.set('Access-Control-Allow-Origin', '*');
+    res.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
     console.log("cookie: " + req.headers.getSetCookie());
     
     if (url.pathname === "/chat") {
@@ -60,7 +63,7 @@ const server = Bun.serve({
       }
       return;
     }
-    return new Response("Hello World");
+    return res;
   },
   websocket: {
     publishToSelf: true,
