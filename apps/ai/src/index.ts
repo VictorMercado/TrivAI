@@ -18,59 +18,10 @@ const apiKey: string = process.env.GOOGLE_API_KEY as string;
 export const googleAI = new GoogleGenerativeAI(apiKey);
 const googleModelName = "gemini-pro";
 
-async function hitWebhook(body: string) {
-  console.log("hitWebhook is running");
-  let parsedBody: TBody;
-  try {
-    parsedBody = ZBody.parse(JSON.parse(body as string));
-  }
-  catch (e) {
-    if (e instanceof ZodError) {
-      return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
-    }
-    return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
-  }
-
-  let response = "";
-  try {
-    response = await run(parsedBody.prompt);
-  }
-  catch (e) {
-    console.log("error in run");
-    console.log(e);
-  }
-  // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
-
-  const match = backticksRegex.exec(response);
-  if (match === null) {
-    return { message: "No response", error: true };
-  }
-  response = match[1];
-  response = stringExtractor(response, "JSON");
-  response = stringExtractor(response, "json");
-  console.log(response);
-
-  let webhookResponse;
-  try {
-    webhookResponse = await fetch(parsedBody.webhook, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-      method: "POST",
-      body: response,
-    });
-  } catch (e) {
-    console.log(e);
-  }
-
-  const webhookResponseJson = await webhookResponse?.json();
-  console.log(webhookResponseJson.status);
-}
-
 async function run(prompt: string = "Give me a 5 question quiz about anything.") {
   // For text-only input, use the gemini-pro model
   console.log("run is running");
-  
+
   const model = googleAI.getGenerativeModel({ model: googleModelName });
 
   const result = await model.generateContent(prompt);
@@ -78,6 +29,7 @@ async function run(prompt: string = "Give me a 5 question quiz about anything.")
   const text = response.text();
   return text;
 }
+
 
 const ZBody = z.object({
   prompt: z.string(),
@@ -130,9 +82,58 @@ const app = new Elysia()
   // })
 
   // .post("/ai/quiz/gen", async ({ body, cookie: { userToken } } : {body: string; cookie: TCookie}) => {
-  .post("/ai/quiz/gen", async ({ body, req, res}: { body: string; req: Request; res: Response}) => {
+  .post("/ai/quiz/gen", async ({ body}: { body: string;}) => {
     console.log("/ai/quiz/gen hit");
     requestNumber++;
+    async function hitWebhook(body: string) {
+      console.log("hitWebhook is running");
+      let parsedBody: TBody;
+      try {
+        parsedBody = ZBody.parse(JSON.parse(body as string));
+      }
+      catch (e) {
+        if (e instanceof ZodError) {
+          return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
+        }
+        return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
+      }
+      console.log("body is parsed");
+      
+      let response = "";
+      try {
+        response = await run(parsedBody.prompt);
+      }
+      catch (e) {
+        console.log("error in run");
+        console.log(e);
+      }
+      // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
+
+      const match = backticksRegex.exec(response);
+      if (match === null) {
+        return { message: "No response", error: true };
+      }
+      response = match[1];
+      response = stringExtractor(response, "JSON");
+      response = stringExtractor(response, "json");
+      console.log(response);
+
+      let webhookResponse;
+      try {
+        webhookResponse = await fetch(parsedBody.webhook, {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          method: "POST",
+          body: response,
+        });
+      } catch (e) {
+        console.log(e);
+      }
+
+      const webhookResponseJson = await webhookResponse?.json();
+      console.log(webhookResponseJson.status);
+    }
     // const allToken: string = userToken.value;
 
     // if (!allToken) {
@@ -161,8 +162,13 @@ const app = new Elysia()
     //   return new Response(JSON.stringify({ message: "No session or bad token", error: true }), { status: 400 });
     // }
     console.log("about to run hitWebhook");
-    
-    await hitWebhook(body);
+    try {
+      await hitWebhook(body);
+    }
+    catch (e) {
+      console.log(e);
+      return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
+    }
 
     console.log("hitWebhook ran");
     
