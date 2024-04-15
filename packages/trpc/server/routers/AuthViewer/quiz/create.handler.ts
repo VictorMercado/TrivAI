@@ -107,7 +107,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "AI API failed",
+          message: "AI API did not return a 200 status code",
         });
       }
     } else {
@@ -122,7 +122,10 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
         genStatus: "FAILED",
       }
     });
-    throw new Error('AI API is not available');
+    throw new TRPCError({
+      code: "INTERNAL_SERVER_ERROR",
+      message: "Something went wrong with the AI API",
+    });
   }
   // revalidatePath("/quizzes/dashboard");
   return {

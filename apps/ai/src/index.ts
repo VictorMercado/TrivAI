@@ -80,6 +80,8 @@ let requestNumber = 1;
 const app = new Elysia()
   .use(cors())
   .get("/", () => {
+    console.log("/GET hit");
+    
     return new Response("Hello World");
   })
   // .get("/", async ({ cookie: { userToken }, request }) => {
@@ -110,6 +112,7 @@ const app = new Elysia()
 
   // .post("/ai/quiz/gen", async ({ body, cookie: { userToken } } : {body: string; cookie: TCookie}) => {
   .post("/ai/quiz/gen", async ({ body, req, res}: { body: string; req: Request; res: Response}) => {
+    console.log("/ai/quiz/gen hit");
     requestNumber++;
     // const allToken: string = userToken.value;
 
@@ -148,6 +151,8 @@ const app = new Elysia()
     return new Response(JSON.stringify({ message: "Processing started", type: "Success" }));
   })
   .listen(process.env.PORT || 3000);
+
+console.log("process.env.PORT: ", process.env.PORT);
 
 console.log(
   `🦊 Elysia is running at ${app.server?.hostname}:${app.server?.port}`
