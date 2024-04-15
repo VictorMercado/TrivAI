@@ -55,6 +55,15 @@ const app = new Elysia()
     
     return new Response("Hello World");
   })
+  .get("/pokemon", async () => {
+    console.log("/pokemon hit");
+    let response = await fetch("https://pokeapi.co/api/v2/pokemon/ditto");
+    if (!response.ok) {
+      return new Response(JSON.stringify({ message: "No response", error: true }), { status: 400 });
+    }
+    response = await response.json();
+    return new Response(JSON.stringify(response));
+  })
   // .get("/", async ({ cookie: { userToken }, request }) => {
   //   const allToken: string = userToken.value;
   //   if (!allToken) {
@@ -89,7 +98,7 @@ const app = new Elysia()
       console.log("hitWebhook is running");
       console.log("hitWebhook is running");
       console.log("hitWebhook is running");
-      console.log("hitWebhook is running");
+      console.log(z);
       let parsedBody: TBody;
       try {
         parsedBody = ZBody.parse(JSON.parse(body as string));
