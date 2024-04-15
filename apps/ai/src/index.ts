@@ -19,6 +19,7 @@ export const googleAI = new GoogleGenerativeAI(apiKey);
 const googleModelName = "gemini-pro";
 
 async function hitWebhook(body: string) {
+  console.log("hitWebhook is running");
   let parsedBody: TBody;
   try {
     parsedBody = ZBody.parse(JSON.parse(body as string));
@@ -68,6 +69,8 @@ async function hitWebhook(body: string) {
 
 async function run(prompt: string = "Give me a 5 question quiz about anything.") {
   // For text-only input, use the gemini-pro model
+  console.log("run is running");
+  
   const model = googleAI.getGenerativeModel({ model: googleModelName });
 
   const result = await model.generateContent(prompt);
@@ -157,9 +160,12 @@ const app = new Elysia()
     // if (!session) {
     //   return new Response(JSON.stringify({ message: "No session or bad token", error: true }), { status: 400 });
     // }
-
+    console.log("about to run hitWebhook");
+    
     hitWebhook(body);
 
+    console.log("hitWebhook ran");
+    
     // console.log("request out: " + newReq);
     // console.log(response);
 
