@@ -100,8 +100,7 @@ const app = new Elysia()
       let parsedBody: TBody;
       try {
         console.log("body is being parsed");
-        console.log(body);
-        parsedBody = ZBody.parse(JSON.parse(body));
+        parsedBody = ZBody.parse(body);
         console.log(parsedBody);
       }
       catch (e) {
