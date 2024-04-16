@@ -53,6 +53,7 @@ async function hitWebhook(body: string) {
   let parsedBody: TBody;
   try {
     console.log("body is being parsed");
+    console.log(body);
     parsedBody = ZBody.parse(body);
     console.log(parsedBody);
   }
@@ -192,7 +193,7 @@ const app = new Elysia()
     // console.log(response);
 
     // return new Response(JSON.stringify({ message: `request number: ${requestNumber} \n ${response}` }));
-    return new Response(JSON.stringify({ message: "Processing started", type: "Success" }));
+    return new Response(JSON.stringify({ message: "Processing started", type: "Success" }), { status: 200 });
   })
   .listen(process.env.PORT || 3000);
 

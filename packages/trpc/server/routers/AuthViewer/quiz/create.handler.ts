@@ -93,18 +93,23 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
     if (AI_URL) {
       console.log("AI URL:", AI_URL);
       console.log("vercel url:", getBaseUrl());
-      
       console.log(prompt);
+      const body = {
+        prompt: prompt,
+        webhook: getBaseUrl() + "/api/quizzes/generate/" + String(quiz.id),
+        quizId: String(quiz.id),
+      };
+      const stringifiedBody = JSON.stringify(body);
+      
+      console.log(body);
+      console.log(stringifiedBody);
+
       let res = await fetch(AI_URL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({
-          prompt: prompt,
-          webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
-          quizId: String(quiz.id),
-        }),
+        body: stringifiedBody,
       });
       if (res.ok) {
         quizJSON = await res.json();
