@@ -103,7 +103,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
         body: JSON.stringify({
           prompt: prompt,
           webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
-          quizId: quiz.id,
+          quizId: String(quiz.id),
         }),
       });
       if (res.ok) {

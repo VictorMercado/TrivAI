@@ -7,6 +7,24 @@ import { decrypt } from "@trivai/auth/lib/decrypt";
 
 const backticksRegex = /```([\s\S]+?)```/;
 
+const ZBody = z.object({
+  prompt: z.string(),
+  webhook: z.string(),
+  quizId: z.string(),
+});
+type TBody = z.infer<typeof ZBody>;
+
+const ZCookie = z.object({
+  userToken: z.object({
+    value: z.string(),
+  }),
+});
+
+type TCookie = z.infer<typeof ZCookie>;
+
+
+let requestNumber = 1;
+
 export const stringExtractor = (stringToModify: string | undefined, substring: string) => {
   if (!stringToModify) return "";
   const index = stringToModify.indexOf(substring);
@@ -30,24 +48,60 @@ async function run(prompt: string = "Give me a 5 question quiz about anything.")
   return text;
 }
 
+async function hitWebhook(body: string) {
+  console.log("hitWebhook is running");
+  let parsedBody: TBody;
+  try {
+    console.log("body is being parsed");
+    parsedBody = ZBody.parse(body);
+    console.log(parsedBody);
+  }
+  catch (e) {
+    if (e instanceof ZodError) {
+      console.log("zod error");
 
-const ZBody = z.object({
-  prompt: z.string(),
-  webhook: z.string(),
-  quizId: z.string(),
-});
-type TBody = z.infer<typeof ZBody>;
+      return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
+    }
+    console.log("json error");
+    return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
+  }
+  console.log("body is parsed");
 
-const ZCookie =  z.object({ 
-  userToken: z.object({
-    value: z.string(),
-  }),
-});
+  let response = "";
+  try {
+    response = await run(parsedBody.prompt);
+  }
+  catch (e) {
+    console.log("error in run");
+    console.log(e);
+  }
+  // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
 
-type TCookie = z.infer<typeof ZCookie>;
+  const match = backticksRegex.exec(response);
+  if (match === null) {
+    return { message: "No response", error: true };
+  }
+  response = match[1];
+  response = stringExtractor(response, "JSON");
+  response = stringExtractor(response, "json");
+  console.log(response);
 
+  let webhookResponse;
+  try {
+    webhookResponse = await fetch(parsedBody.webhook, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: response,
+    });
+  } catch (e) {
+    console.log(e);
+  }
 
-let requestNumber = 1;
+  const webhookResponseJson = await webhookResponse?.json();
+  console.log(webhookResponseJson.status);
+}
 
 const app = new Elysia()
   .use(cors())
@@ -95,60 +149,7 @@ const app = new Elysia()
   .post("/ai/quiz/gen", async ({ body}: { body: string;}) => {
     console.log("/ai/quiz/gen hit");
     requestNumber++;
-    async function hitWebhook(body: string) {
-      console.log("hitWebhook is running");
-      let parsedBody: TBody;
-      try {
-        console.log("body is being parsed");
-        parsedBody = ZBody.parse(body);
-        console.log(parsedBody);
-      }
-      catch (e) {
-        if (e instanceof ZodError) {
-          console.log("zod error");
-          
-          return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
-        }
-        console.log("json error");
-        return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
-      }
-      console.log("body is parsed");
-      
-      let response = "";
-      try {
-        response = await run(parsedBody.prompt);
-      }
-      catch (e) {
-        console.log("error in run");
-        console.log(e);
-      }
-      // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
 
-      const match = backticksRegex.exec(response);
-      if (match === null) {
-        return { message: "No response", error: true };
-      }
-      response = match[1];
-      response = stringExtractor(response, "JSON");
-      response = stringExtractor(response, "json");
-      console.log(response);
-
-      let webhookResponse;
-      try {
-        webhookResponse = await fetch(parsedBody.webhook, {
-          headers: {
-            "Content-Type": "application/json",
-          },
-          method: "POST",
-          body: response,
-        });
-      } catch (e) {
-        console.log(e);
-      }
-
-      const webhookResponseJson = await webhookResponse?.json();
-      console.log(webhookResponseJson.status);
-    }
     // const allToken: string = userToken.value;
 
     // if (!allToken) {
@@ -178,7 +179,7 @@ const app = new Elysia()
     // }
     console.log("about to run hitWebhook");
     try {
-      await hitWebhook(body);
+      hitWebhook(body);
     }
     catch (e) {
       console.log(e);
