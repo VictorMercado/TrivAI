@@ -96,8 +96,8 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       console.log(prompt);
       const body = {
         prompt: prompt,
-        webhook: getBaseUrl() + "/api/quizzes/generate/" + String(quiz.id),
-        quizId: String(quiz.id),
+        webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
+        quizId: quiz.id,
       };
       const stringifiedBody = JSON.stringify(body);
       

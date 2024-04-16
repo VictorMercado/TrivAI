@@ -10,7 +10,7 @@ const backticksRegex = /```([\s\S]+?)```/;
 const ZBody = z.object({
   prompt: z.string(),
   webhook: z.string(),
-  quizId: z.string(),
+  quizId: z.number(),
 });
 type TBody = z.infer<typeof ZBody>;
 
