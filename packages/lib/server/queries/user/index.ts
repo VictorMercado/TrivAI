@@ -8,11 +8,14 @@ export type UserState = {
   totalScore: number;
   image: string;
   cheatUsed: boolean;
+  primaryColor?: string;
+  credits: number;
+  creditsMultiplier: number;
 }
 
 export const getUser = async () => {
   let dbUser;
-  const currentUser = await getCurrentUser() as any;
+  const currentUser = await getCurrentUser();
   if (currentUser) {
     try {
       dbUser = (await prisma.user.findUnique({
@@ -25,6 +28,9 @@ export const getUser = async () => {
           totalScore: true,
           cheatUsed: true,
           image: true,
+          credits: true,
+          primaryColor: true,
+          creditsMultiplier: true,
         },
       })) as UserState;
     } catch (error) {

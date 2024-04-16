@@ -9,6 +9,8 @@ import {
   PrismaQuestionSelectView,
   getQuizWithQuestions,
 } from "@trivai/lib/server/queries/quiz";
+import { CREDITSPERQUESTION } from "@src/config/constants";
+
 
 interface Routes {
   [key: string]: JSX.Element;
@@ -24,6 +26,7 @@ async function getUserQuiz(
     },
     select: {
       id: true,
+      scoreAmt: true,
       questions: {
         select: PrismaQuestionSelectView,
         where: {
@@ -116,7 +119,11 @@ export default async function QuizIdPage({
 
   return (
     <>
-      <QuizController quizId={quiz?.id} activeQuestions={questions} />
+      <QuizController
+        quizId={quiz?.id}
+        activeQuestions={questions}
+        scoreAmt={quiz.scoreAmt}
+      />
     </>
   );
 }

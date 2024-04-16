@@ -23,19 +23,23 @@ import { useToast } from "@ui/toast";
 import { shuffle } from "@trivai/lib/utils";
 // import QuestionOptions from '@/app/components/QuestionOptions';
 
+type QuizControllerProps = {
+  quizId: number | undefined;
+  activeQuestions: Array<TQuestionView>;
+  scoreAmt: number;
+};
+
 const QuizController = ({
   quizId,
   activeQuestions,
-}: {
-  quizId: number | undefined;
-  activeQuestions: Array<TQuestionView>;
-}) => {
+  scoreAmt,
+}: QuizControllerProps) => {
   // console.log(getDate());
   let router = useRouter();
   let { addToast } = useToast();
   const { data: session } = useSession();
   const userId = session?.user.id;
-  const { totalScore, cheatUsed } = useStore((state) => state);
+  const { totalScore, cheatUsed, incrementScore, incrementCredits } = useStore((state) => state);
   const [questions, setQuestions] =
     useState<Array<TQuestionView>>(activeQuestions);
   let question = questions[0] || null;
@@ -76,6 +80,8 @@ const QuizController = ({
           message: "Credits added!",
           type: "success",
         });
+        incrementScore(scoreAmt);
+        incrementCredits();
       }
       setReturnedAnswer({
         correct: data.correct,
@@ -105,8 +111,11 @@ const QuizController = ({
       .then((res) => res.json())
       .then((data) => {
         console.log(data);
-      }).catch((e) => {
-        console.log("error occured cause this needs to be in TRPC in QuizController.tsx");
+      })
+      .catch((e) => {
+        console.log(
+          "error occured cause this needs to be in TRPC in QuizController.tsx",
+        );
       });
     alert("dismounted");
   });

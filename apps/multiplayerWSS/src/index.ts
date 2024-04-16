@@ -42,7 +42,7 @@ type WebSocketData = {
 };
 
 const server = Bun.serve({
-  port: 3002,
+  port: process.env.PORT || 3002,
   fetch(req, server) {
     const url = new URL(req.url);
     let res = new Response("Hello World");

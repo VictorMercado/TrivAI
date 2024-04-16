@@ -15,6 +15,7 @@ export const QuizModel = z.object({
   genStatus: z.nativeEnum(GeneratedStatus),
   createdAt: z.date(),
   updatedAt: z.date(),
+  reasonForFail: z.string().nullish(),
   ownerId: z.string().nullish(),
   quizCategoryId: z.number().int(),
 })

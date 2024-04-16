@@ -13,44 +13,48 @@ import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { AuthButton } from "./ui/auth-button";
 import { Button } from "@ui/button";
 import { use } from "react";
+import { CreditsDetail } from "@ui/credits-detail";
 
-type ProfilePicturePopoverProps = {
-  image: string;
+const NotaUser = () => {
+  return(
+    <Popover>
+      <PopoverTrigger>
+        <ProfilePicture image={"/default.png"} />
+      </PopoverTrigger>
+
+      <PopoverContent>
+        <div className="flex w-full flex-col items-center gap-y-4 ">
+          <div className="flex gap-x-2">
+            <span className="text-textBase">
+              Not a User?
+            </span>
+          </div>
+          <PopoverClose className="" asChild>
+            <AuthButton />
+          </PopoverClose>
+        </div>
+      </PopoverContent>
+    </Popover>
+  );
 };
 
-const ProfilePicturePopover = ({ image }: ProfilePicturePopoverProps) => {
+const ProfilePicturePopover = () => {
   const userSession = use(getCurrentUser());
   if (!userSession) {
-    return (
-      <Popover>
-        <PopoverTrigger>
-          <ProfilePicture image={image} />
-        </PopoverTrigger>
-
-        <PopoverContent>
-          <div className="flex w-full flex-col items-center gap-y-4 ">
-            <div className="flex gap-x-2">
-              <span className="text-textBase">
-                Not a User?
-              </span>
-            </div>
-            <PopoverClose className="" asChild>
-              <AuthButton />
-            </PopoverClose>
-          </div>
-        </PopoverContent>
-      </Popover>
-    );
+    return (<NotaUser />);
   }
   const user = use(getUserWithProperties({
     userId: userSession.id,
-    properties: ["credits", "userName", "role"],
+    properties: ["credits", "userName", "role", "image"],
   }));
-  
+  // check if user is not logged in
+  if (!user) {
+    return (<NotaUser />);
+  }
   return (
     <Popover>
       <PopoverTrigger>
-        <ProfilePicture image={image} />
+        <ProfilePicture image={user.image || "/default.png"} />
       </PopoverTrigger>
 
       <PopoverContent>
@@ -59,10 +63,7 @@ const ProfilePicturePopover = ({ image }: ProfilePicturePopoverProps) => {
             <span className="text-textBase">
               {user?.userName?.toUpperCase()}
             </span>
-            <div className="flex items-center gap-x-1 text-yellow-600 dark:text-yellow-400">
-              <SVGCoin size={24} className="inline-block" />
-              <span className="">{user?.credits}</span>
-            </div>
+            <CreditsDetail />
           </div>
           {user?.role === "ADMIN" && (
             <PopoverClose className="w-64" asChild>

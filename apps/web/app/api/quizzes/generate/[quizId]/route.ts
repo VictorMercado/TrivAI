@@ -19,12 +19,15 @@ export async function POST(request: Request, { params } : {params: { quizId: str
     body = await request.json();
   } 
   catch (e) {
+    console.log("json parse failed");
+    
     await prisma.quiz.update({
       where: {
         id: parseInt(params.quizId),
       },
       data: {
         genStatus: "FAILED",
+        reasonForFail: "Json Parse Failed, AI did not send a valid JSON object",
       }
     });
     return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
@@ -32,14 +35,32 @@ export async function POST(request: Request, { params } : {params: { quizId: str
 
   let prismaResult;
   const questions = body.map((question: any) => {
-    return {
-      text: question.text,
+    let doesCorrectAnswerExist = false;
+    let questionObject : {[k: string] : string} = {
+      text: question.text || question.question,
       answer1: question.answer1,
       answer2: question.answer2,
       answer3: question.answer3,
       answer4: question.answer4,
       correctAnswer: question[question.correctAnswer] || question.correctAnswer,
+    };
+    for (let key in questionObject) {
+      if (key === "correctAnswer") continue;
+      if (questionObject[key] === questionObject.correctAnswer) {
+        doesCorrectAnswerExist = true;
+      }
     }
+    if (!doesCorrectAnswerExist) {
+      return {
+        text: question.text,
+        answer1: question.answer1,
+        answer2: question.answer2,
+        answer3: question.answer3,
+        answer4: questionObject.correctAnswer,
+        correctAnswer: question[question.correctAnswer] || question.correctAnswer,
+      };
+    }
+    return questionObject;
   });
   try {
     prismaResult = await prisma.quiz.update({
@@ -61,6 +82,7 @@ export async function POST(request: Request, { params } : {params: { quizId: str
       },
       data: {
         genStatus: "FAILED",
+        reasonForFail: "Questions could not be created in the database",
       }
     });
     return new Response(JSON.stringify({ message: "Error", status: "failed" }), { status: 500 });

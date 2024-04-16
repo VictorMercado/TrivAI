@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { UserState } from "@trivai/lib/server/queries/user";
+import { CREDITSPERQUESTION } from './config/constants';
 
 export type Actions = {
   incrementScore: (pointAmount: number) => void;
@@ -7,17 +8,23 @@ export type Actions = {
   resetScore: () => void;
   deleteAccount: () => void;
   updateUserName: (name: string) => void;
+  incrementCredits: () => void;
 };
 
-const initialState: UserState = {
+const initialState = {
   id: "",
   name: "",
   totalScore: 0,
   image: "",
   cheatUsed: false,
+  credits: 0,
+  creditsMultiplier: 1,
+  creditsToAdd: CREDITSPERQUESTION,
 };
 
-export const useStore = create<UserState & Actions>((set, get) => ({
+export type UserStore = UserState & { creditsToAdd: number; };
+
+export const useStore = create<UserStore & Actions>((set, get) => ({
   ...initialState,
   updateUserName: async (name) => {
     const response = await fetch("/api/updateName", {
@@ -33,20 +40,13 @@ export const useStore = create<UserState & Actions>((set, get) => ({
     let nameResponse = await response.json().then(data => data.name);
     set({ name: nameResponse });
   },
-  incrementScore: async (pointAmount) => {
-    const response = await fetch("/api/score", {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ id: get().id, totalScore: get().totalScore + pointAmount })
-    });
-    if (!response.ok) {
-
-      throw new Error(response.statusText);
-    }
-    let score = await response.json().then(data => data.totalScore);
+  incrementScore: (pointAmount) => {
+    const score = get().totalScore + pointAmount;
     set({ totalScore: score });
+  },
+  incrementCredits: () => {
+    const credits = get().credits + (get().creditsToAdd * get().creditsMultiplier);
+    set({ credits: credits });
   },
   removeCheat: async () => {
     const response = await fetch("/api/cheat", {

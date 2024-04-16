@@ -77,7 +77,7 @@ export default async function RootLayout({ children }: IProps) {
             user={dbUser}
           >
             {/* <ClientDimensions /> */}
-            <Nav user={dbUser} />
+            <Nav />
             <div className="flex grow flex-col justify-between md:flex-row md:justify-start">
               <div className="fixed bottom-0 left-0 z-50 order-last flex w-screen justify-center border-r border-primary/25 bg-background pb-5 md:static md:order-first md:w-24 md:items-start">
                 <SiteNav />

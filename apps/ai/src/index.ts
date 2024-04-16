@@ -20,6 +20,26 @@ const ZCookie = z.object({
   }),
 });
 
+const ZQuestions = z.array(z.object({
+  text: z.string(),
+  answer1: z.string(),
+  answer2: z.string(),
+  answer3: z.string(),
+  answer4: z.string(),
+  correctAnswer: z.string(),
+}));
+
+const ZQuestionWithQustionText = z.array(z.object({
+  question: z.string(),
+  answer1: z.string(),
+  answer2: z.string(),
+  answer3: z.string(),
+  answer4: z.string(),
+  correctAnswer: z.string(),
+}));
+
+const ZQuestionsEither = z.lazy(() => z.union([ZQuestions, ZQuestionWithQustionText]));
+
 type TCookie = z.infer<typeof ZCookie>;
 
 
@@ -52,15 +72,11 @@ async function hitWebhook(body: string) {
   console.log("hitWebhook is running");
   let parsedBody: TBody;
   try {
-    console.log("body is being parsed");
-    console.log(body);
     parsedBody = ZBody.parse(body);
-    console.log(parsedBody);
   }
   catch (e) {
     if (e instanceof ZodError) {
       console.log("zod error");
-
       return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
     }
     console.log("json error");
@@ -68,9 +84,18 @@ async function hitWebhook(body: string) {
   }
   console.log("body is parsed");
 
+  let match;
   let response = "";
   try {
     response = await run(parsedBody.prompt);
+    match = backticksRegex.exec(response);
+    if (match === null) {
+      return { message: "No response", error: true };
+    }
+    response = match[1];
+    response = stringExtractor(response, "JSON");
+    response = stringExtractor(response, "json");
+    console.log(response);
   }
   catch (e) {
     console.log("error in run");
@@ -78,16 +103,25 @@ async function hitWebhook(body: string) {
   }
   // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
 
-  const match = backticksRegex.exec(response);
-  if (match === null) {
-    return { message: "No response", error: true };
+  try {
+    response = JSON.stringify(ZQuestionsEither.parse(JSON.parse(response)));
+  } catch (e) {
+    console.log("zod error");
+    console.log("rerunning");
+    response = await run(parsedBody.prompt);
+    match = backticksRegex.exec(response);
+    if (match === null) {
+      return { message: "No response", error: true };
+    }
+    response = match[1];
+    response = stringExtractor(response, "JSON");
+    response = stringExtractor(response, "json");
+    console.log(response);
   }
-  response = match[1];
-  response = stringExtractor(response, "JSON");
-  response = stringExtractor(response, "json");
-  console.log(response);
+
 
   let webhookResponse;
+  // todo check response against a zod schema, if it fails run again then return error
   try {
     webhookResponse = await fetch(parsedBody.webhook, {
       headers: {
@@ -178,7 +212,6 @@ const app = new Elysia()
     // if (!session) {
     //   return new Response(JSON.stringify({ message: "No session or bad token", error: true }), { status: 400 });
     // }
-    console.log("about to run hitWebhook");
     try {
       hitWebhook(body);
     }
@@ -186,8 +219,6 @@ const app = new Elysia()
       console.log(e);
       return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
     }
-
-    console.log("hitWebhook ran");
     
     // console.log("request out: " + newReq);
     // console.log(response);

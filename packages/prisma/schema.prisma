@@ -323,6 +323,7 @@ model Quiz {
   genStatus      GeneratedStatus           @default(PENDING) 
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
+  reasonForFail  String?          
 
   questions      Question[]
   userAnswers    UserAnsweredQuiz[]
@@ -350,7 +351,7 @@ model UserAssignedQuiz {
   day       Int?            @db.TinyInt
 
   quizId Int
-  quiz   Quiz @relation(fields: [quizId], references: [id])
+  quiz   Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   userId String
   user   User   @relation(name: "owner", fields: [userId], references: [id], onDelete: Cascade)

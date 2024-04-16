@@ -2,14 +2,9 @@ import Link from "next/link";
 import { TrivaiLogo } from "@ui/trivai-logo";
 import { ProfilePicturePopover } from "./ProfilePicturePopover";
 import { Slug } from "@ui/slug";
-import { UserState } from "@trivai/lib/server/queries/user";
 import { Suspense } from "react";
 
-type NavProps = {
-  user?: UserState;
-};
-
-const Nav = ({ user }: NavProps) => {
+const Nav = () => {
   return (
     <>
       <nav className="flex flex-row items-center justify-between gap-x-4 border-b border-primary/25 px-4 py-2 text-textBase transition delay-150 ease-in-out lg:flex-wrap lg:items-center lg:px-4">
@@ -24,7 +19,7 @@ const Nav = ({ user }: NavProps) => {
           <Suspense
             fallback={<img width="36" height="36" src="/default.png" />}
           >
-            <ProfilePicturePopover image={user?.image || "/default.png"} />
+            <ProfilePicturePopover />
           </Suspense>
         </div>
       </nav>

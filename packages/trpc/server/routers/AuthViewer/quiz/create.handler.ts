@@ -101,8 +101,6 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       };
       const stringifiedBody = JSON.stringify(body);
       
-      console.log(body);
-      console.log(stringifiedBody);
 
       let res = await fetch(AI_URL, {
         method: 'POST',
@@ -117,7 +115,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       } else {
         throw new TRPCError({
           code: "BAD_REQUEST",
-          message: "AI API did not return a 200 status code",
+          message: "AI_API did not return a 200 status code",
         });
       }
     } else {

@@ -185,6 +185,7 @@ export async function getQuizWithQuestions(id: number) {
     },
     select: {
       id: true,
+      scoreAmt: true,
       questions: {
         select: PrismaQuestionSelectView,
       },
@@ -277,7 +278,7 @@ export async function getUserAssignedQuizzesToFriends(userId: string) {
     where: {
       userId: userId,
       assigneeId: {
-        not: AIOVERLORD_ID,
+        notIn: [AIOVERLORD_ID, userId],
       },
     },
     select: {
