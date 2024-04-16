@@ -34,6 +34,7 @@ async function run(prompt: string = "Give me a 5 question quiz about anything.")
 const ZBody = z.object({
   prompt: z.string(),
   webhook: z.string(),
+  quizId: z.string(),
 });
 type TBody = z.infer<typeof ZBody>;
 
@@ -96,17 +97,18 @@ const app = new Elysia()
     requestNumber++;
     async function hitWebhook(body: string) {
       console.log("hitWebhook is running");
-      console.log("hitWebhook is running");
-      console.log("hitWebhook is running");
-      console.log(z);
       let parsedBody: TBody;
       try {
+        console.log("body is being parsed");
         parsedBody = ZBody.parse(JSON.parse(body as string));
       }
       catch (e) {
         if (e instanceof ZodError) {
+          console.log("zod error");
+          
           return new Response(JSON.stringify({ message: e.errors, error: true }), { status: 400 });
         }
+        console.log("json error");
         return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
       }
       console.log("body is parsed");
