@@ -21,7 +21,7 @@ const FriendRequest = ({userId} : FriendRequestProps) => {
         message: "Friend request sent",
         type: "success",
       });
-      utils.authViewer.friend.getRequested.invalidate();
+      utils.authViewer.friend.getPending.invalidate();
     },
     onError: (e) => {
       addToast({

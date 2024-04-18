@@ -38,9 +38,9 @@ const QuestionButtons = ({
           variant={`${isLoading ? "loading" : "default"}`}
           size="default"
           onClick={() => handleCheckAnswer(answer)}
-          disabled
           ref={index === 0 ? ref : undefined}
           className="py-4"
+          disabled={isLoading}
         >
           {answer}
         </Button>

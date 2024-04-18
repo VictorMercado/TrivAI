@@ -4,6 +4,7 @@ import { serverRouter } from "@/app/_trpc/serverRouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/tabs";
 import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { Friends } from "@components/Friends";
+import { Suspense } from "react";
 interface Friend {
   id: number;
   name: string;
@@ -47,11 +48,7 @@ export default async function Layout({
             </TabsList>
             <TabsContent value="friends" className="w-full" tabIndex={-1}>
               <div className="hideScroll flex w-screen overflow-auto p-2 md:w-full md:flex-col md:space-x-0 md:space-y-2">
-                {friends ? (
-                  <Friends friends={friends} sessionUserId={user!.id} />
-                ) : (
-                  <div>Loading...</div>
-                )}
+                <Friends friends={friends} sessionUserId={user!.id} />
               </div>
             </TabsContent>
             <TabsContent value="quizzes">

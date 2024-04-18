@@ -24,6 +24,7 @@ type UserProps = {
   // TODO: maybe change name of this prop to friendId or rootUser 
   // to make the distinction that this is the session user interacting with the friend
   sessionUserId: string;
+  actions?: boolean;
 };
 
 const User = ({
@@ -35,7 +36,9 @@ const User = ({
   totalScore,
   credits,
   sessionUserId,
+  actions = false,
 }: UserProps) => {
+  const utils = trpc.useUtils();
   const { addToast } = useToast();
   const deleteFriend = trpc.authViewer.friend.delete.useMutation({
     onSuccess: () => {
@@ -44,6 +47,7 @@ const User = ({
         message: "Friend deleted",
         type: "success",
       });
+      utils.authViewer.friend.getAll.invalidate();
     },
     onError: (error) => {
       addToast({
@@ -80,69 +84,71 @@ const User = ({
       <div className="flex hidden grow items-center justify-center">
         <p>{prize}</p>
       </div>
-      <DropdownMenu>
-        <DropdownMenuTrigger>
-          <MoreVertical />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent className="w-52 p-2">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSeparator />
-          <div className="space-y-2">
-            <DropdownMenuItem asChild>
-              <Button
-                size="default"
-                variant="default"
-                className="w-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Invite to Quiz");
-                }}
-              >
-                Invite to Quiz
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Button
-                size="default"
-                variant="default"
-                className="w-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Send Quiz");
-                }}
-              >
-                Assign Quiz
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Button
-                size="default"
-                variant="default"
-                className="w-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  alert("Invite to Allegiance");
-                }}
-              >
-                Invite to Allegiance
-              </Button>
-            </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Button
-                size="default"
-                variant="default"
-                className="w-full"
-                onClick={(e) => {
-                  e.preventDefault();
-                  handleDeleteFriend(id, sessionUserId);
-                }}
-              >
-                Delete Friend
-              </Button>
-            </DropdownMenuItem>
-          </div>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      {actions && (
+        <DropdownMenu>
+          <DropdownMenuTrigger>
+            <MoreVertical />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-52 p-2">
+            <DropdownMenuLabel>Actions</DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <div className="space-y-2">
+              <DropdownMenuItem asChild>
+                <Button
+                  size="default"
+                  variant="default"
+                  className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert("Invite to Quiz");
+                  }}
+                >
+                  Invite to Quiz
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  size="default"
+                  variant="default"
+                  className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert("Send Quiz");
+                  }}
+                >
+                  Assign Quiz
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  size="default"
+                  variant="default"
+                  className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    alert("Invite to Allegiance");
+                  }}
+                >
+                  Invite to Allegiance
+                </Button>
+              </DropdownMenuItem>
+              <DropdownMenuItem asChild>
+                <Button
+                  size="default"
+                  variant="default"
+                  className="w-full"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handleDeleteFriend(id, sessionUserId);
+                  }}
+                >
+                  Delete Friend
+                </Button>
+              </DropdownMenuItem>
+            </div>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      )}
     </div>
   );
 };

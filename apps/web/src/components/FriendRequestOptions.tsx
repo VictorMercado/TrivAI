@@ -41,6 +41,7 @@ const FriendRequestOptions = ({ userId, friendId, pendingRequest, requestedReque
         type: "success",
       });
       utils.authViewer.friend.getAll.invalidate();
+      utils.authViewer.friend.getRequested.invalidate();
     },
     onError: (error) => {
       addToast({
