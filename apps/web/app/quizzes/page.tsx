@@ -55,7 +55,7 @@ export default async function QuizPage() {
                     <QuizCard key={quiz.id} quiz={quiz} />
                   ))
                 ) : (
-                  <p className="coolText"> Horray your free </p>
+                  <p className="coolText"> Horray no quizzes left </p>
                 )
               }
             </HorizontalScroll>
@@ -146,7 +146,7 @@ export default async function QuizPage() {
                   <QuizCard key={quiz.id} quiz={quiz} />
                 ))
               ) : (
-                <p className="coolText"> Horray your free </p>
+                <p className="coolText"> Horray no quizzes left </p>
               )
             }
           </HorizontalScroll>
@@ -163,7 +163,7 @@ export default async function QuizPage() {
                 <QuizCard key={quiz.id} quiz={quiz} />
               ))
             ) : (
-              <p className="coolText"> Horray your free </p>
+              <p className="coolText"> Horray no quizzes left </p>
             )}
           </HorizontalScroll>
         </div>
@@ -179,7 +179,7 @@ export default async function QuizPage() {
                 <QuizCard key={quiz.id} quiz={quiz} />
               ))
             ) : (
-              <p className="coolText"> Horray your free </p>
+              <p className="coolText"> Horray no quizzes left </p>
             )}
           </HorizontalScroll>
         </div>

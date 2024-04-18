@@ -58,7 +58,7 @@ export default async function RootPage() {
                   ))
                 ) : (
                   <div className="flex h-44 w-full items-center justify-center">
-                    <p className="coolText"> Horray your free </p>
+                    <p className="coolText"> Horray no quizzes left </p>
                   </div>
                 )
               }
@@ -102,7 +102,7 @@ export default async function RootPage() {
                 ))
               ) : (
                 <div className="flex h-44 w-full items-center justify-center">
-                  <p className="coolText"> Horray your free </p>
+                  <p className="coolText"> Horray no quizzes left </p>
                 </div>
               )
             }
