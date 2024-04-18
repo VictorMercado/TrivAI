@@ -22,6 +22,8 @@ export const buttonVariants = cva(
         link: "underline-offset-4 hover:underline text-primary",
         delete:
           "border border-danger text-danger lg:hover:bg-danger lg:hover:text-black lg:hover:text-black lg:hover:shadow-danger lg:focus-visible:ring-danger",
+        loading:
+          "bg-primary/20 border border-primary/75 text-primary/75 animate-pulse",
       },
       size: {
         default: "p-2 text-md",
@@ -50,6 +52,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     | "secondary"
     | "ghost"
     | "link"
+    | "loading"
     | "delete";
   size?: "default" | "sm" | "lg";
   active?: boolean;

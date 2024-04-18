@@ -11,7 +11,7 @@ export const getPending = async ({ ctx }: GetPendingFriendOptions) => {
     throw new Error("No session");
   }
   const userId = session.user?.id;
-  return await prisma.userFriend.findMany({
+  const friends =  await prisma.userFriend.findMany({
     where: {
       userId,
       status: "PENDING",
@@ -30,5 +30,14 @@ export const getPending = async ({ ctx }: GetPendingFriendOptions) => {
         }
       }
     }
+  });
+  return friends.map(f => {
+    return {
+      ...f.friend,
+      userName: f.friend.userName || "Ghost",
+      name: f.friend.name || "No name",
+      prize: f.friend.prize || "N/A",
+      image: f.friend.image || "/default.png",
+    };
   });
 };

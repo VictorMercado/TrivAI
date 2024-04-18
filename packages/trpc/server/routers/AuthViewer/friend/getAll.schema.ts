@@ -1,6 +1,15 @@
 import { Prisma } from "@trivai/prisma";
 
 // Prisma.validator<Prisma.UserSelect>;
+export type Friend = {
+  id: string;
+  name: string;
+  userName: string;
+  image: string;
+  prize: string;
+  totalScore: number;
+  credits: number;
+};
 
 export type TGetAllFriendInput = {};
 

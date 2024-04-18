@@ -12,6 +12,7 @@ export type ReturnedAnswer = {
 };
 
 type QuestionButtonsProps = {
+  isLoading?: boolean;
   answers: Array<string> | undefined;
   handleCheckAnswer: (answer: string) => void;
 };
@@ -19,6 +20,7 @@ type QuestionButtonsProps = {
 const QuestionButtons = ({
   answers,
   handleCheckAnswer,
+  isLoading
 }: QuestionButtonsProps) => {
   const ref = useRef<HTMLButtonElement>(null);
 
@@ -26,23 +28,23 @@ const QuestionButtons = ({
     if (ref?.current) {
       ref.current?.focus();
     }
-  });
+  }); 
+
   return (
     <div className="my-10 grid grid-cols-2 gap-4 md:gap-8">
-      {answers?.map((answer, index) => {
-        return (
-          <Button
-            key={index}
-            variant="default"
-            size="default"
-            ref={index === 0 ? ref : null}
-            className="py-4"
-            onClick={() => handleCheckAnswer(answer)}
-          >
-            <b>{answer}</b>
-          </Button>
-        );
-      })}
+      {answers?.map((answer, index) => (
+        <Button
+          key={index}
+          variant={`${isLoading ? "loading" : "default"}`}
+          size="default"
+          onClick={() => handleCheckAnswer(answer)}
+          disabled
+          ref={index === 0 ? ref : undefined}
+          className="py-4"
+        >
+          {answer}
+        </Button>
+      ))}
     </div>
   );
 };

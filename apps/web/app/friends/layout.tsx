@@ -2,7 +2,8 @@ import { User } from "@components/User";
 import Link from "next/link";
 import { serverRouter } from "@/app/_trpc/serverRouter";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@ui/tabs";
-
+import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
+import { Friends } from "@components/Friends";
 interface Friend {
   id: number;
   name: string;
@@ -25,6 +26,7 @@ export default async function Layout({
   children: any;
   params: any;
 }) {
+  const user = await getCurrentUser();
   const router = await serverRouter();
   const friends = await router.authViewer.friend.getAll();
   return (
@@ -35,7 +37,10 @@ export default async function Layout({
             <h1>Friends</h1>
             <h1>Quizzes</h1>
           </div> */}
-          <Tabs defaultValue="friends" className="flex flex-col items-center w-full">
+          <Tabs
+            defaultValue="friends"
+            className="flex w-full flex-col items-center"
+          >
             <TabsList>
               <TabsTrigger value="friends">Friends</TabsTrigger>
               <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
@@ -43,23 +48,7 @@ export default async function Layout({
             <TabsContent value="friends" className="w-full" tabIndex={-1}>
               <div className="hideScroll flex w-screen overflow-auto p-2 md:w-full md:flex-col md:space-x-0 md:space-y-2">
                 {friends ? (
-                  friends.map((friend) => (
-                    <Link
-                      href={`/friends/${friend.userName}`}
-                      key={friend.id}
-                      className="min-w-72 w-full"
-                    >
-                      <User
-                        id={parseInt(friend.id)}
-                        name={friend.name || "No name"}
-                        userName={friend.userName || "Ghost"}
-                        image={friend.image || "/default.png"}
-                        prize={friend.prize || "N/a"}
-                        totalScore={friend.totalScore}
-                        credits={friend.credits}
-                      />
-                    </Link>
-                  ))
+                  <Friends friends={friends} sessionUserId={user!.id} />
                 ) : (
                   <div>Loading...</div>
                 )}

@@ -73,7 +73,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
         <div className="grid grid-cols-2 lg:col-span-2 lg:items-center">
           <div className="flex flex-col items-center gap-y-2 lg:flex-row lg:justify-center lg:gap-x-5">
             <Image
-              className="border-2 border-primary bg-primary "
+              className={`border-2 border-primary ${user.userName === "GalacticNet" ? "" : "bg-primary"}`}
               src={user.image === null ? "/default.png" : user.image}
               alt="Profile"
               width={100}

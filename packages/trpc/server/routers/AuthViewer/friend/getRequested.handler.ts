@@ -14,7 +14,7 @@ export const getRequested = async ({ ctx }: GetRequestedFriendOptions) => {
   // the user that initiated the friend request is the userId
   // the user that received the friend request is the friendId
   // so we want to find all the friend requests that the user has received
-  return await prisma.userFriend.findMany({
+  const friends = await prisma.userFriend.findMany({
     where: {
       friendId: userId,
       status: "PENDING",
@@ -34,5 +34,14 @@ export const getRequested = async ({ ctx }: GetRequestedFriendOptions) => {
         }
       }
     }
+  });
+  return friends.map(f => {
+    return {
+      ...f.user,
+      userName: f.user.userName || "Ghost",
+      name: f.user.name || "No name",
+      prize: f.user.prize || "N/A",
+      image: f.user.image || "/default.png",
+    };
   });
 };

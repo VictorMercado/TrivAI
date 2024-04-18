@@ -49,10 +49,9 @@ export function ClientAppWrapper({
       const randUser = "anon" + randNum.current;
       // Connect to the WebSocket server
       try {
-        if(process.env.WS_URL === undefined) {
-          console.log("No WS_URL found");
+        if(process.env.WS_URL !== undefined) {
           socket.current = new WebSocket(
-            `spotted-fall-production.up.railway.app/chat?userName=${userName.current || randUser}`,
+            `${process.env.WS_URL}?userName=${userName.current || randUser}`,
           );
 
           socket.current.onopen = () => {
@@ -69,6 +68,8 @@ export function ClientAppWrapper({
             };
             socket.current?.send(JSON.stringify(msg));
           };
+        } else {
+          console.log("No WS_URL found");
         }
       } catch (e) {
         console.log(e);

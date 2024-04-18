@@ -40,7 +40,7 @@ import {
   SelectTrigger,
 } from "@ui/select";
 import { Tabs, TabsList, TabsTrigger } from "@ui/tabs";
-import { Friend } from "@trivai/trpc/server/routers/AuthViewer/friend/getAll.handler";
+import { Friend } from "@trivai/trpc/server/routers/AuthViewer/friend/getAll.schema";
 import { TabsContent } from "@radix-ui/react-tabs";
 
 type QuizGenControllerProps = {
@@ -138,7 +138,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
       await utils.authViewer.quiz.invalidate();
       addToast({
         id: Math.random(),
-        message: "Successfully created quiz: " + String(data.quiz.id),
+        message: "Successfully initialized quiz: " + String(data.quiz.id),
         type: "success",
       });
       router.refresh();

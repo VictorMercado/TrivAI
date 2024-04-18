@@ -3,10 +3,12 @@ import type { Session } from "next-auth";
 import { prisma } from "@trivai/prisma";
 import { getSessionWithReqRes } from "@trivai/auth/lib/getSessionWithReqRes";
 import { CREDITSPERQUESTION } from "@/src/config/constants";
+import { sleep } from "@trivai/lib/utils";
 
 // this route is only accessible by admin users
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session: Session | null = await getSessionWithReqRes(req, res);
+  // await sleep(2);
   if (session) {
     if (req.method == 'PUT') {
       let { quizId, questionId, userId, answer, completed } = JSON.parse(req.body);

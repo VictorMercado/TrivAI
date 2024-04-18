@@ -15,7 +15,7 @@ const HorizontalScroll = ({ children, className }: HorizontalScrollProps) => {
         )}
       >
         {children}
-        <div className="min-w-[300px]"></div>
+        <div className="min-w-[100px]"></div>
       </div>
     </div>
   );

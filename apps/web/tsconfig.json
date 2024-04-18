@@ -8,7 +8,8 @@
     ],
     "baseUrl": ".",
     "typeRoots": [
-      "@trivai/types/*.d.ts"
+      "@trivai/types/*.d.ts",
+      "../../packages/types/next-auth.d.ts",
     ],
     "paths": {
       "react": [
@@ -39,9 +40,9 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+    "../../packages/types/next-auth.d.ts",
     ".next/types/**/*.ts",
     "../../packages/types/*.d.ts",
-    "../../packages/types/next-auth.d.ts",
     "pages/about.jsx",
     "apps/web/app/about/[...slug]",
     "../../packages/prisma/seed.js",

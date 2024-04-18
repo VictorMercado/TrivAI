@@ -55,8 +55,10 @@ const QuizController = ({
   );
   const [text, setText] = useState<string>("");
   const [hasAnswered, setHasAnswered] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   /** HandleClick will only execute when questions exist */
   const handleCheckAnswer = async (answer: string) => {
+    setIsLoading(true);
     let res;
     try {
       res = await fetch("/api/checkAnswer", {
@@ -89,6 +91,7 @@ const QuizController = ({
         userAnswer: data.userAnswer,
       });
       setHasAnswered(!hasAnswered);
+      setIsLoading(false);
     } else if (res?.status === 409) {
       alert("You already answered this question!");
     } else if (res?.status === 500) {
@@ -158,6 +161,7 @@ const QuizController = ({
                 />
               ) : (
                 <QuestionButtons
+                  isLoading={isLoading}
                   answers={answers}
                   handleCheckAnswer={
                     userId ? handleCheckAnswer : handleQuestionsSlice

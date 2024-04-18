@@ -88,6 +88,14 @@ const FuturisticBox = ({
               H${(262 / 572) * width}
               L${(335 / 572) * width} ${0}Z`}
         />
+        <path
+          className="z-10 fill-primary stroke-primary"
+          d={`M${1} ${0}
+              V${(60 / 310) * height}
+              L${(110 / 572) * width} 0
+              H 1 1
+              Z`}
+        />
         <motion.text
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}

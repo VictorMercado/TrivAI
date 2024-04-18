@@ -130,3 +130,11 @@ function flattenObjectToStringArray(array: any[]) {
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
+
+export const sleep = async (seconds: number) => {
+  return new Promise<void>((resolve) => {
+    setTimeout(() => {
+      resolve();
+    }, seconds * 1000);
+  });
+};

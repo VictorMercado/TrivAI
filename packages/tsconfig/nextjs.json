@@ -3,6 +3,7 @@
   "display": "Next.js",
   "extends": "./base.json",
   "compilerOptions": {
+    "typeRoots": ["../types/next-auth.d.ts", "../types/*.d.ts", "../node_modules/@types"],
     "declaration": false,
     "declarationMap": false,
     "target": "es5",
@@ -24,7 +25,7 @@
     "jsx": "preserve",
     "strictNullChecks": true,
     "useUnknownInCatchVariables": true,
-    "allowImportingTsExtensions": true,
+    "allowImportingTsExtensions": true
   },
   "include": [
     "src",

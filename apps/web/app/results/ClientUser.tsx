@@ -29,7 +29,7 @@ export const ClientUser = ({ initQuizzes }: ClientUserProps) => {
   const quizRef = useRef<HTMLDivElement>(null);
   const [callbackFn, setCallbackFn] = useState<any>([]);
   const [userAnswerId, setUserAnswerId] = useState<string>();
-
+  console.log(initQuizzes);
   const [quizzes, setQuizzes] = useState(initQuizzes);
 
   useEffect(() => {
@@ -144,7 +144,7 @@ export const ClientUser = ({ initQuizzes }: ClientUserProps) => {
                       <b>Theme:</b>
                     </p>
                     <p className="text-left md:text-right">
-                      {quiz.quizCategory.theme.name}
+                      {quiz.quizCategory?.theme?.name || "N/A"}
                     </p>
                   </span>
                   <span className="flex flex-col md:flex-row md:justify-between">

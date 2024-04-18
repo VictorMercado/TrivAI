@@ -1,17 +1,42 @@
 "use client";
 import Image from "next/image";
 import { FuturisticBox } from "./futuristic-box";
-import { Check, Heart, Save, Share, createLucideIcon } from "lucide-react";
+import {
+  Check,
+  Heart,
+  Save,
+  Share,
+  createLucideIcon,
+  MoreVertical,
+} from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
 import Link from "next/link";
 import { shortenNumber } from "@trivai/lib/utils";
 import { TQuizView } from "@trivai/lib/server/queries/quiz";
 import { useState, useRef, useEffect } from "react";
+import { Button } from "./button";
+import { useSession } from "next-auth/react";
 
 type QuizCardProps = {
   quiz: TQuizView;
 };
+{/* <svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+  class="lucide lucide-ellipsis"
+>
+  <circle cx="12" cy="12" r="1" />
+  <circle cx="19" cy="12" r="1" />
+  <circle cx="5" cy="12" r="1" />
+</svg>; */}
 
 const RectInfo = createLucideIcon("Info", [
   [
@@ -45,6 +70,9 @@ function dateFormat(date: Date | null | undefined) {
 // - when it was created
 // - how many questions are completed
 const QuizCard = ({ quiz }: QuizCardProps) => {
+  const { data: session } = useSession();
+  const user = session?.user;
+  
   const [parentDimensions, setParentDimensions] = useState({
     width: 0,
     height: 0,
@@ -151,6 +179,10 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                 </div>
                 <div className="flex flex-col justify-center">
                   <div className="grid grid-cols-2 gap-x-2 @lg:text-xl">
+                    <p className="">ID: </p>
+                    <p className="flex justify-end text-right">{quiz.id}</p>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-2 @lg:text-xl">
                     <p className="">Theme: </p>
                     <p className="flex justify-end text-right">
                       {quiz.quizCategory.theme?.name
@@ -181,46 +213,86 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                 </div>
               </div>
               <div className="z-20 col-span-1 mb-6 grid grid-cols-4 items-center justify-center gap-x-2 px-4  pb-4 text-sm @md:col-span-2 @md:grid @md:grid-cols-4 @lg:pl-20 @lg:pr-8 @lg:text-xl">
-                <button
-                  className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-red-500/25 hover:ring-1 hover:ring-red-500 @md:space-x-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log("liked");
-                  }}
-                >
-                  <Heart className="m-auto h-4 w-4 stroke-red-500 lg:h-6 lg:w-6" />
-                  <p>{shortenNumber(quiz.likes)}</p>
-                </button>
-                <button
-                  className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-blue-500/25 hover:ring-1 hover:ring-blue-500 @md:space-x-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log("saved");
-                  }}
-                >
-                  <Save className="m-auto h-4 w-4 stroke-blue-500 lg:h-6 lg:w-6" />
-                  <p>{shortenNumber(quiz.saves)}</p>
-                </button>
-                <button
-                  className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-violet-500/25 hover:ring-1 hover:ring-violet-500 @md:space-x-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log("shared");
-                  }}
-                >
-                  <Share className="m-auto h-4 w-4 stroke-violet-500 lg:h-6 lg:w-6" />
-                  <p>{shortenNumber(quiz.shares)}</p>
-                </button>
-                <button
-                  className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-green-500/25 hover:ring-1 hover:ring-green-500 @md:space-x-2"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    console.log("completed");
-                  }}
-                >
-                  <Check className="m-auto h-4 w-4 stroke-green-500 lg:h-6 lg:w-6" />
-                  <p>{shortenNumber(quiz.completions)}</p>
-                </button>
+                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                  <HoverCardTrigger className="pointer-events-auto" asChild>
+                    <button
+                      className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-red-500/25 hover:ring-1 hover:ring-red-500 @md:space-x-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("liked");
+                      }}
+                    >
+                      <Heart className="m-auto h-4 w-4 stroke-red-500 lg:h-6 lg:w-6" />
+                      <p>{shortenNumber(quiz.likes)}</p>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    side="top"
+                    className="border-red-500 p-2 text-sm text-red-500"
+                  >
+                    <p>Likes</p>
+                  </HoverCardContent>
+                </HoverCard>
+                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-blue-500/25 hover:ring-1 hover:ring-blue-500 @md:space-x-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("saved");
+                      }}
+                    >
+                      <Save className="m-auto h-4 w-4 stroke-blue-500 lg:h-6 lg:w-6" />
+                      <p>{shortenNumber(quiz.saves)}</p>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    side="top"
+                    className="border-blue-500 p-2 text-sm text-blue-500"
+                  >
+                    <p>Saves</p>
+                  </HoverCardContent>
+                </HoverCard>
+                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-violet-500/25 hover:ring-1 hover:ring-violet-500 @md:space-x-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("shared");
+                      }}
+                    >
+                      <Share className="m-auto h-4 w-4 stroke-violet-500 lg:h-6 lg:w-6" />
+                      <p>{shortenNumber(quiz.shares)}</p>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    side="top"
+                    className="border-violet-500 p-2 text-sm text-violet-500"
+                  >
+                    <p>Shares</p>
+                  </HoverCardContent>
+                </HoverCard>
+                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                  <HoverCardTrigger asChild>
+                    <button
+                      className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-green-500/25 hover:ring-1 hover:ring-green-500 @md:space-x-2"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        console.log("completed");
+                      }}
+                    >
+                      <Check className="m-auto h-4 w-4 stroke-green-500 lg:h-6 lg:w-6" />
+                      <p>{shortenNumber(quiz.completions)}</p>
+                    </button>
+                  </HoverCardTrigger>
+                  <HoverCardContent
+                    side="top"
+                    className="text-md border-green-500 p-2 text-sm text-green-500"
+                  >
+                    <p>Completions</p>
+                  </HoverCardContent>
+                </HoverCard>
               </div>
             </div>
           </div>
@@ -260,10 +332,10 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
       </HoverCard>
       {/* Use popover for small devices that cant hover */}
       <Popover>
-        <PopoverTrigger className="absolute bottom-2 right-2 flex h-6 w-6 animate-fadeIn items-center justify-center @md:hidden">
-          <RectInfo className="animate-pulse stroke-textBase" />
+        <PopoverTrigger className="absolute bottom-2 right-2 flex h-6 w-6 animate-fadeIn items-center justify-center">
+          <MoreVertical className="animate-pulse stroke-textBase" />
         </PopoverTrigger>
-        <PopoverContent aria-label="Owner Information" className="p-2">
+        <PopoverContent aria-label="Owner Information" className="p-4">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-full text-left">
               <h1 className={`text-xl`}>Owner</h1>
@@ -276,6 +348,26 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                 <h1 className={`text-md`}>{quiz.owner!.userName}</h1>
               </div>
             </Link>
+            <div>
+              <Button
+                variant="default"
+                size="default"
+                className="w-full"
+                onClick={() => {}}
+              >
+                View Quiz
+              </Button>
+              {quiz.owner?.userName === user?.userName ? (
+                <Button
+                  variant="default"
+                  size="default"
+                  className="w-full"
+                  onClick={() => {}}
+                >
+                  Delete
+                </Button>
+              ) : null}
+            </div>
           </div>
         </PopoverContent>
       </Popover>

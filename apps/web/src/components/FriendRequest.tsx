@@ -4,44 +4,36 @@ import { Button } from "@ui/button";
 import { useState } from "react";
 import { useToast } from "@ui/toast";
 import { trpc } from "@t/client";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 
-const FriendRequest = () => {
-  const router = useRouter();
-  const { data: session } = useSession();
+type FriendRequestProps = {
+  userId: string;
+};
+
+const FriendRequest = ({userId} : FriendRequestProps) => {
+  const utils = trpc.useUtils();
   const [username, setUsername] = useState("");
-  const toast = useToast();
-  const { mutate } = trpc.authViewer.friend.create.useMutation({
+  const { addToast } = useToast();
+  const createFriend = trpc.authViewer.friend.create.useMutation({
     onSuccess: () => {
       setUsername("");
-    },
-    onError: () => {
-      toast.addToast({
+      addToast({
         id: Math.random(),
-        message: "Error sending friend request",
+        message: "Friend request sent",
+        type: "success",
+      });
+      utils.authViewer.friend.getRequested.invalidate();
+    },
+    onError: (e) => {
+      addToast({
+        id: Math.random(),
+        message: e.message,
         type: "error",
       });
     }
   });
 
-  const handleSendRequest = async () => {
-    try {
-      mutate({ userId: session!.user.id, friendUsername: username });
-      toast.addToast({
-        id: Math.random(),
-        message: "Friend request sent",
-        type: "success",
-      });
-      router.push("/friends");
-      router.refresh();
-    } catch (error) {
-      toast.addToast({
-        id: Math.random(),
-        message: "Error sending friend request",
-        type: "error",
-      });
-    }
+  const handleSendRequest = (userId: string, friendUsername: string) => {
+    createFriend.mutate({ userId, friendUsername });
   };
 
   return (
@@ -61,7 +53,7 @@ const FriendRequest = () => {
           }}
           className="h-full w-64"
         />
-        <Button variant="default" size="default" onClick={handleSendRequest}>Send request</Button>
+        <Button variant="default" size="default" onClick={() => handleSendRequest(userId, username)}>Send request</Button>
       </form>
     </div>
   );
