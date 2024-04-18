@@ -171,3 +171,7 @@ dist
 .DS_Store
 
 .turbo\*
+
+.turbo 
+apps/ai/.turbo\*
+apps/multiplayer/.turbo\*

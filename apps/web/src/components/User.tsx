@@ -12,7 +12,6 @@ import { Button } from "@ui/button";
 import Image from "next/image";
 import { trpc } from "@t/client";
 import { useToast } from "@ui/toast";
-import type { Friend } from "@trivai/trpc/server/routers/authViewer/friend/getAll.schema";
 
 type UserProps = {
   id: string;
