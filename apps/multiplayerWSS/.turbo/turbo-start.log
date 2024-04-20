@@ -2,5 +2,5 @@
 [2K[1G[1myarn run v1.22.21[22m
 [2K[1G[33mwarning[39m package.json: No license field
 [2K[1G[2m$ bun run src/index.ts[22m
-[0m[2m[[1m0.33ms[0m[2m][0m [2m".env"[0m
+[0m[2m[[1m0.52ms[0m[2m][0m [2m".env"[0m
 Listening on http://localhost:3002 ...
