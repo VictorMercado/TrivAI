@@ -4,6 +4,44 @@ import { cors } from '@elysiajs/cors';
 import { GoogleGenerativeAI } from "@google/generative-ai";
 import { z, ZodError } from "zod";
 import { decrypt } from "@trivai/auth/lib/decrypt";
+import OpenAI from "openai";
+import { Storage } from "@google-cloud/storage";
+import { Buffer } from "buffer";
+
+const storage = new Storage({
+  projectId: process.env.PROJECT_ID,
+  credentials: {
+    type: process.env.TYPE,
+    project_id: process.env.PROJECT_ID,
+    private_key_id: process.env.PROJECT_KEY_ID,
+    private_key: process.env.PRIVATE_KEY,
+    token_uri: process.env.TOKEN_URI,
+    client_email: process.env.CLIENT_EMAIL,
+    client_id: process.env.CLIENT_ID,
+    auth_uri: process.env.AUTH_URI,
+    auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+    client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
+    universe_domain: process.env.UNIVERSE_DOMAIN,
+  }
+});
+
+const openai = new OpenAI({
+  apiKey: process.env.OPENAI_API_KEY as string,
+  organization: process.env.ORGANIZATION as string,
+})
+
+const apiKey: string = process.env.GOOGLE_API_KEY as string;
+export const googleAI = new GoogleGenerativeAI(apiKey);
+const googleModelName = "gemini-pro";
+
+async function uploadFromMemory(bucketName: string = "trivai-images", contents: Buffer, destFileName: string = "imgTest.png", contentType = "image/png") {
+  await storage.bucket(bucketName).file(destFileName).save(contents, {
+    contentType,
+  });
+}
+
+// uploadFromMemory().catch(console.error);
+
 
 const backticksRegex = /```([\s\S]+?)```/;
 
@@ -11,6 +49,8 @@ const ZBody = z.object({
   prompt: z.string(),
   webhook: z.string(),
   quizId: z.number(),
+  category: z.string(),
+  theme: z.string().optional(),
 });
 type TBody = z.infer<typeof ZBody>;
 
@@ -52,9 +92,7 @@ export const stringExtractor = (stringToModify: string | undefined, substring: s
   return stringToModify.slice(0, index) + stringToModify.slice(index + substring.length);
 };
 
-const apiKey: string = process.env.GOOGLE_API_KEY as string;
-export const googleAI = new GoogleGenerativeAI(apiKey);
-const googleModelName = "gemini-pro";
+
 
 async function run(prompt: string = "Give me a 5 question quiz about anything.") {
   // For text-only input, use the gemini-pro model
@@ -73,6 +111,7 @@ async function hitWebhook(body: string) {
   let parsedBody: TBody;
   try {
     parsedBody = ZBody.parse(body);
+    // parsedBody = ZBody.parse(body);
   }
   catch (e) {
     if (e instanceof ZodError) {
@@ -86,11 +125,12 @@ async function hitWebhook(body: string) {
 
   let match;
   let response = "";
+  let questions;
   try {
     response = await run(parsedBody.prompt);
     match = backticksRegex.exec(response);
     if (match === null) {
-      return { message: "No response", error: true };
+      throw new Error("No response");
     }
     response = match[1];
     response = stringExtractor(response, "JSON");
@@ -98,20 +138,44 @@ async function hitWebhook(body: string) {
     console.log(response);
   }
   catch (e) {
-    console.log("error in run");
-    console.log(e);
-  }
+    try {
+      response = await run(parsedBody.prompt);
+      match = backticksRegex.exec(response);
+      if (match === null) {
+        throw new Error("No response");
+      }
+      response = match[1];
+      response = stringExtractor(response, "JSON");
+      response = stringExtractor(response, "json");
+    } catch (e) {
+      await fetch(parsedBody.webhook, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ message: e, error: true }),
+      });
+      return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
+    }
+  } 
   // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
 
   try {
-    response = JSON.stringify(ZQuestionsEither.parse(JSON.parse(response)));
+    questions = ZQuestionsEither.parse(JSON.parse(response));
   } catch (e) {
     console.log("zod error");
     console.log("rerunning");
     response = await run(parsedBody.prompt);
     match = backticksRegex.exec(response);
     if (match === null) {
-      return { message: "No response", error: true };
+      await fetch(parsedBody.webhook, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ message: e, error: true }),
+      });
+      return;
     }
     response = match[1];
     response = stringExtractor(response, "JSON");
@@ -119,6 +183,28 @@ async function hitWebhook(body: string) {
     console.log(response);
   }
 
+  const image = await openai.images.generate({ model: "dall-e-2", prompt: `generate a beautiful colorful HD image about ${parsedBody.category} ${parsedBody.theme ? "with a focus on " + parsedBody.theme : ""}`, size: "512x512", response_format: "b64_json" });
+  const todaysDate = new Date().toISOString().slice(0, 10);
+  const destination = `${todaysDate}/quiz-${parsedBody.quizId}/img.png`;
+  const googleImageURL = `https://storage.googleapis.com/trivai-images/${destination}`;
+
+  if (image.data.length > 0 && image.data[0].b64_json) {
+    try {
+      const imageBuffer = Buffer.from(image.data[0].b64_json, "base64");
+      await uploadFromMemory("trivai-images", imageBuffer, destination, "image/png");
+      console.log("UPLOAD DONESKIES");
+    } catch (e) {
+      await fetch(parsedBody.webhook, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ quizImageURL: null, questions: questions }),
+      });
+    }
+  }
+  
+  response = JSON.stringify({ quizImageURL: googleImageURL, questions: questions});
 
   let webhookResponse;
   // todo check response against a zod schema, if it fails run again then return error
@@ -151,8 +237,9 @@ const app = new Elysia()
     if (!response.ok) {
       return new Response(JSON.stringify({ message: "No response", error: true }), { status: 400 });
     }
-    response = await response.json();
-    return new Response(JSON.stringify(response));
+    // response = await response.json();
+    // return new Response(JSON.stringify(response));
+    return response;
   })
   // .get("/", async ({ cookie: { userToken }, request }) => {
   //   const allToken: string = userToken.value;
@@ -219,11 +306,25 @@ const app = new Elysia()
       console.log(e);
       return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
     }
-    
-    // console.log("request out: " + newReq);
-    // console.log(response);
 
     // return new Response(JSON.stringify({ message: `request number: ${requestNumber} \n ${response}` }));
+    return new Response(JSON.stringify({ message: "Processing started", type: "Success" }), { status: 200 });
+  })
+  .get("/ai/img/gen", async ({ body }) => {
+    console.log("/ai/img/gen hit");
+    
+    // const image = await openai.images.generate({ model: "dall-e-2", prompt: "place holder image for quiz preview", size: "256x256", response_format: "b64_json"});
+    // if (image.data.length > 0 && image.data[0].b64_json) {
+    //   try {
+    //     const imageBuffer = Buffer.from(image.data[0].b64_json, "base64");
+    //     const todaysDate = new Date().toISOString().slice(0, 10);
+    //     const result = await uploadFromMemory("trivai-images", imageBuffer, `${todaysDate}/quiz-11/img1.png`, "image/png");
+    //     console.log("UPLOAD DONESKIES");
+    //     console.log(result);
+    //   } catch (e) {
+    //     console.log(e);
+    //   }
+    // }
     return new Response(JSON.stringify({ message: "Processing started", type: "Success" }), { status: 200 });
   })
   .listen(process.env.PORT || 3000);

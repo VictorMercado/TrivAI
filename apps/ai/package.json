@@ -9,8 +9,10 @@
   },
   "dependencies": {
     "@elysiajs/cors": "^0.8.0",
+    "@google-cloud/storage": "^7.10.0",
     "@google/generative-ai": "^0.2.1",
     "elysia": "latest",
+    "openai": "^4.37.1",
     "zod": "^3.22.4"
   },
   "devDependencies": {
@@ -18,4 +20,3 @@
   },
   "module": "src/index.js"
 }
-

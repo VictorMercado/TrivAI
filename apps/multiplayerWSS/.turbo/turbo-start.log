@@ -1,11 +1,6 @@
-[2K[1G[1myarn run v1.22.21[22m
+
+[2K[1G[1myarn run v1.22.21[22m
 [2K[1G[33mwarning[39m package.json: No license field
 [2K[1G[2m$ bun run src/index.ts[22m
-[0m[2m[[1m0.03ms[0m[2m][0m [2m".env"[0m
+[0m[2m[[1m0.33ms[0m[2m][0m [2m".env"[0m
 Listening on http://localhost:3002 ...
-cookie: 
-WebSocket connection opened
-Received message: {"action":"new user","type":"subscribe","topic":"chat","user":{"userName":"Pikachu505","status":"online","id":"cluuf8pxw000dothkgmqp3lyr"}}
-published
-Pikachu505 has left the chat!
-WebSocket connection closed

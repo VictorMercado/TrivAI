@@ -8,6 +8,7 @@ import {
   Share,
   createLucideIcon,
   MoreVertical,
+  Scroll,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
@@ -17,6 +18,8 @@ import { TQuizView } from "@trivai/lib/server/queries/quiz";
 import { useState, useRef, useEffect } from "react";
 import { Button } from "./button";
 import { useSession } from "next-auth/react";
+import { trpc } from "@t/client";
+import { useToast } from "@ui/toast";
 
 type QuizCardProps = {
   quiz: TQuizView;
@@ -70,6 +73,8 @@ function dateFormat(date: Date | null | undefined) {
 // - when it was created
 // - how many questions are completed
 const QuizCard = ({ quiz }: QuizCardProps) => {
+  const { addToast } = useToast();
+  const utils = trpc.useUtils();
   const { data: session } = useSession();
   const user = session?.user;
   
@@ -77,10 +82,10 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
     width: 0,
     height: 0,
   });
-  const [likes, setLikes] = useState(quiz.likes);
-  const [saves, setSaves] = useState(quiz.saves);
-  const [shares, setShares] = useState(quiz.shares);
-  const [completions, setCompletions] = useState(quiz.completions);
+  const [likes, setLikes] = useState({ count: quiz.likes, liked: false });
+  const [saves, setSaves] = useState({ count: quiz.saves, saved: false });
+  const [shares, setShares] = useState({ count: quiz.shares, shared: false});
+  const [completions, setCompletions] = useState({ count: quiz.completions, completed: false});
   const ref = useRef<HTMLDivElement>(null);
   const status = quiz.status;
   const statusTextColor =
@@ -91,6 +96,29 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
         : "text-blue-500";
 
   const date = dateFormat(quiz?.dateDue);
+
+  const deleteQuiz = trpc.authViewer.quiz.delete.useMutation({
+    onSuccess: () => {
+      addToast({
+        id: Math.random(),
+        message: "Quiz has been successfully deleted",
+        type: "success",
+      });
+      utils.authViewer.quiz.invalidate();
+    },
+    onError: (error) => {
+      addToast({
+        id: Math.random(),
+        message: error.message,
+        type: "error",
+      });
+    },
+  
+  });
+
+  const handleDelete = async (id : number, userId : string ) => {
+    await deleteQuiz.mutateAsync({id, userId});
+  };
 
   useEffect(() => {
     const handleResize = () => {
@@ -140,20 +168,24 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
           <div className="flex w-full items-center px-8 pb-8 pt-14">
             <div className="grid w-full grid-cols-1 gap-2 @md:grid-cols-2 @md:gap-4">
               <div className="m-auto p-4">
-                <Image
-                  src="https://storage.googleapis.com/trivai-images/5-10-2023/FILMS/grid-0020.png"
-                  width={500}
-                  height={500}
-                  alt="Quiz Image"
-                  onLoad={(e) => {
-                    if (ref.current) {
-                      setParentDimensions({
-                        width: ref.current.offsetWidth,
-                        height: ref.current.offsetHeight,
-                      });
-                    }
-                  }}
-                />
+                {quiz.image ? (
+                  <Image
+                    src={quiz.image}
+                    width={200}
+                    height={200}
+                    alt="Quiz Image"
+                    onLoad={(e) => {
+                      if (ref.current) {
+                        setParentDimensions({
+                          width: ref.current.offsetWidth,
+                          height: ref.current.offsetHeight,
+                        });
+                      }
+                    }}
+                  />
+                ) : (
+                  <Scroll className="h-[120px] w-[225px] md:h-[140px] md:w-[275px]"></Scroll>
+                )}
                 <p className="text-sm">
                   Created At: {new Date(quiz.createdAt).toDateString()}
                 </p>
@@ -184,7 +216,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   </div>
                   <div className="grid grid-cols-2 gap-x-2 @lg:text-xl">
                     <p className="">Theme: </p>
-                    <p className="flex justify-end text-right">
+                    <p className="flex justify-end text-nowrap text-right">
                       {quiz.quizCategory.theme?.name
                         ? quiz.quizCategory.theme.name
                         : "N/A"}
@@ -362,7 +394,9 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   variant="default"
                   size="default"
                   className="w-full"
-                  onClick={() => {}}
+                  onClick={() => {
+                    handleDelete(quiz.id, user!.id);
+                  }}
                 >
                   Delete
                 </Button>
