@@ -194,6 +194,7 @@ async function hitWebhook(body: string) {
       await uploadFromMemory("trivai-images", imageBuffer, destination, "image/png");
       console.log("UPLOAD DONESKIES");
     } catch (e) {
+      console.log("OpenAI image upload error");
       await fetch(parsedBody.webhook, {
         headers: {
           "Content-Type": "application/json",
@@ -201,6 +202,7 @@ async function hitWebhook(body: string) {
         method: "POST",
         body: JSON.stringify({ quizImageURL: null, questions: questions }),
       });
+      return;
     }
   }
   
