@@ -11,19 +11,25 @@ import { Buffer } from "buffer";
 const storage = new Storage({
   projectId: process.env.PROJECT_ID,
   credentials: {
-    type: process.env.TYPE,
+    type: "service_account",
     project_id: process.env.PROJECT_ID,
-    private_key_id: process.env.PROJECT_KEY_ID,
-    private_key: process.env.PRIVATE_KEY,
-    token_uri: process.env.TOKEN_URI,
+    private_key_id: process.env.PRIVATE_KEY_ID,
+    private_key: process.env.PRIVATE_KEY?.replace(/\\n/g, "\n"),
     client_email: process.env.CLIENT_EMAIL,
     client_id: process.env.CLIENT_ID,
-    auth_uri: process.env.AUTH_URI,
-    auth_provider_x509_cert_url: process.env.AUTH_PROVIDER_X509_CERT_URL,
+    // @ts-ignore
     client_x509_cert_url: process.env.CLIENT_X509_CERT_URL,
-    universe_domain: process.env.UNIVERSE_DOMAIN,
+    auth_uri: "https://accounts.google.com/o/oauth2/auth",
+    token_uri: "https://oauth2.googleapis.com/token",
+    auth_provider_x509_cert_url: "https://www.googleapis.com/oauth2/v1/certs",
   }
 });
+
+async function uploadFromMemory(bucketName: string = (process.env.BUCKET_NAME as string), contents: Buffer, destFileName: string, contentType = "image/png") {
+  await storage.bucket(bucketName).file(destFileName).save(contents, {
+    contentType,
+  });
+}
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string,
@@ -34,11 +40,7 @@ const apiKey: string = process.env.GOOGLE_API_KEY as string;
 export const googleAI = new GoogleGenerativeAI(apiKey);
 const googleModelName = "gemini-pro";
 
-async function uploadFromMemory(bucketName: string = "trivai-images", contents: Buffer, destFileName: string = "imgTest.png", contentType = "image/png") {
-  await storage.bucket(bucketName).file(destFileName).save(contents, {
-    contentType,
-  });
-}
+
 
 // uploadFromMemory().catch(console.error);
 
@@ -183,18 +185,31 @@ async function hitWebhook(body: string) {
     console.log(response);
   }
 
-  const image = await openai.images.generate({ model: "dall-e-2", prompt: `generate a beautiful colorful HD image about ${parsedBody.category} ${parsedBody.theme ? "with a focus on " + parsedBody.theme : ""}`, size: "512x512", response_format: "b64_json" });
+  let image;
+  try {
+    image = await openai.images.generate({ model: "dall-e-2", prompt: `generate a beautiful colorful HD image about ${parsedBody.category} ${parsedBody.theme ? "with a focus on " + parsedBody.theme : ""}`, size: "512x512", response_format: "b64_json" });
+  } catch (e) {
+    console.log("OpenAI image generation error");
+    await fetch(parsedBody.webhook, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ quizImageURL: null, questions: questions }),
+    });
+    return;
+  }
+  
   const todaysDate = new Date().toISOString().slice(0, 10);
   const destination = `${todaysDate}/quiz-${parsedBody.quizId}/img.png`;
   const googleImageURL = `https://storage.googleapis.com/trivai-images/${destination}`;
-
+  let imageBuffer;
+  
   if (image.data.length > 0 && image.data[0].b64_json) {
     try {
-      const imageBuffer = Buffer.from(image.data[0].b64_json, "base64");
-      await uploadFromMemory("trivai-images", imageBuffer, destination, "image/png");
-      console.log("UPLOAD DONESKIES");
+      imageBuffer = Buffer.from(image.data[0].b64_json, "base64");
     } catch (e) {
-      console.log("OpenAI image upload error");
+      console.log("OpenAI image buffer error");
       await fetch(parsedBody.webhook, {
         headers: {
           "Content-Type": "application/json",
@@ -204,6 +219,22 @@ async function hitWebhook(body: string) {
       });
       return;
     }
+    try {
+      await uploadFromMemory((process.env.BUCKET_NAME as string), imageBuffer, destination, "image/png");
+      console.log("UPLOAD DONESKIES");
+    } catch (e) {
+      console.log("Google Cloud Storage image upload error");
+      await fetch(parsedBody.webhook, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        body: JSON.stringify({ quizImageURL: null, questions: questions }),
+      });
+      return;
+    }
+  } else {
+    console.log("No image data");
   }
   
   response = JSON.stringify({ quizImageURL: googleImageURL, questions: questions});

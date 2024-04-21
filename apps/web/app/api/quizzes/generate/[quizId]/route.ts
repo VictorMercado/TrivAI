@@ -130,7 +130,7 @@ export async function POST(request: Request, { params } : {params: { quizId: str
         id: parseInt(params.quizId),
       },
       data: {
-        image: body.quizImageURL || "/Scroll.svg",
+        image: body.quizImageURL || null,
         genStatus: "DONE",
         questions: {
           create: questions,
