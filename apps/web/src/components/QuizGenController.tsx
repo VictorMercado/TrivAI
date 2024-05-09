@@ -7,7 +7,7 @@ import { PopoverClose, PopoverContent } from "@ui/popover";
 import { Input } from "@ui/input";
 import { Button } from "@ui/button";
 import { useSearchParams } from "next/navigation";
-import { removeURL, replaceURL } from "@trivai/lib/utils";
+import { removeURLParam, replaceURLParam } from "@trivai/lib/utils";
 import { useSession } from "@trivai/auth/react";
 import { Edit, X } from "lucide-react";
 import type { GetAllCategories } from "@trivai/trpc/server/routers/AuthViewer/category/getAll.handler";
@@ -42,6 +42,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from "@ui/tabs";
 import { Friend } from "@trivai/trpc/server/routers/AuthViewer/friend/getAll.schema";
 import { TabsContent } from "@radix-ui/react-tabs";
+import { revalidatePath } from "next/cache";
 
 type QuizGenControllerProps = {
   categories: GetAllCategories;
@@ -72,6 +73,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
   const selectedCategory = searchParams?.get("category") || "";
   const selectedTheme = searchParams?.get("theme") || "";
   const [readyToDelete, setReadyToDelete] = useState(false);
+  const [userDescription, setUserDescription] = useState("");
   const { addToast } = useToast();
   const router = useRouter();
   const [assigneeId, setAssigneeId] = useState(
@@ -213,6 +215,10 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
     questionLength?: number;
     questionType?: string;
   }) => {
+    if (input?.theme?.id === -1 || input.category.id === -1) {
+      await utils.authViewer.category.invalidate();
+      await utils.authViewer.theme.invalidate();
+    }
     createQuiz.mutate(input);
     return createQuiz.data;
   };
@@ -248,60 +254,81 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
               <DialogTitle>Generate</DialogTitle>
             </DialogHeader>
             <DialogDescription>
-              <p>
-                Quickly generate a quiz based on your selected category and
-                theme
-              </p>
+              Quickly generate a quiz based on your selected category and theme.
             </DialogDescription>
             <div className="flex flex-col gap-y-4">
               <div className="flex justify-between">
-                <span>Category</span>
-                <Tabs>
-                  <TabsList>
-                    <TabsTrigger value="input">Text input</TabsTrigger>
-                    <TabsTrigger value="select">Select</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="input">
-                    <Input
-                      className="w-52"
-                      placeholder="Enter Category"
-                      defaultValue={selectedCategory}
-                      value={generateCategoryInput || selectedCategory}
-                      onChange={(e) => setGenerateCategoryInput(e.target.value)}
-                    />
-                  </TabsContent>
-                  <TabsContent value="select">
-                    <Select
-                      onValueChange={(e) => {
-                        setGenerateCategoryInput(e);
-                      }}
-                    >
-                      <SelectTrigger className="w-52">
-                        <SelectValue placeholder="Category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {categoriesData.map((category) => (
-                          <SelectItem key={category.id} value={category.name}>
-                            {category.name}
+                <span>Category:</span>
+                <div className="flex border border-primary p-1 text-sm">
+                  <Input
+                    className="w-44 border-none bg-transparent focus:ring-0 focus-visible:ring-0"
+                    placeholder="Enter Category"
+                    // defaultValue={selectedCategory}
+                    value={generateCategoryInput || selectedCategory}
+                    onChange={(e) =>
+                      setGenerateCategoryInput(e.target.value.toUpperCase())
+                    }
+                    required
+                  />
+                  <Select
+                    onValueChange={(e) => {
+                      setGenerateCategoryInput(e);
+                    }}
+                  >
+                    <SelectTrigger className="w-min border-none px-1 focus:ring-0 focus-visible:ring-0">
+                      <SelectValue placeholder="">
+                        <div></div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {categoriesData.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex justify-between">
+                <span>Theme (Optional):</span>
+                <div className="flex border border-primary p-1 text-sm">
+                  <Input
+                    className="w-44 border-none bg-transparent focus:ring-0 focus-visible:ring-0"
+                    placeholder="Enter Theme"
+                    // defaultValue={selectedTheme}
+                    value={generateThemeInput || selectedTheme}
+                    onChange={(e) =>
+                      setGenerateThemeInput(e.target.value.toUpperCase())
+                    }
+                  />
+                  <Select
+                    onValueChange={(value) => {
+                      setGenerateThemeInput(value);
+                    }}
+                  >
+                    <SelectTrigger className="w-min border-none px-1 focus:ring-0 focus-visible:ring-0">
+                      <SelectValue placeholder="">
+                        <div></div>
+                      </SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      {themesData
+                        .filter(
+                          (theme) =>
+                            theme.category.name === generateCategoryInput,
+                        )
+                        .map((theme) => (
+                          <SelectItem key={theme.id} value={theme.name}>
+                            {theme.name}
                           </SelectItem>
                         ))}
-                      </SelectContent>
-                    </Select>
-                  </TabsContent>
-                </Tabs>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
               <div className="flex justify-between">
-                <span>Theme (Optional)</span>
-                <Input
-                  className="w-52"
-                  placeholder="Enter Theme"
-                  defaultValue={selectedTheme}
-                  value={generateThemeInput || selectedTheme}
-                  onChange={(e) => setGenerateThemeInput(e.target.value)}
-                />
-              </div>
-              <div className="flex justify-between">
-                <span>Assign</span>
+                <span>Assign:</span>
                 <Select
                   defaultValue={user.id}
                   onValueChange={(value) => {
@@ -322,8 +349,14 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                 </Select>
               </div>
               <div className="flex justify-between">
-                <span>Date Due</span>
+                <span>Date Due (Optional):</span>
                 <Input className="w-52" type="date" />
+              </div>
+              <div className="flex justify-between">
+                <span>More Details (Optional):</span>
+                <Input className="w-52" type="text" onChange={(e)=> {
+                  setUserDescription(e.target.value);
+                }}/>
               </div>
               <div className="flex justify-center">
                 <DialogClose asChild>
@@ -336,17 +369,31 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                         ownerId: user.id,
                         assignId: assigneeId || user.id,
                         category: {
-                          id: categoryData?.id!,
-                          name: selectedCategory,
+                          id:
+                            categoryData?.id ||
+                            categoriesData.find(
+                              (category) =>
+                                category.name === generateCategoryInput,
+                            )?.id! ||
+                            -1,
+                          name: selectedCategory || generateCategoryInput,
                         },
                         theme: {
-                          id: themeData.find(
-                            (theme) => theme.name === selectedTheme,
-                          )?.id!,
-                          name: selectedTheme,
+                          id:
+                            themesData.find(
+                              (theme) => theme.name === selectedTheme,
+                            )?.id ||
+                            themesData.find(
+                              (theme) => theme.name === generateThemeInput,
+                            )?.id ||
+                            -1,
+                          name: selectedTheme || generateThemeInput,
                         },
+                        userDescription: userDescription === "" ? undefined : userDescription,
                         questionLength: 10,
                       });
+                      setGenerateCategoryInput("");
+                      setGenerateThemeInput("");
                     }}
                   >
                     Generate
@@ -354,6 +401,11 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                 </DialogClose>
               </div>
             </div>
+            <DialogDescription className="text-xs">
+              (P.S. Use the refresh button at the top of the page after about
+              5-10 seconds to see the finished generated quiz. If the quiz
+              generation fails delete it and try again.)
+            </DialogDescription>
           </DialogContent>
         </Dialog>
         <Tabs defaultValue="Quizzes">
@@ -361,7 +413,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
             <TabsTrigger
               value="Quizzes"
               onClick={() => {
-                removeURL("moreOptions");
+                removeURLParam("moreOptions");
               }}
             >
               Quizzes
@@ -369,7 +421,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
             <TabsTrigger
               value="Create"
               onClick={() => {
-                replaceURL("moreOptions", "true");
+                replaceURLParam("moreOptions", "true");
               }}
             >
               Options
@@ -399,8 +451,8 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                       variant="default"
                       size="default"
                       onClick={() => {
-                        removeURL("category");
-                        removeURL("theme");
+                        removeURLParam("category");
+                        removeURLParam("theme");
                       }}
                     >
                       Clear
@@ -427,8 +479,8 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                       tabIndex={0}
                       onClick={(e) => {
                         if (!readyToDelete) {
-                          replaceURL("category", category.name);
-                          removeURL("theme");
+                          replaceURLParam("category", category.name);
+                          removeURLParam("theme");
                         } else {
                           e.stopPropagation();
                         }
@@ -467,8 +519,8 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                                 <AlertDialogAction
                                   onClick={(e) => {
                                     setReadyToDelete(false);
-                                    removeURL("category");
-                                    removeURL("theme");
+                                    removeURLParam("category");
+                                    removeURLParam("theme");
                                     handleDeleteCategory({
                                       id: category.id,
                                       userId: user?.id,
@@ -504,7 +556,9 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                     className="group h-full max-w-48 rounded-none bg-primary/25 p-2 text-primary"
                     placeholder="Enter new Category"
                     value={textCategoryInput}
-                    onChange={(e) => setTextCategoryInput(e.target.value)}
+                    onChange={(e) =>
+                      setTextCategoryInput(e.target.value.toUpperCase())
+                    }
                   />
                   <PopoverClose asChild>
                     <Button
@@ -538,7 +592,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                     variant="default"
                     size="default"
                     onClick={() => {
-                      removeURL("theme");
+                      removeURLParam("theme");
                     }}
                   >
                     Clear
@@ -570,7 +624,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                     tabIndex={0}
                     onClick={(e) => {
                       if (!readyToDelete) {
-                        replaceURL("theme", theme.name);
+                        replaceURLParam("theme", theme.name);
                       } else {
                         e.stopPropagation();
                       }
@@ -609,7 +663,7 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                               <AlertDialogAction
                                 onClick={() => {
                                   setReadyToDelete(false);
-                                  removeURL("theme");
+                                  removeURLParam("theme");
                                   handleDeleteTheme({
                                     id: theme.id,
                                     userId: user?.id,
@@ -629,17 +683,6 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
             </ul>
             <div className="-mx-1 my-1 h-px bg-primary" />
             <div className="flex flex-col">
-              <div className="mt-4 flex">
-                <Button variant="default" size="default">
-                  Name
-                </Button>
-                <Button variant="default" size="default">
-                  Days
-                </Button>
-                <Button variant="default" size="default">
-                  Length
-                </Button>
-              </div>
               <div className="mt-4 ">
                 <form
                   className="flex items-center space-x-2"
@@ -665,7 +708,9 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
                     className="group flex-1 rounded-none bg-primary/25 p-2 text-primary focus:text-primary dark:focus-visible:ring-primary"
                     placeholder="Enter new theme"
                     value={textThemeInput}
-                    onChange={(e) => setTextThemeInput(e.target.value)}
+                    onChange={(e) =>
+                      setTextThemeInput(e.target.value.toUpperCase())
+                    }
                   />
                   <PopoverClose asChild>
                     <Button

@@ -21,6 +21,7 @@ import {
 } from "@ui/questionView";
 import { useToast } from "@ui/toast";
 import { shuffle } from "@trivai/lib/utils";
+import { CREDITSPERQUESTION } from "@/src/config/constants";
 // import QuestionOptions from '@/app/components/QuestionOptions';
 
 type QuizControllerProps = {
@@ -79,7 +80,7 @@ const QuizController = ({
       if (data.correct) {
         addToast({
           id: Math.random(),
-          message: "Credits added!",
+          message: CREDITSPERQUESTION + " Credits added!",
           type: "success",
         });
         incrementScore(scoreAmt);
@@ -109,19 +110,19 @@ const QuizController = ({
     }
   };
 
-  useUnmount(() => {
-    fetch(`/api/quizzes/${quizId}`)
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-      })
-      .catch((e) => {
-        console.log(
-          "error occured cause this needs to be in TRPC in QuizController.tsx",
-        );
-      });
-    alert("dismounted");
-  });
+  // useUnmount(() => {
+  //   fetch(`/api/quizzes/${quizId}`)
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       console.log(data);
+  //     })
+  //     .catch((e) => {
+  //       console.log(
+  //         "error occured cause this needs to be in TRPC in QuizController.tsx",
+  //       );
+  //     });
+  //   alert("dismounted");
+  // });
 
   return (
     <>
@@ -129,7 +130,6 @@ const QuizController = ({
       {question ? (
         <div className="container flex grow flex-col items-center justify-center p-4">
           <QuizMetaDataView
-            totalScore={totalScore}
             questionsLength={questions.length}
             className="text-sm "
           />

@@ -13,6 +13,12 @@ import { update } from "./update.handler";
 import { ZUpdateQuizInput } from "./update.schema";
 import { deleteQuiz } from "./delete.handler";
 import { ZDeleteQuizInput } from "./delete.schema";
+import { assignQuiz } from "./assignQuiz.handler";
+import { ZAssignQuizInput } from "./assignQuiz.schema";
+import { createMultiplayer } from "./createMultiplayer.handler";
+import { ZCreateMultiplayerInput } from "./createMultiplayer.schema";
+import { ZGetRoomsInput } from "./getRooms.schema";
+import { getRooms } from "./getRooms.handler";
 
 export const quizRouter = router({
   getAllByUserId: protectedProcedure.input(ZGetAllByUserIdInput).query(async ({ ctx, input }) => {
@@ -23,6 +29,9 @@ export const quizRouter = router({
   }),
   getAllByTheme: protectedProcedure.input(ZGetAllByThemeInput).query(async ({ ctx, input }) => {
     return await getAllByTheme({ ctx, input });
+  }),
+  getRooms: protectedProcedure.input(ZGetRoomsInput).query(async ({ input, ctx }) => {
+    return await getRooms({ input, ctx });
   }),
   get: protectedProcedure.input(ZGetInput).query(async ({ input, ctx }) => {
     return await get({ input, ctx });
@@ -35,5 +44,11 @@ export const quizRouter = router({
   }),
   delete: protectedProcedure.input(ZDeleteQuizInput).mutation(async ({ input, ctx }) => {
     return await deleteQuiz({ input, ctx});
+  }),
+  assignQuiz: protectedProcedure.input(ZAssignQuizInput).mutation(async ({ input, ctx }) => {
+    return await assignQuiz({ input, ctx });
+  }),
+  createMultiplayer: protectedProcedure.input(ZCreateMultiplayerInput).mutation(async ({ input, ctx }) => {
+    return await createMultiplayer({ input, ctx });
   }),
 });

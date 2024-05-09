@@ -28,41 +28,99 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
   let res;
   // create a quiz record but will not have questions connected yet this will be done in a webhook
   // quiz id will be sent to the AI API to be sent to the webhook
-
+  let categoryCreate;
+  let themeCreate;
   try {
-    if (input.theme?.id && input.theme?.name) {
-      quizCategory = await prisma.quizCategory.findFirst({
-        where: {
-          categoryId: input.category.id,
-          themeId: input.theme.id,
+    // create a category since it does not exist
+    if (input?.category?.id === -1 ) {
+      categoryCreate = await prisma.category.create({
+        data: {
+          name: input.category.name,
+          userId: input.ownerId,
         },
       });
-      if (!quizCategory) {
-        quizCategory = await prisma.quizCategory.create({
+      // create a theme since it does not exist and check for name
+      if (input?.theme?.id === -1 && input.theme?.name) {
+        themeCreate = await prisma.theme.create({
           data: {
-            userId: input.ownerId,
-            basePrompt: input.userDescription || '',
-            categoryId: input.category.id,
-            themeId: input.theme?.id,
+            name: input.theme.name,
+            categoryId: categoryCreate.id,
           },
         });
-      };
+        quizCategory = await prisma.quizCategory.create({
+          data: {
+            basePrompt: input.userDescription || '',
+            userId: input.ownerId,
+            categoryId: categoryCreate.id,
+            themeId: themeCreate.id,
+          },
+        });
+      } else {
+        quizCategory = await prisma.quizCategory.create({
+          data: {
+            basePrompt: input.userDescription || '',
+            userId: input.ownerId,
+            categoryId: categoryCreate.id,
+            themeId: null,
+          },
+        });
+      }
     } else {
-      quizCategory = await prisma.quizCategory.findFirst({
-        where: {
-          categoryId: input.category.id,
-          themeId: null,
-        },
-      });
-      if (!quizCategory) {
-        quizCategory = await prisma.quizCategory.create({
+      if (input.theme?.id === -1 && input.theme?.name) {
+        themeCreate = await prisma.theme.create({
           data: {
-            userId: input.ownerId,
-            basePrompt: input.userDescription || '',
+            name: input.theme.name,
             categoryId: input.category.id,
           },
         });
-      };
+        quizCategory = await prisma.quizCategory.create({
+          data: {
+            basePrompt: input.userDescription || '',
+            userId: input.ownerId,
+            categoryId: input.category.id,
+            themeId: themeCreate.id,
+          },
+        });
+      } else if (input.theme?.id && input.theme?.name) {
+        quizCategory = await prisma.quizCategory.findFirst({
+          where: {
+            categoryId: input.category.id,
+            themeId: input.theme.id,
+          },
+        });
+        if (!quizCategory) {
+          quizCategory = await prisma.quizCategory.create({
+            data: {
+              userId: input.ownerId,
+              basePrompt: input.userDescription || '',
+              categoryId: input.category.id,
+              themeId: input.theme?.id,
+            },
+          });
+        };
+      } else {
+        quizCategory = await prisma.quizCategory.findFirst({
+          where: {
+            categoryId: input.category.id,
+            themeId: null,
+          },
+        });
+        if (!quizCategory) {
+          quizCategory = await prisma.quizCategory.create({
+            data: {
+              userId: input.ownerId,
+              basePrompt: input.userDescription || '',
+              categoryId: input.category.id,
+            },
+          });
+        };
+      }
+    }
+    if (!quizCategory) {
+      throw new TRPCError({
+        code: "BAD_REQUEST",
+        message: "Could not find or create a quiz category",
+      });
     }
     quiz = await prisma.quiz.create({
       data: {
@@ -137,6 +195,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
       message: "Something went wrong with the AI API",
     });
   }
+
   return {
     status: "success",
     message: "Quiz created",
@@ -144,3 +203,4 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
   };
   // return quizJSON;
 };
+

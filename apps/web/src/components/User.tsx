@@ -93,7 +93,7 @@ const User = ({
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             <div className="space-y-2">
-              <DropdownMenuItem asChild>
+              {/* <DropdownMenuItem asChild>
                 <Button
                   size="default"
                   variant="default"
@@ -105,7 +105,7 @@ const User = ({
                 >
                   Invite to Quiz
                 </Button>
-              </DropdownMenuItem>
+              </DropdownMenuItem> */}
               <DropdownMenuItem asChild>
                 <Button
                   size="default"

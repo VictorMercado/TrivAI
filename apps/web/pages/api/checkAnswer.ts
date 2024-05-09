@@ -105,8 +105,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
           });
           res.status(200).json({ correct: true, correctAnswer: question.correctAnswer, answer: answer });
           return;
-        }
-        else {
+        } else {
           await prisma.userAnsweredQuiz.upsert({
             where: {
               quizId_userId: {

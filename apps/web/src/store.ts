@@ -8,18 +8,21 @@ export type Actions = {
   resetScore: () => void;
   deleteAccount: () => void;
   updateUserName: (name: string) => void;
-  incrementCredits: () => void;
+  incrementCredits: (optionalValue?: number) => void;
+  addFriend: (friend: { id: string; userName: string; }) => void;
 };
 
 const initialState = {
   id: "",
   name: "",
+  userName: "",
   totalScore: 0,
   image: "",
   cheatUsed: false,
   credits: 0,
   creditsMultiplier: 1,
   creditsToAdd: CREDITSPERQUESTION,
+  friends: [],
 };
 
 export type UserStore = UserState & { creditsToAdd: number; };
@@ -44,7 +47,11 @@ export const useStore = create<UserStore & Actions>((set, get) => ({
     const score = get().totalScore + pointAmount;
     set({ totalScore: score });
   },
-  incrementCredits: () => {
+  incrementCredits: (optionalValue) => {
+    if (optionalValue) {
+      set({ credits: get().credits + optionalValue });
+      return;
+    }
     const credits = get().credits + (get().creditsToAdd * get().creditsMultiplier);
     set({ credits: credits });
   },
@@ -96,6 +103,10 @@ export const useStore = create<UserStore & Actions>((set, get) => ({
       alert("Nextwork Error");
       console.log(e);
     }
+  },
+  addFriend: (friend) => {
+    const friends = get().friends;
+    set({friends: [...friends, friend ]});
   }
 }));
 

@@ -9,6 +9,8 @@ import {
   createLucideIcon,
   MoreVertical,
   Scroll,
+  RotateCcw,
+  Users,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
@@ -20,10 +22,18 @@ import { Button } from "./button";
 import { useSession } from "next-auth/react";
 import { trpc } from "@t/client";
 import { useToast } from "@ui/toast";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  DialogClose,
+} from "@ui/dialog";
+import { useRouter } from "next/navigation";
 
-type QuizCardProps = {
-  quiz: TQuizView;
-};
+
 {/* <svg
   xmlns="http://www.w3.org/2000/svg"
   width="24"
@@ -41,21 +51,6 @@ type QuizCardProps = {
   <circle cx="5" cy="12" r="1" />
 </svg>; */}
 
-const RectInfo = createLucideIcon("Info", [
-  [
-    "rect",
-    {
-      width: "20",
-      height: "20",
-      x: "2",
-      y: "2",
-      key: "6G1vXw",
-    },
-  ],
-  ["path", { d: "M12 16v-4", key: "1dtifu" }],
-  ["path", { d: "M12 8h.01", key: "e9boi3" }],
-]);
-
 function dateFormat(date: Date | null | undefined) {
   if (date === null) {
     return undefined;
@@ -67,25 +62,29 @@ function dateFormat(date: Date | null | undefined) {
   return isoDate.slice(5) + "-" + isoDate.slice(2).slice(0, 2);
 }
 
+type QuizCardProps = {
+  quiz: TQuizView;
+};
 // TODO:
 // add more stats:
 // - who the quiz is assigned to
 // - when it was created
 // - how many questions are completed
 const QuizCard = ({ quiz }: QuizCardProps) => {
+  const router = useRouter();
   const { addToast } = useToast();
   const utils = trpc.useUtils();
   const { data: session } = useSession();
   const user = session?.user;
-  
+  const friends = trpc.authViewer.friend.getAll.useQuery();
   const [parentDimensions, setParentDimensions] = useState({
     width: 0,
     height: 0,
   });
   const [likes, setLikes] = useState({ count: quiz.likes, liked: false });
-  const [saves, setSaves] = useState({ count: quiz.saves, saved: false });
-  const [shares, setShares] = useState({ count: quiz.shares, shared: false});
-  const [completions, setCompletions] = useState({ count: quiz.completions, completed: false});
+  // const [saves, setSaves] = useState({ count: quiz.saves, saved: false });
+  // const [shares, setShares] = useState({ count: quiz.shares, shared: false});
+  // const [completions, setCompletions] = useState({ count: quiz.completions, completed: false});
   const ref = useRef<HTMLDivElement>(null);
   const status = quiz.status;
   const statusTextColor =
@@ -96,6 +95,63 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
         : "text-blue-500";
 
   const date = dateFormat(quiz?.dateDue);
+  const { data : rooms, isLoading } = trpc.authViewer.quiz.getRooms.useQuery({quizId: quiz.id});
+
+  const resetQuiz = trpc.authViewer.user.resetQuizAnswers.useMutation({
+    onSuccess: () => {
+      addToast({
+        id: Math.random(),
+        message: "Quiz has been successfully reset",
+        type: "success",
+      });
+      utils.authViewer.user.invalidate();
+    },
+    onError: (error) => {
+      addToast({
+        id: Math.random(),
+        message: error.message,
+        type: "error",
+      });
+    },
+  });
+  const handleResetQuiz = (quizId: number, userId: string) => {
+    resetQuiz.mutate({ quizId, userId });
+  }
+
+  const assignQuiz = trpc.authViewer.quiz.assignQuiz.useMutation({
+    onSuccess: () => {
+      addToast({
+        id: Math.random(),
+        message: "Quiz has been successfully assigned",
+        type: "success",
+      });
+    },
+    onError: (error) => {
+      addToast({
+        id: Math.random(),
+        message: error.message,
+        type: "error",
+      });
+    },
+  });
+
+  const handleAssign = (quizId: number, userId: string, assigneeId: string) => {
+    assignQuiz.mutate({ quizId, userId, assigneeId });
+  }
+
+  const createMultiplayerQuiz = trpc.authViewer.quiz.createMultiplayer.useMutation({
+    onError: (error) => {
+      addToast({
+        id: Math.random(),
+        message: error.message,
+        type: "error",
+      });
+    },
+  });
+
+  const handleCreateMultiplayer = (quizId: number, roomId: string) => {
+    createMultiplayerQuiz.mutate({ quizId, roomId });
+  };
 
   const deleteQuiz = trpc.authViewer.quiz.delete.useMutation({
     onSuccess: () => {
@@ -105,6 +161,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
         type: "success",
       });
       utils.authViewer.quiz.invalidate();
+      utils.authViewer.user.invalidate();
     },
     onError: (error) => {
       addToast({
@@ -116,8 +173,8 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
   
   });
 
-  const handleDelete = async (id : number, userId : string ) => {
-    await deleteQuiz.mutateAsync({id, userId});
+  const handleDelete = (id : number, userId : string ) => {
+    deleteQuiz.mutate({id, userId});
   };
 
   useEffect(() => {
@@ -246,7 +303,10 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
               </div>
               <div className="z-20 col-span-1 mb-6 grid grid-cols-4 items-center justify-center gap-x-2 px-4  pb-4 text-sm @md:col-span-2 @md:grid @md:grid-cols-4 @lg:pl-20 @lg:pr-8 @lg:text-xl">
                 <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
-                  <HoverCardTrigger className="pointer-events-auto" asChild>
+                  <HoverCardTrigger
+                    className="pointer-events-auto col-start-2"
+                    asChild
+                  >
                     <button
                       className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-red-500/25 hover:ring-1 hover:ring-red-500 @md:space-x-2"
                       onClick={(e) => {
@@ -265,7 +325,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                     <p>Likes</p>
                   </HoverCardContent>
                 </HoverCard>
-                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                {/* <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
                   <HoverCardTrigger asChild>
                     <button
                       className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-blue-500/25 hover:ring-1 hover:ring-blue-500 @md:space-x-2"
@@ -284,8 +344,8 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   >
                     <p>Saves</p>
                   </HoverCardContent>
-                </HoverCard>
-                <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
+                </HoverCard> */}
+                {/* <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
                   <HoverCardTrigger asChild>
                     <button
                       className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-violet-500/25 hover:ring-1 hover:ring-violet-500 @md:space-x-2"
@@ -304,25 +364,19 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   >
                     <p>Shares</p>
                   </HoverCardContent>
-                </HoverCard>
+                </HoverCard> */}
                 <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
                   <HoverCardTrigger asChild>
-                    <button
-                      className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-green-500/25 hover:ring-1 hover:ring-green-500 @md:space-x-2"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        console.log("completed");
-                      }}
-                    >
-                      <Check className="m-auto h-4 w-4 stroke-green-500 lg:h-6 lg:w-6" />
-                      <p>{shortenNumber(quiz.completions)}</p>
-                    </button>
+                    <div className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-green-500/25 hover:ring-1 hover:ring-green-500 @md:space-x-2">
+                      <Users className="m-auto h-4 w-4 stroke-green-500 lg:h-6 lg:w-6" />
+                      <p>{shortenNumber(rooms?.length? rooms?.length : 0)}</p>
+                    </div>
                   </HoverCardTrigger>
                   <HoverCardContent
                     side="top"
                     className="text-md border-green-500 p-2 text-sm text-green-500"
                   >
-                    <p>Completions</p>
+                    <p>Multiplayer Rooms</p>
                   </HoverCardContent>
                 </HoverCard>
               </div>
@@ -367,7 +421,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
         <PopoverTrigger className="absolute bottom-2 right-2 flex h-6 w-6 animate-fadeIn items-center justify-center">
           <MoreVertical className="animate-pulse stroke-textBase" />
         </PopoverTrigger>
-        <PopoverContent aria-label="Owner Information" className="p-4">
+        <PopoverContent aria-label="Owner Information" className="p-6">
           <div className="flex flex-col items-center justify-center space-y-4">
             <div className="w-full text-left">
               <h1 className={`text-xl`}>Owner</h1>
@@ -380,20 +434,125 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                 <h1 className={`text-md`}>{quiz.owner!.userName}</h1>
               </div>
             </Link>
-            <div>
+            <div className="flex flex-col">
               <Button
                 variant="default"
                 size="default"
                 className="w-full"
-                onClick={() => {}}
+                title="reset your quiz answers"
+                onClick={() => {
+                  handleResetQuiz(quiz.id, user!.id);
+                }}
               >
-                View Quiz
+                <RotateCcw className="mr-2 h-4 w-4" />
+                Reset Answers
               </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="default"
+                    className=""
+                    onClick={() => {}}
+                  >
+                    View Multiplayer Quizzes
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Multiplayer Quizzes</DialogTitle>
+                    <DialogClose />
+                  </DialogHeader>
+                  <DialogDescription>
+                    Click to Join
+                  </DialogDescription>
+                  <div className="flex flex-col gap-y-4">
+                    {!isLoading && rooms && 
+                      rooms.map((room) => (
+                        <Button
+                          variant="default"
+                          size="default"
+                          className="w-full"
+                          key={room.id}
+                          onClick={() => {
+                            router.push(
+                              `/quizzes/${quiz.id}/multiplayer?roomid=${room.roomId}`,
+                            );
+                          }}
+                        >
+                          {room.roomId}
+                        </Button>
+                      ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
+              <Button
+                variant="default"
+                size="default"
+                className="w-full"
+                onClick={() => {
+                  // if (quiz.owner?.userName === user?.userName) {
+
+                  //   router.push(
+                  //     `/quizzes/${quiz.id}/multiplayer?roomid=${roomId}`,
+                  //   );
+                  // } else {
+                  //   router.push(`/quizzes/${quiz.id}/multiplayer?roomid=${quiz.roomId}`);
+                  // }
+                  const roomId = `${user?.userName}_${quiz.id}`;
+                  if (!rooms?.find((room) => room.roomId === roomId)) {
+                    handleCreateMultiplayer(quiz.id, roomId);
+                  }
+                  router.push(
+                    `/quizzes/${quiz.id}/multiplayer?roomid=${roomId}`,
+                  );
+                }}
+              >
+                Start Multiplayer Quiz
+              </Button>
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="default"
+                    size="default"
+                    className=""
+                    onClick={() => {}}
+                  >
+                    Assign Quiz
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Assign Quiz</DialogTitle>
+                    <DialogClose />
+                  </DialogHeader>
+                  <DialogDescription>
+                    Assign this quiz to a friend
+                  </DialogDescription>
+                  <div className="flex flex-col gap-y-4">
+                    {friends &&
+                      friends.data &&
+                      friends?.data.map((friend) => (
+                        <Button
+                          variant="default"
+                          size="default"
+                          className="w-full"
+                          key={friend.id}
+                          onClick={() => {
+                            handleAssign(quiz.id, user!.id, friend.id);
+                          }}
+                        >
+                          {friend.userName}
+                        </Button>
+                      ))}
+                  </div>
+                </DialogContent>
+              </Dialog>
               {quiz.owner?.userName === user?.userName ? (
                 <Button
                   variant="default"
                   size="default"
-                  className="w-full"
+                  className=""
                   onClick={() => {
                     handleDelete(quiz.id, user!.id);
                   }}

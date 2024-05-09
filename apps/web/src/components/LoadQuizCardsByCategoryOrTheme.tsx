@@ -20,7 +20,7 @@ const getQuizHandlerByCategory = (categoryId: number) => {
   return trpc.authViewer.quiz.getAllByCategory.useQuery({ categoryId });
 };
 
-const LoadQuizCards = ({ categoryId, themeId }: LoadQuizCardProps) => {
+const LoadQuizCardsByCategoryOrTheme = ({ categoryId, themeId }: LoadQuizCardProps) => {
   let data, error;
   if (categoryId && themeId) {
     ({ data, error } = getQuizHandlerByProps({ categoryId, themeId }));
@@ -52,4 +52,4 @@ const LoadQuizCards = ({ categoryId, themeId }: LoadQuizCardProps) => {
   );
 };
 
-export { LoadQuizCards };
+export { LoadQuizCardsByCategoryOrTheme };

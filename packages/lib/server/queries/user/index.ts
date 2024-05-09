@@ -5,12 +5,14 @@ import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 export type UserState = {
   id: string;
   name: string;
+  userName: string;
   totalScore: number;
   image: string;
   cheatUsed: boolean;
   primaryColor?: string;
   credits: number;
   creditsMultiplier: number;
+  friends: Array<{id: string; userName: string;}>;
 }
 
 export const getUser = async () => {
@@ -25,6 +27,7 @@ export const getUser = async () => {
         select: {
           id: true,
           name: true,
+          userName: true,
           totalScore: true,
           cheatUsed: true,
           image: true,
@@ -96,6 +99,18 @@ export async function getUsers() {
       totalScore: true,
       image: true,
       primaryColor: true,
+    },
+  });
+}
+
+export async function getUsersByScore() {
+  return await prisma.user.findMany({
+    select: {
+      id: true,
+      totalScore: true,
+    },
+    orderBy: {
+      totalScore: 'desc',
     },
   });
 }

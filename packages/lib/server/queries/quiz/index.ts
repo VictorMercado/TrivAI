@@ -40,6 +40,13 @@ export const PrismaUserAnsweredQuizWithoutAnswersSelectView = {
   completed: true,
   quizId: true,
 };
+export const PrismaUserAnsweredQuizWithAnswersSelectView = {
+  id: true,
+  completed: true,
+  time: true,
+  quizId: true,
+  userAnswers: true,
+};
 
 export const PrismaQuizSelectView = {
   id: true,
@@ -178,6 +185,17 @@ export async function getQuiz(id: number) {
   return quiz;
 }
 
+export async function getQuizzes(ids: number[]) {
+  return await prisma.quiz.findMany({
+    where: {
+      id: {
+        in: ids,
+      },
+    },
+    select: PrismaQuizSelectView,
+  });
+}
+
 export async function getQuizWithQuestions(id: number) {
   return await prisma.quiz.findUnique({
     where: {
@@ -270,6 +288,18 @@ export async function getUserAnsweredQuizzes(userId: string | undefined, quizIds
       },
     },
     select: PrismaUserAnsweredQuizWithoutAnswersSelectView,
+  });
+}
+
+export async function getUserAnsweredQuizzesWithAnswers(userId: string ) {
+  if (!userId) {
+    return [];
+  }
+  return await prisma.userAnsweredQuiz.findMany({
+    where: {
+      userId: userId,
+    },
+    select: PrismaUserAnsweredQuizWithAnswersSelectView,
   });
 }
 

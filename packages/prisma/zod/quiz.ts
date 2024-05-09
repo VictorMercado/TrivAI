@@ -1,6 +1,6 @@
 import * as z from "zod"
 import { QuizAccess, GeneratedStatus } from "@prisma/client"
-import { CompleteQuestion, RelatedQuestionModel, CompleteUserAnsweredQuiz, RelatedUserAnsweredQuizModel, CompleteAllegianceQuiz, RelatedAllegianceQuizModel, CompleteUserAssignedQuiz, RelatedUserAssignedQuizModel, CompleteUserLikedQuiz, RelatedUserLikedQuizModel, CompleteUserSharedQuiz, RelatedUserSharedQuizModel, CompleteUserSavedQuiz, RelatedUserSavedQuizModel, CompleteUser, RelatedUserModel, CompleteQuizCategory, RelatedQuizCategoryModel } from "./index"
+import { CompleteRoom, RelatedRoomModel, CompleteQuestion, RelatedQuestionModel, CompleteUserAnsweredQuiz, RelatedUserAnsweredQuizModel, CompleteAllegianceQuiz, RelatedAllegianceQuizModel, CompleteUserAssignedQuiz, RelatedUserAssignedQuizModel, CompleteUserLikedQuiz, RelatedUserLikedQuizModel, CompleteUserSharedQuiz, RelatedUserSharedQuizModel, CompleteUserSavedQuiz, RelatedUserSavedQuizModel, CompleteUser, RelatedUserModel, CompleteQuizCategory, RelatedQuizCategoryModel } from "./index"
 
 export const QuizModel = z.object({
   id: z.number().int(),
@@ -21,6 +21,7 @@ export const QuizModel = z.object({
 })
 
 export interface CompleteQuiz extends z.infer<typeof QuizModel> {
+  rooms: CompleteRoom[]
   questions: CompleteQuestion[]
   userAnswers: CompleteUserAnsweredQuiz[]
   allegianceQuiz?: CompleteAllegianceQuiz | null
@@ -38,6 +39,7 @@ export interface CompleteQuiz extends z.infer<typeof QuizModel> {
  * NOTE: Lazy required in case of potential circular dependencies within schema
  */
 export const RelatedQuizModel: z.ZodSchema<CompleteQuiz> = z.lazy(() => QuizModel.extend({
+  rooms: RelatedRoomModel.array(),
   questions: RelatedQuestionModel.array(),
   userAnswers: RelatedUserAnsweredQuizModel.array(),
   allegianceQuiz: RelatedAllegianceQuizModel.nullish(),

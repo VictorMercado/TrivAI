@@ -53,7 +53,7 @@ const ProfilePicturePopover = () => {
   }
   return (
     <Popover>
-      <PopoverTrigger>
+      <PopoverTrigger className="border border-primary animate-pulse">
         <ProfilePicture image={user.image || "/default.png"} />
       </PopoverTrigger>
 

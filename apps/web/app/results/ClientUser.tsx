@@ -29,7 +29,7 @@ export const ClientUser = ({ initQuizzes }: ClientUserProps) => {
   const quizRef = useRef<HTMLDivElement>(null);
   const [callbackFn, setCallbackFn] = useState<any>([]);
   const [userAnswerId, setUserAnswerId] = useState<string>();
-  console.log(initQuizzes);
+  // console.log(initQuizzes);
   const [quizzes, setQuizzes] = useState(initQuizzes);
 
   useEffect(() => {
@@ -74,19 +74,28 @@ export const ClientUser = ({ initQuizzes }: ClientUserProps) => {
     }
   };
   return (
-    <div className="flex flex-col gap-2 p-4 text-lg transition-colors duration-500 4xl:grid 4xl:grid-cols-2">
-      <Calendar
+    <div className="flex flex-col gap-2 p-4 text-lg transition-colors duration-500 ">
+      {/* <Calendar
         years={[2023, 2024]}
         months={[
           { monthNumber: 0, monthName: "January" },
           { monthNumber: 1, monthName: "Feburary" },
           { monthNumber: 2, monthName: "March" },
+          { monthNumber: 3, monthName: "April" },
+          { monthNumber: 4, monthName: "May" },
+          { monthNumber: 5, monthName: "June" },
+          { monthNumber: 6, monthName: "July" },
+          { monthNumber: 7, monthName: "August" },
+          { monthNumber: 8, monthName: "September" },
+          { monthNumber: 9, monthName: "October" },
+          { monthNumber: 10, monthName: "November" },
+          { monthNumber: 11, monthName: "December" },
         ]}
         onDayClick={handleClick}
-      />
+      /> */}
       <div
         ref={scrollToQuizRef}
-        className="mx-auto grid w-full grid-cols-2 gap-4 lg:gap-6 xl:grid-cols-4"
+        className="mx-auto grid w-full grid-cols-2 gap-4 lg:gap-6 md:grid-cols-4 lg:grid-cols-6"
       >
         {quizzes?.map((quiz: any, index: number) => {
           let quizLength;

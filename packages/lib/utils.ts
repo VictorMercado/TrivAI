@@ -1,7 +1,18 @@
 import clsx, { ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export const replaceURL = (key: string, value: string) => {
+export const getURL = () => {
+  let search = new URLSearchParams(window.location.search);
+  return search.toString();
+}
+
+export const pushURLParam = (key: string, value: string) => {
+  let search = new URLSearchParams(window.location.search);
+  search.set(key, value);
+  window.history.pushState({}, "", `?${search}`);
+}
+
+export const replaceURLParam = (key: string, value: string) => {
   let search = new URLSearchParams(window.location.search);
   let arr = Array.from(search.entries());
   arr = arr.filter(([k, v]) => k !== key);
@@ -9,7 +20,7 @@ export const replaceURL = (key: string, value: string) => {
   window.history.replaceState({}, "", `?${new URLSearchParams(arr)}`);
 };
 
-export const removeURL = (key: string) => {
+export const removeURLParam = (key: string) => {
   let search = new URLSearchParams(window.location.search);
   let arr = Array.from(search.entries());
   arr = arr.filter(([k, v]) => k !== key);

@@ -18,7 +18,7 @@ import { Leaderboard } from "@components/LeaderBoard";
 import Link from "next/link";
 import { Button } from "@ui/button";
 import { QuizCard } from "@ui/quiz-card";
-import { ArrowDown, ArrowRight } from "lucide-react";
+import { ArrowDown, ArrowRight, Scroll } from "lucide-react";
 // import { ColorPicker } from "@/src/components/ColorPicker";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -113,12 +113,13 @@ export default async function RootPage() {
           <ArrowRight className="h-4 w-4 text-primary" />
           <Link href="/quizzes">
             <Button variant="default" size="default">
+              <Scroll className="h-6 w-6 mr-2" />
               Quizzes
             </Button>
           </Link>
         </div>
         <Leaderboard />
-        <p className="ml-6 mt-6">Want to join the fun? Sign in!</p>
+        <p className="ml-6">Want to join the fun? Sign in!</p>
       </div>
     </main>
   );

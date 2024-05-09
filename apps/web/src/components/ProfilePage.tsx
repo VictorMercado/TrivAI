@@ -8,6 +8,7 @@ import { QuizCard } from "@/src/components/ui/quiz-card";
 import { getUserOwnedQuizzes } from "@trivai/lib/server/queries/quiz";
 import { mergeQuizzesView } from "@trivai/lib/server/queries/quiz/helpers";
 import { HorizontalScroll } from "@ui/horizontal-scroll";
+import { getUsersByScore } from "@trivai/lib/server/queries/user";
 
 export type ProfileIdPageProps = {
   userName: string;
@@ -53,11 +54,14 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
   if (!user) {
     notFound();
   }
+  const users = await getUsersByScore();
+  const rank = users.findIndex((u) => u.id === user.id) + 1;
   const userOwnedQuizzes = await getUserOwnedQuizzes(user.id);
   const quizzesToView = mergeQuizzesView(
     userOwnedQuizzes,
     user.userAnsweredQuizzes,
-  ); 
+  ).reverse();
+
   const quizzesCompleted = user.userAnsweredQuizzes.reduce(
     (acc: number, quiz) => {
       if (quiz.completed === true) {
@@ -81,7 +85,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
             />
             <h1 className="text-2xl">{user.userName}</h1>
           </div>
-
+          {/*
           <div className="flex flex-col items-center gap-y-2 lg:flex-row lg:justify-center lg:gap-x-5">
             {user.allegiance === null && false ? ( //
               <>
@@ -95,7 +99,6 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
             ) : (
               <>
                 <h1 className="order-last text-center text-2xl lg:order-first">
-                  {/* {user.allegiance.allegiance.name} */}
                   The Brotherhood
                 </h1>
                 <AllegiancePicturePopover
@@ -110,6 +113,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
               </>
             )}
           </div>
+          */}
         </div>
 
         <div className="grid w-full md:grid-cols-2">
@@ -126,9 +130,9 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
           </div>
 
           <div className="space-y-2 bg-primary/25 p-4 text-primary md:p-6">
-            <div>Rank: 1</div>
+            <div>Rank: {rank}</div>
             <div>Quizzes Completed: {quizzesCompleted} </div>
-            <div>Cheats Used: 20 </div>
+            {/* <div>Cheats Used: 20 </div> */}
             <div>Knowledge Points: {user.totalScore}</div>
             <div>Credits: {user.credits}</div>
             <div>Average Quiz Grade Percent: N/A</div>
@@ -140,7 +144,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
         <div className="flex justify-between pb-4">
           <h1 className="w-fit bg-primary/25 p-4 text-xl">Collections: (12)</h1>
           <h1 className="w-fit bg-primary/25 p-4 text-xl">
-            Quizzes: ({user.userAnsweredQuizzes.length})
+            Quizzes: ({userOwnedQuizzes.length})
           </h1>
         </div>
         <HorizontalScroll>

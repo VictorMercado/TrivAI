@@ -323,7 +323,8 @@ model Quiz {
   genStatus      GeneratedStatus           @default(PENDING) 
   createdAt      DateTime         @default(now())
   updatedAt      DateTime         @updatedAt
-  reasonForFail  String?          
+  reasonForFail  String?
+  rooms          Room[]
 
   questions      Question[]
   userAnswers    UserAnsweredQuiz[]
@@ -343,6 +344,19 @@ model Quiz {
   @@index([quizCategoryId])
 }
 
+model Room {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  roomId    String   @unique
+
+  quizId Int
+  quiz   Quiz @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  // users RoomUser[]
+  @@index([quizId])
+}
+
 model UserAssignedQuiz {
   id        Int      @id @default(autoincrement())
   createdAt DateTime @default(now())
@@ -359,6 +373,7 @@ model UserAssignedQuiz {
   assigneeId String
   assignee   User   @relation(fields: [assigneeId], references: [id], onDelete: Cascade)
 
+  @@unique([quizId, assigneeId])
   @@index([quizId])
   @@index([userId])
   @@index([assigneeId])

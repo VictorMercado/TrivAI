@@ -13,6 +13,10 @@ import { SiteNav } from "./_components/SiteNav";
 import TRPCProvider from "./_trpc/TRPCProvider";
 import { cookies } from "next/headers";
 import { SetCookie } from "./_components/SetCookie";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
+import { Button } from "@ui/button";
+import { Settings } from "lucide-react";
+import Link from "next/link";
 // Font files can be colocated inside of `app`
 const overseer = localFont({
   src: "../public/fonts/overseer/Overseer.otf",
@@ -65,7 +69,7 @@ export default async function RootLayout({ children }: IProps) {
       */}
       <head />
       <body
-        className="flex w-screen grow flex-col "
+        className="flex w-screen grow flex-col"
         data-atr="this is the body"
       >
         <TRPCProvider>
@@ -80,10 +84,27 @@ export default async function RootLayout({ children }: IProps) {
             <Nav />
             <div className="flex grow flex-col justify-between md:flex-row md:justify-start">
               <div className="fixed bottom-0 left-0 z-50 order-last flex w-screen justify-center border-r border-primary/25 bg-background pb-5 md:static md:order-first md:w-24 md:items-start">
-                <SiteNav />
+                <div className="flex h-full flex-col">
+                  <SiteNav />
+                </div>
               </div>
-              <div className="flex w-full h-full flex-col">{children}</div>
+              <div className="flex h-full w-full flex-col">{children}</div>
               <div className="h-32 lg:h-2"></div>
+            </div>
+            <div className="fixed left-4 bottom-16 hidden md:block z-50">
+              <HoverCard>
+                <HoverCardTrigger className="h-min" asChild>
+                  <Link
+                    href="/settings"
+                    className=" items-center justify-center p-2 text-black"
+                  >
+                    <Button variant="default" size="default">
+                      <Settings className="h-6 w-6" />
+                    </Button>
+                  </Link>
+                </HoverCardTrigger>
+                <HoverCardContent>Settings</HoverCardContent>
+              </HoverCard>
             </div>
           </ClientAppWrapper>
         </TRPCProvider>

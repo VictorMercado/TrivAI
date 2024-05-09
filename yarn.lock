@@ -538,6 +538,28 @@
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
 
+"@liveblocks/client@1.11.3", "@liveblocks/client@^1.11.3":
+  version "1.11.3"
+  resolved "https://registry.yarnpkg.com/@liveblocks/client/-/client-1.11.3.tgz#e23ee36423d253aa4c254649b5d18309fcd86605"
+  integrity sha512-Vinzfrz/pBGN/l3XTDgYiUrBzs1xmzKzMtES/qHdIWxTVyVEBT5p8ilyi7kSCdRkdSe6bfmnJmkQljViTsX3vw==
+  dependencies:
+    "@liveblocks/core" "1.11.3"
+
+"@liveblocks/core@1.11.3":
+  version "1.11.3"
+  resolved "https://registry.yarnpkg.com/@liveblocks/core/-/core-1.11.3.tgz#a7087cc92f8b6568728509d8e91a2766772d0161"
+  integrity sha512-lai5o9nhgboocb+AQzL94syp8CZ4blTJFk6xWgUD+/L3qK110ADp7JSEH93k90pXqjf5zBOj5XWPMYehQ6I43w==
+
+"@liveblocks/react@^1.11.3":
+  version "1.11.3"
+  resolved "https://registry.yarnpkg.com/@liveblocks/react/-/react-1.11.3.tgz#bf3554666153b67332482f27e2bf9faae2f2078a"
+  integrity sha512-kli2rZjZkQ92+JXpZY308ljYsxU0upUGv7LZGEcjg2aCmZHHWeVWe5nzZzeSxI6NODNeEP3X6Ymlk+0uDaGlrA==
+  dependencies:
+    "@liveblocks/client" "1.11.3"
+    "@liveblocks/core" "1.11.3"
+    nanoid "^3"
+    use-sync-external-store "^1.2.0"
+
 "@next-auth/prisma-adapter@^1.0.5":
   version "1.0.7"
   resolved "https://registry.yarnpkg.com/@next-auth/prisma-adapter/-/prisma-adapter-1.0.7.tgz#86195e9cc5a23a9e71370c7e8745b630388143b1"
@@ -3745,7 +3767,7 @@ nano-time@1.0.0:
   dependencies:
     big-integer "^1.6.16"
 
-nanoid@^3.3.6, nanoid@^3.3.7:
+nanoid@^3, nanoid@^3.3.6, nanoid@^3.3.7:
   version "3.3.7"
   resolved "https://registry.yarnpkg.com/nanoid/-/nanoid-3.3.7.tgz#d0c301a691bc8d54efa0a2226ccf3fe2fd656bd8"
   integrity sha512-eSRppjcPIatRIMC1U6UngP8XFcz8MQWGQdt1MTBQ7NaAmvXDfvNxbvWV3x2y6CdEUciCSsDHDQZbhYaB8QEo2g==
@@ -5016,6 +5038,11 @@ use-sync-external-store@1.2.0:
   version "1.2.0"
   resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.0.tgz#7dbefd6ef3fe4e767a0cf5d7287aacfb5846928a"
   integrity sha512-eEgnFxGQ1Ife9bzYs6VLi8/4X6CObHMw9Qr9tPY43iKwsPw8xE8+EFsf/2cFZ5S3esXgpWgtSCtLNS41F+sKPA==
+
+use-sync-external-store@^1.2.0:
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/use-sync-external-store/-/use-sync-external-store-1.2.2.tgz#c3b6390f3a30eba13200d2302dcdf1e7b57b2ef9"
+  integrity sha512-PElTlVMwpblvbNqQ82d2n6RjStvdSoNe9FG28kNfz3WiXilJm4DdNkEzRhCZuIDwY8U08WVihhGR5iRqAwfDiw==
 
 util-deprecate@^1.0.1, util-deprecate@^1.0.2:
   version "1.0.2"

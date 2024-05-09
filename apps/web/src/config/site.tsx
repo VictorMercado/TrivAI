@@ -43,12 +43,19 @@ const routes: Array<Route> = [
     name: "Profile",
     icon: <User />,
   },
+  // {
+  //   access: "USER",
+  //   route: "/allegiance",
+  //   color: "bg-[#39DBFF]",
+  //   name: "Alleigance",
+  //   icon: <Sword />,
+  // },
   {
-    access: "USER",
-    route: "/allegiance",
+    access: "ALL",
+    route: "/quizzes",
     color: "bg-[#39DBFF]",
-    name: "Alleigance",
-    icon: <Sword />,
+    name: "Quizzes",
+    icon: <Scroll />,
   },
   {
     access: "ALL",
@@ -56,13 +63,6 @@ const routes: Array<Route> = [
     color: "bg-[#88FF8A]",
     name: "Results",
     icon: <LineChart />,
-  },
-  {
-    access: "ALL",
-    route: "/quizzes",
-    color: "bg-[#39DBFF]",
-    name: "Quizzes",
-    icon: <Scroll />,
   },
   {
     access: "USER",

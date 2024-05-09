@@ -3,6 +3,8 @@ import { categoryRouter } from './category/_router';
 import { themeRouter } from './themes/_router';
 import { friendRouter } from './friend/_router';
 import { quizRouter } from "./quiz/_router";
+import { userRouter } from "./user/_router";
+import { questionRouter } from "./question/_router";
 
 export const authViewerRouter = mergeRouters(
   router({
@@ -10,5 +12,7 @@ export const authViewerRouter = mergeRouters(
     theme: themeRouter,
     friend: friendRouter,
     quiz: quizRouter,
+    user: userRouter,
+    question: questionRouter,
   }),
 );

@@ -11,12 +11,11 @@ import {
 } from "@trivai/lib/server/queries/quiz";
 import { CREDITSPERQUESTION } from "@src/config/constants";
 
-
 interface Routes {
   [key: string]: JSX.Element;
 }
 
-async function getUserQuiz(
+async function getUserQuizWithUnansweredQuestions(
   quizId: number,
   filterAnswersArray: { id: { equals: string } }[] | [],
 ) {
@@ -57,10 +56,13 @@ async function getUserAnswerQuizCompleted(userId: string, quizId: number) {
 
 type QuizIdPageProps = {
   params: { quizId: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 };
 export default async function QuizIdPage({
   params: { quizId },
+  searchParams,
 }: QuizIdPageProps) {
+
   if (isDigit(quizId) === false) {
     return notFound();
   }
@@ -92,8 +94,7 @@ export default async function QuizIdPage({
           return { id: { equals: userAnswer.questionId } };
         })
       : [];
-    // get quiz with questions that the user has not answered
-    quiz = await getUserQuiz(quizIdInt, userAnswers);
+    quiz = await getUserQuizWithUnansweredQuestions(quizIdInt, userAnswers);
   }
   // see if there is a better way to do this
   if (!quiz) {

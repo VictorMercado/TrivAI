@@ -20,5 +20,5 @@ export const getAllByTheme = async ({ ctx, input }: GetAllByThemeOptions) => {
       },
     },
   });
-  return quizCategory?.quizzes ?? [];
+  return quizCategory?.quizzes.reverse() ?? [];
 };

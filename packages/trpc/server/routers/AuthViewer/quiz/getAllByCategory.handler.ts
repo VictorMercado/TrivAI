@@ -22,5 +22,5 @@ export const getAllByCategory = async ({ ctx, input }: GetAllByCategoryOptions) 
       }
     }
   });
-  return quizCategory?.quizzes ?? [];
+  return quizCategory?.quizzes.reverse() ?? [];
 }

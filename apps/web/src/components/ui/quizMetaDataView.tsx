@@ -2,9 +2,9 @@
 import { usePathname } from "next/navigation";
 import { Clock } from "@components/Clock";
 import { cn } from "@trivai/lib/utils";
+import { useStore } from "@src/store";
 
 type QuizViewProps = {
-  totalScore: number;
   questionsLength: number;
   assignedFrom?: string;
   className?: string;
@@ -14,23 +14,23 @@ interface Routes {
 }
 
 const QuizMetaDataView = ({
-  totalScore,
   questionsLength,
   assignedFrom,
   className,
 }: QuizViewProps) => {
+  const { totalScore } = useStore((state) => state);  
   const routes: Routes = {
     quizzes: (
       <>
         <p>Current Score: {totalScore}</p>
-        <Clock text="" />
+        {/* <Clock text="" /> */}
         <p>Questions left: {questionsLength}</p>
       </>
     ),
     allegianceQuiz: (
       <>
         <p>Allegiance Score: 10</p>
-        <Clock text="sdf" />
+        {/* <Clock text="sdf" /> */}
         <p>Assigned From: {assignedFrom}</p>
       </>
     ),

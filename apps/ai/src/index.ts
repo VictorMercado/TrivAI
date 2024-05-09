@@ -128,18 +128,8 @@ async function hitWebhook(body: string) {
   let match;
   let response = "";
   let questions;
-  try {
-    response = await run(parsedBody.prompt);
-    match = backticksRegex.exec(response);
-    if (match === null) {
-      throw new Error("No response");
-    }
-    response = match[1];
-    response = stringExtractor(response, "JSON");
-    response = stringExtractor(response, "json");
-    console.log(response);
-  }
-  catch (e) {
+  let index = 0;
+  for (index; index < 5; index++ ) {
     try {
       response = await run(parsedBody.prompt);
       match = backticksRegex.exec(response);
@@ -149,40 +139,25 @@ async function hitWebhook(body: string) {
       response = match[1];
       response = stringExtractor(response, "JSON");
       response = stringExtractor(response, "json");
-    } catch (e) {
-      await fetch(parsedBody.webhook, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({ message: e, error: true }),
-      });
-      return new Response(JSON.stringify({ message: e, error: true }), { status: 400 });
+      response = JSON.parse(response);
+      questions = ZQuestionsEither.parse(response);
+      console.log(response);
+      break;
     }
-  } 
-  // let response = `Dude heres your token ${token} and heres your user id ${userId} and heres your prompt: ${body}`;
-
-  try {
-    questions = ZQuestionsEither.parse(JSON.parse(response));
-  } catch (e) {
-    console.log("zod error");
-    console.log("rerunning");
-    response = await run(parsedBody.prompt);
-    match = backticksRegex.exec(response);
-    if (match === null) {
-      await fetch(parsedBody.webhook, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        method: "POST",
-        body: JSON.stringify({ message: e, error: true }),
-      });
-      return;
+    catch (e) {
+      console.log("rerunning");
+      continue;
     }
-    response = match[1];
-    response = stringExtractor(response, "JSON");
-    response = stringExtractor(response, "json");
-    console.log(response);
+  }
+  if (index === 5) {
+    await fetch(parsedBody.webhook, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ message: "AI was unsuccessful in generating valid JSON", error: true }),
+    });
+    return;
   }
 
   let image;

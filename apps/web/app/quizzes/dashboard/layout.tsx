@@ -12,9 +12,9 @@ export default async function Layout({
   const user = await getCurrentUser();
   const router = await serverRouter();
   if(!user) {
-    return(
-      <div>
-        Please log in
+    return (
+      <div className="flex h-full flex-col items-center justify-center">
+        <h1 className="text-2xl">Please login to view the dashboard</h1>
       </div>
     );
   }

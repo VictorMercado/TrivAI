@@ -5,6 +5,7 @@ import StoreInitializer from "@src/components/StoreInitializer";
 import { UserState } from "@trivai/lib/server/queries/user";
 import { useEffect, useRef } from "react";
 import { useLocalStorage } from "@src/hooks/useLocalStorage";
+import { trpc } from "@t/client";
 
 type Action =
   | "offline user"
@@ -40,6 +41,8 @@ export function ClientAppWrapper({
 }) {
   const [color, setColor] = useLocalStorage("--color-primary", "");
   // const socket = useStore((state) => state.socket);
+  const friends = trpc.authViewer.friend.getAll.useQuery();
+  
   let socket = useRef<WebSocket>();
   let userName = useRef<string | undefined>();
   const randNum = useRef<number>(Math.floor(Math.random() * 1000));

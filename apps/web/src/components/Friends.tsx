@@ -18,7 +18,7 @@ const Friends = ({ friends, sessionUserId }: FriendsProps) => {
   });
   return (
     <>
-      {allFriends.data.map((friend) => (
+      {allFriends?.data?.map((friend) => (
         <Link
           href={`/friends/${friend.userName}`}
           key={friend.id}

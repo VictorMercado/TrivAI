@@ -5,6 +5,9 @@ import { ClientUser } from "./ClientUser";
 import {
   getUserAssignedQuizzesForPresentation,
   getUsersAnsweredQuizzesWithAnswers,
+  getUserAnsweredQuizzesWithAnswers,
+  getQuizzes,
+  getFriendAssignedQuizzesToUser,
 } from "@trivai/lib/server/queries/quiz";
 import { getQuizIdsHelper, mergeQuizzesWithAnswers } from "@trivai/lib/server/queries/quiz/helpers";
 import { Suspense } from "react";
@@ -30,35 +33,42 @@ export type UserAssignedQuizzes = Prisma.PromiseReturnType<
 >;
 
 
-export default async function ResultsPage() {
+export default async function ResultsPage({params, searchParams}: {params: string; searchParams: string}) {
   const user = await getCurrentUser();
   if (!user) {
     return notFound();
   }
-  const date = new Date();
-  // when ready to deploy remove the:   1 ||
-  const year = date.getFullYear();
-  const month = 1 || date.getMonth();
-  const day = 1 || date.getDate();
+  
+  let userAnsweredQuizzes = await getUserAnsweredQuizzesWithAnswers(user.id);
+  let userAnsweredQuizzesIds = userAnsweredQuizzes.map((quiz) => quiz.quizId);
+  let theAnsweredQuizzes = await getQuizzes(userAnsweredQuizzesIds);
+  let moreData = mergeQuizzesWithAnswers(theAnsweredQuizzes, userAnsweredQuizzes);
 
   let results: UserAssignedQuizzes | undefined;
 
   results = await getUserAssignedQuizzesForPresentation(user?.id);
 
-  const quizzes = results?.map((result) => result.quiz);
-  const quizIds = getQuizIdsHelper(quizzes);
+  let quizzes = results?.map((result) => result.quiz);
+  let quizIds = [];
+  for (let i = 0; i<quizzes.length; i++) {
+    if (!userAnsweredQuizzesIds.includes(quizzes[i].id)) {
+      quizIds.push(quizzes[i].id);
+    }
+  }
+  quizzes = quizzes.filter((quiz) => !userAnsweredQuizzesIds.includes(quiz.id));
   const userQuizzes: TUserAnsweredQuizzesWithAnswers =
     await getUsersAnsweredQuizzesWithAnswers(user?.id, quizIds);
 
   const mergedQuizzes = mergeQuizzesWithAnswers(quizzes, userQuizzes);
-
+  const doneQuizzes = [...mergedQuizzes, ...moreData].reverse();
   return (
     <main id="main" className="h-fit">
       {user ? (
-        <Suspense fallback={<LoadingCalendar />}>
-          {/* turn component into composition component that way u can pass year data, month data and day data quizzes */}
-          <ClientUser initQuizzes={mergedQuizzes} />
-        </Suspense>
+        // <Suspense fallback={}>
+        //   {/* turn component into composition component that way u can pass year data, month data and day data quizzes */}
+
+        // </Suspense>
+        <ClientUser initQuizzes={doneQuizzes} />
       ) : (
         <h1 className="text-center text-3xl">Not Allowed</h1>
       )}

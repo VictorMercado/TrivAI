@@ -32,6 +32,26 @@ function rgbToHex(color: string) {
   return hexColor;
 }
 
+function filterLettersAndNumbers(inputString : string) {
+  // Initialize an empty string to store the filtered characters
+  let filteredString = "";
+
+  // Iterate through each character in the input string
+  for (let i = 0; i < inputString.length; i++) {
+    // Get the current character
+    let char = inputString.charAt(i);
+
+    // Check if the character is a letter or a number using a regular expression
+    if (/[a-zA-Z0-9]/.test(char)) {
+      // If it's a letter or a number, append it to the filtered string
+      filteredString += char;
+    }
+  }
+
+  // Return the filtered string
+  return filteredString;
+}
+
 type SettingsFormProps = {
   profilePictures: Array<ProfilePicture>;
 };
@@ -117,8 +137,10 @@ const SettingsForm = (props: SettingsFormProps) => {
           type="text"
           name="userName"
           id="userName"
-          onChange={(e) => setUserName(e.target.value)}
-          defaultValue={userName}
+          onChange={(e) => {
+            setUserName(filterLettersAndNumbers(e.target.value))
+          }}
+          value={userName}
           maxLength={15}
         />
         <label className="" htmlFor="userImage">
