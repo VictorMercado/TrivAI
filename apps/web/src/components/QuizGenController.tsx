@@ -742,7 +742,6 @@ const QuizGenController = ({ categories, friends }: QuizGenControllerProps) => {
           </PopoverContent>
         </PopoverSelect>
       </li>
-      <li>Friends</li>
     </ul>
   );
 };
