@@ -4,6 +4,7 @@ import {
   getUserAnsweredQuizzes,
   type TUserAnsweredQuizzesWithoutAnswers,
   getUserAssignedQuizzesForPresentation,
+  getAllUsersQuizzes,
   getUsersAnsweredQuizzesWithAnswers,
   getPublicAIAssignedQuizzesForPresentation,
   getUserAIAssignedQuizzesForPresentation,
@@ -20,13 +21,16 @@ import { Button } from "@ui/button";
 import { QuizCard } from "@ui/quiz-card";
 import { ArrowDown, ArrowRight, Scroll } from "lucide-react";
 // import { ColorPicker } from "@/src/components/ColorPicker";
+import { AllUsersQuizzes } from "@components/AllUsersQuizzes";
 
 const inter = Inter({ subsets: ["latin"] });
 
 
 export default async function RootPage() {
   const user = await getCurrentUser();
-  
+  let data = await getAllUsersQuizzes();
+  let data2 = data.map((result) => result.ownedQuizzes);
+  let allUsersQuizzes = data2.flat();
   let result;
   let quizzesToDisplay: TQuizzesView = [];
   let quizzesToDisplayForUser: TQuizView[] = [];
@@ -40,6 +44,7 @@ export default async function RootPage() {
       <main className="container grid grid-cols-1 justify-center">
         <div className="flex flex-col gap-y-12 p-6">
           <div className="w-full space-y-2">
+            <AllUsersQuizzes quizzes={allUsersQuizzes} />
             <h1 className="flex items-center gap-x-4 text-3xl">
               AI Assigned You
               <ArrowDown className="h-4 w-4 text-primary" />
@@ -87,6 +92,7 @@ export default async function RootPage() {
     <main className="container grid grid-cols-1 justify-center">
       <div className="flex flex-col gap-y-12 p-6">
         <div className="w-full space-y-2">
+          <AllUsersQuizzes quizzes={allUsersQuizzes} />
           <h1 className="flex items-center gap-x-4 text-3xl">
             AI Assigned You
             <ArrowDown className="h-4 w-4 text-primary" />
@@ -113,7 +119,7 @@ export default async function RootPage() {
           <ArrowRight className="h-4 w-4 text-primary" />
           <Link href="/quizzes">
             <Button variant="default" size="default">
-              <Scroll className="h-6 w-6 mr-2" />
+              <Scroll className="mr-2 h-6 w-6" />
               Quizzes
             </Button>
           </Link>

@@ -335,3 +335,19 @@ export async function getFriendAssignedQuizzesToUser(userId: string) {
     },
   });
 }
+
+export async function getAllUsersQuizzes() {
+  return await prisma.user.findMany({
+    where: {
+      NOT: {
+        id: AIOVERLORD_ID,
+      }
+    },
+    select: {
+      id: true,
+      ownedQuizzes: {
+        select: PrismaQuizSelectView,
+      },
+    },
+  });
+}

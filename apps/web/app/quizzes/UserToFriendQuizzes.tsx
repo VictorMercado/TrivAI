@@ -2,7 +2,7 @@
 import { HorizontalScroll } from "@/src/components/ui/horizontal-scroll";
 import { QuizCard } from "@/src/components/ui/quiz-card";
 import { ArrowDown } from "lucide-react";
-import { TQuizView, TQuizzesView } from "@trivai/lib/server/queries/quiz";
+import { TQuizzesView } from "@trivai/lib/server/queries/quiz";
 import { trpc } from "@t/client";
 
 type UserToFriendQuizzesProps = {
