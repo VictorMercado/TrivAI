@@ -31,6 +31,9 @@ export default async function RootPage() {
   let data = await getAllUsersQuizzes();
   let data2 = data.map((result) => result.ownedQuizzes);
   let allUsersQuizzes = data2.flat();
+  let sortedQuizzesByDate = allUsersQuizzes.sort((a, b) => {
+    return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+  });
   let result;
   let quizzesToDisplay: TQuizzesView = [];
   let quizzesToDisplayForUser: TQuizView[] = [];
@@ -44,7 +47,7 @@ export default async function RootPage() {
       <main className="container grid grid-cols-1 justify-center">
         <div className="flex flex-col gap-y-12 p-6">
           <div className="w-full space-y-2">
-            <AllUsersQuizzes quizzes={allUsersQuizzes} />
+            <AllUsersQuizzes quizzes={sortedQuizzesByDate} />
             <h1 className="flex items-center gap-x-4 text-3xl">
               AI Assigned You
               <ArrowDown className="h-4 w-4 text-primary" />
@@ -92,7 +95,7 @@ export default async function RootPage() {
     <main className="container grid grid-cols-1 justify-center">
       <div className="flex flex-col gap-y-12 p-6">
         <div className="w-full space-y-2">
-          <AllUsersQuizzes quizzes={allUsersQuizzes} />
+          <AllUsersQuizzes quizzes={sortedQuizzesByDate} />
           <h1 className="flex items-center gap-x-4 text-3xl">
             AI Assigned You
             <ArrowDown className="h-4 w-4 text-primary" />
