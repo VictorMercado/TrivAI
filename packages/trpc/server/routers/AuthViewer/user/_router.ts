@@ -19,8 +19,8 @@ export const userRouter = router({
   getFriendToUserAssignedQuizzes: protectedProcedure.query(async ({ ctx, input }) => {
     return await getFriendToUserAssignedQuizzes({ ctx, input });
   }),
-  getProfilePictures: protectedProcedure.input(ZGetProfilePictures).query(async ({ ctx }) => {
-    return await getProfilePictures({ ctx });
+  getProfilePictures: protectedProcedure.input(ZGetProfilePictures).query(async ({ ctx, input }) => {
+    return await getProfilePictures({ ctx, input });
   }),
   getProfilePicturesByGen: protectedProcedure.input(ZGetProfilePicturesByGen).query(async ({ input, ctx }) => {
     return await getProfilePicturesByGen({ input, ctx });

@@ -35,7 +35,7 @@ export default async function SettingsPage() {
     properties: ["userName", "email"],
   });
   // console.log(pictures);
-  const userProfilePictures = await router.authViewer.user.getProfilePictures({});
+  const userProfilePictures = await router.authViewer.user.getProfilePictures({userId: userSession.id});
   const profilePictures = userProfilePictures.map((p) => p.profilePicture);
   return (
     <main className="flex items-center justify-center text-xl">

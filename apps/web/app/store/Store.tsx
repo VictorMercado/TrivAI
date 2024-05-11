@@ -15,6 +15,7 @@ import { ProfilePicture } from "@trivai/lib/server/queries/profilePicture";
 import { useState } from "react";
 import { Button } from "@/src/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useSession } from "@trivai/auth/react";
 
 type Product = {
   name: string;
@@ -30,7 +31,7 @@ type StoreProps = {
 
 const Store = ({ }) => {
   const [ skip, setSkip ] = useState(0);
-
+  const { data: session } = useSession();
   const utils = trpc.useUtils();
   const { data, isLoading, isError } =
     trpc.authViewer.profilePicture.getMore.useQuery({
@@ -39,7 +40,12 @@ const Store = ({ }) => {
     });
   const profilePictureCount = trpc.authViewer.profilePicture.count.useQuery();
 
-  const userProfilePictures = trpc.authViewer.user.getProfilePictures.useQuery({});
+  let userProfilePictures; 
+  if (session?.user) {
+    userProfilePictures = trpc.authViewer.user.getProfilePictures.useQuery({
+      userId: session.user.id,
+    });
+  }
   return (
     <div className="grid w-full grid-cols-1 gap-10 p-4 md:grid-cols-3">
       {/* <QuizCard quiz={quiz} /> */}
@@ -47,17 +53,19 @@ const Store = ({ }) => {
       <div>
         <h1 className="text-2xl">Obtained Collection </h1>
         <div className="grid grid-cols-2 pt-10">
-          {userProfilePictures?.data?.map(({ profilePicture }, _index) => {
-            return (
-              <ProfilePictureCard
-                key={
-                  profilePicture.id + _index + profilePicture.image
-                }
-                product={profilePicture}
-                isBuy={false}
-              />
-            );
-          })}
+          {userProfilePictures ? (
+            userProfilePictures?.data?.map(({ profilePicture }, _index) => {
+              return (
+                <ProfilePictureCard
+                  key={profilePicture.id + _index + profilePicture.image}
+                  product={profilePicture}
+                  isBuy={false}
+                />
+              );
+            })
+          ) : (
+            <div>No Profile Pictures</div>
+          )}
         </div>
       </div>
       <div className="col-span-2">
@@ -107,9 +115,7 @@ const Store = ({ }) => {
           {data?.map((profilePicture, _index) => {
             return (
               <ProfilePictureCard
-                key={
-                  profilePicture.id + profilePicture.image
-                }
+                key={profilePicture.id + profilePicture.image}
                 product={profilePicture}
                 isBuy={true}
               />

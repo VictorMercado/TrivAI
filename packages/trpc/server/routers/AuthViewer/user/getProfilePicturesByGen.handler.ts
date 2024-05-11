@@ -13,23 +13,13 @@ export const getProfilePicturesByGen = async ({ ctx, input }: GetProfilePictures
   const { take, skip } = input;
   let profilePictures; 
   try {
-    if (input.userId) {
-      profilePictures = await prisma.userProfilePicture.findMany({
-        where: {
-          userId: input.userId,
-        },
-        take,
-        skip,
-      });
-    } else {
-      profilePictures = await prisma.userProfilePicture.findMany({
-        where: {
-          userId: session?.user.id,
-        },
-        take,
-        skip,
-      });
-    }
+    profilePictures = await prisma.userProfilePicture.findMany({
+      where: {
+        userId: input.userId,
+      },
+      take,
+      skip,
+    });
   } catch (e) {
     throw new TRPCError({
       code: "INTERNAL_SERVER_ERROR",

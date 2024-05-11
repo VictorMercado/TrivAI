@@ -20,7 +20,7 @@ import {
 import { getCurrentUser } from "@trivai/auth/lib/getCurrentUser";
 import { notFound } from "next/navigation";
 import { Button } from "@ui/button";
-import { ArrowDown, Plus, SlidersHorizontal } from "lucide-react";
+import { ArrowDown, Plus } from "lucide-react";
 import { QuizCard } from "@/src/components/ui/quiz-card";
 import { HorizontalScroll } from "@ui/horizontal-scroll";
 import { AssignedSelfQuizzes } from "./AssignedSelfQuizzes";
@@ -135,10 +135,6 @@ export default async function QuizPage() {
             Generate Quizzes
           </Button>
         </Link>
-        <Button variant="default" size="default">
-          <SlidersHorizontal className="h-4 w-6" />
-          Filter
-        </Button>
       </div>
       <div className="flex flex-col gap-y-12">
         <AssignedSelfQuizzes quizzes={quizzesToDisplay} />
