@@ -1,12 +1,12 @@
 import { Context } from "@trivai/trpc/server/context";
 import { TDeleteCategoryInput } from "./delete.schema";
 
-type GetCategoryOptions = {
+type DeleteOptions = {
   ctx: Context;
   input: TDeleteCategoryInput;
 };
 
-export const deleteCategory = async ({ ctx, input }: GetCategoryOptions) => {
+export const deleteCategory = async ({ ctx, input }: DeleteOptions) => {
   const { prisma, session } = ctx;
   const category = await prisma.category.findUnique({
     where: {

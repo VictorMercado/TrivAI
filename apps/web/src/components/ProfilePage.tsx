@@ -9,12 +9,15 @@ import { getUserOwnedQuizzes } from "@trivai/lib/server/queries/quiz";
 import { mergeQuizzesView } from "@trivai/lib/server/queries/quiz/helpers";
 import { HorizontalScroll } from "@ui/horizontal-scroll";
 import { getUsersByScore } from "@trivai/lib/server/queries/user";
+import { serverRouter } from "@/app/_trpc/serverRouter";
+import { ProfilePictureCard } from "./ProfilePictureCard";
 
 export type ProfileIdPageProps = {
   userName: string;
 };
 
 const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
+  const router = await serverRouter();
   const user = await prisma.user.findUnique({
     where: {
       userName: userName,
@@ -71,6 +74,10 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
     },
     0,
   );
+  const userProfilePictures = await router.authViewer.user.getProfilePictures({
+    userId: user.id,
+  });
+
   return (
     <main className="container mx-auto space-y-4 p-4">
       <div className="flex w-full flex-col space-y-4 border border-primary p-4 lg:space-y-4 lg:p-12">
@@ -142,7 +149,9 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
       </div>
       <div className="flex flex-col">
         <div className="flex justify-between pb-4">
-          <h1 className="w-fit bg-primary/25 p-4 text-xl">Collections: (12)</h1>
+          <h1 className="w-fit bg-primary/25 p-4 text-xl">
+            Collections: ({userProfilePictures?.length})
+          </h1>
           <h1 className="w-fit bg-primary/25 p-4 text-xl">
             Quizzes: ({userOwnedQuizzes.length})
           </h1>
@@ -153,118 +162,17 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
           })}
         </HorizontalScroll>
 
-        <ul className="grid grid-cols-3 justify-center lg:grid-cols-6">
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              {/* leaving this img here to test the difference */}
-              <Image
-                src="/pikachu-hoenncap.gif"
-                alt="Pikachu"
-                width={125}
-                height={125}
+        <div className="grid grid-cols-3 justify-center">
+          {userProfilePictures?.map(({ profilePicture }, _index) => {
+            return (
+              <ProfilePictureCard
+                key={profilePicture.id + _index}
+                product={profilePicture}
+                isBuy={false}
               />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Sparkle>
-                <Image
-                  src="/charizard-megax.gif"
-                  alt="Charizard"
-                  width={125}
-                  height={125}
-                />
-              </Sparkle>
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image src="/lugia.gif" alt="Lugia" width={125} height={125} />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/lugia-shiny.gif"
-                alt="Shiny Lugia"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image src="/ho-oh.gif" alt="Ho-oh" width={125} height={125} />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/mewtwo.gif"
-                alt="Shiny Ho-oh"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image src="/mew.gif" alt="Mew" width={125} height={125} />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/pikachu-gigantamax.gif"
-                alt="pikachu"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/charmander.gif"
-                alt="Pikachu"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/rayquaza.gif"
-                alt="Rayquaza"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Sparkle>
-                <Image
-                  src="/rayquaza-mega.gif"
-                  alt="rayquaza-mega"
-                  width={125}
-                  height={125}
-                />
-              </Sparkle>
-            </div>
-          </ol>
-          <ol className="m-auto">
-            <div className="mx-auto w-fit">
-              <Image
-                src="/zygarde.gif"
-                alt="zygarde"
-                width={125}
-                height={125}
-              />
-            </div>
-          </ol>
-        </ul>
+            );
+          })}
+        </div>
       </div>
     </main>
   );

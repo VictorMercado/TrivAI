@@ -5,6 +5,7 @@ import { friendRouter } from './friend/_router';
 import { quizRouter } from "./quiz/_router";
 import { userRouter } from "./user/_router";
 import { questionRouter } from "./question/_router";
+import { profilePictureRouter } from "./profilepicture/_router";
 
 export const authViewerRouter = mergeRouters(
   router({
@@ -14,5 +15,6 @@ export const authViewerRouter = mergeRouters(
     quiz: quizRouter,
     user: userRouter,
     question: questionRouter,
+    profilePicture: profilePictureRouter,
   }),
 );

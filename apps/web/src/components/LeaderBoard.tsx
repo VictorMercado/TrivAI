@@ -29,6 +29,7 @@ async function getUsers() {
         select: {
           ownedQuizzes: true,
           friendOf: true,
+          profilePictures: true,
           friends: {
             where: {
               status: "ACCEPTED",
@@ -52,7 +53,7 @@ const Leaderboard = () => {
     "Position",
     "Image",
     "User Name",
-    "Allegiance",
+    "# of Collections",
     "Cheat Used",
     "KP",
   ];
@@ -143,9 +144,7 @@ const Leaderboard = () => {
                 <Link href={"/profile/" + row.userName}>{row.userName}</Link>
               </td>
               <td className="border-b-gray-800">
-                {row.allegiance?.allegiance.name
-                  ? row.allegiance?.allegiance.name
-                  : "N/A"}
+                {row._count.profilePictures}
               </td>
               <td className="border-b-gray-800">{`${row.cheatUsed}`}</td>
               <td className="border-b-gray-800">

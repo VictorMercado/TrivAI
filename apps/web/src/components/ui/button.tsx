@@ -29,6 +29,7 @@ export const buttonVariants = cva(
         default: "p-2 text-md",
         sm: "px-3 py-1 text-sm lg:text-md",
         lg: "p-4 text-lg",
+        icon: "h-10 w-10",
       },
       active: {
         true: "bg-primary text-black",
@@ -41,7 +42,7 @@ export const buttonVariants = cva(
   },
 );
 
-type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
+export type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
   className?: string;
   color?: string;
   variant:
@@ -54,7 +55,7 @@ type ButtonProps = React.ButtonHTMLAttributes<HTMLButtonElement> & {
     | "link"
     | "loading"
     | "delete";
-  size?: "default" | "sm" | "lg";
+  size?: "default" | "sm" | "lg" | "icon";
   active?: boolean;
   children?: React.ReactNode;
 };

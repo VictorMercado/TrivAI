@@ -369,7 +369,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   <HoverCardTrigger asChild>
                     <div className="grid grid-cols-2 items-center justify-center space-x-1 p-2 hover:bg-green-500/25 hover:ring-1 hover:ring-green-500 @md:space-x-2">
                       <Users className="m-auto h-4 w-4 stroke-green-500 lg:h-6 lg:w-6" />
-                      <p>{shortenNumber(rooms?.length? rooms?.length : 0)}</p>
+                      <p>{shortenNumber(rooms?.length ? rooms?.length : 0)}</p>
                     </div>
                   </HoverCardTrigger>
                   <HoverCardContent
@@ -463,11 +463,10 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                     <DialogTitle>Multiplayer Quizzes</DialogTitle>
                     <DialogClose />
                   </DialogHeader>
-                  <DialogDescription>
-                    Click to Join
-                  </DialogDescription>
+                  <DialogDescription>Click to Join</DialogDescription>
                   <div className="flex flex-col gap-y-4">
-                    {!isLoading && rooms && 
+                    {!isLoading &&
+                      rooms &&
                       rooms.map((room) => (
                         <Button
                           variant="default"
@@ -524,7 +523,6 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                 <DialogContent>
                   <DialogHeader>
                     <DialogTitle>Assign Quiz</DialogTitle>
-                    <DialogClose />
                   </DialogHeader>
                   <DialogDescription>
                     Assign this quiz to a friend
@@ -533,17 +531,18 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                     {friends &&
                       friends.data &&
                       friends?.data.map((friend) => (
-                        <Button
-                          variant="default"
-                          size="default"
-                          className="w-full"
-                          key={friend.id}
-                          onClick={() => {
-                            handleAssign(quiz.id, user!.id, friend.id);
-                          }}
-                        >
-                          {friend.userName}
-                        </Button>
+                        <DialogClose key={friend.id} asChild>
+                          <Button
+                            variant="default"
+                            size="default"
+                            className="w-full"
+                            onClick={() => {
+                              handleAssign(quiz.id, user!.id, friend.id);
+                            }}
+                          >
+                            {friend.userName}
+                          </Button>
+                        </DialogClose>
                       ))}
                   </div>
                 </DialogContent>

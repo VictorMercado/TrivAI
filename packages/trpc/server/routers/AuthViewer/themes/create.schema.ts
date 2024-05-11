@@ -1,8 +1,8 @@
 import { z } from 'zod';
 
-export const ZCreateThemeInput = z.object({
+export const ZCreateInput = z.object({
   name: z.string(),
   categoryId: z.number(),
 });
 
-export type TCreateThemeInput = z.infer<typeof ZCreateThemeInput>;
+export type TCreateInput = z.infer<typeof ZCreateInput>;

@@ -1,12 +1,13 @@
 import { TCreateCategoryInput } from './create.schema';
 import { Context } from "@trivai/trpc/server/context";
 import { getPrismaErrorDescription } from "@trivai/prisma";
-type CategoryOptions = {
+
+type CreateOptions = {
   ctx: Context;
   input: TCreateCategoryInput;
 };
 
-export const create = async ({ ctx, input }: CategoryOptions) => {
+export const create = async ({ ctx, input }: CreateOptions) => {
   const { prisma, session } = ctx;
   if (session!.user.id !== input.userId) throw new Error('Unauthorized');
 

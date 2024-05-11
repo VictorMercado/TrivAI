@@ -1,11 +1,11 @@
 import { Context } from "@trivai/trpc/server/context";
 import { Prisma } from "@trivai/prisma";
 
-type GetCategoryOptions = {
+type GetAllOptions = {
   ctx: Context;
 };
 
-export const getAll = async ({ ctx }: GetCategoryOptions) => {
+export const getAll = async ({ ctx }: GetAllOptions) => {
   const { prisma, session } = ctx; 
   return await prisma.category.findMany({
     where: {

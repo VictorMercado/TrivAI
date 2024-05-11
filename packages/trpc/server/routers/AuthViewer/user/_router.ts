@@ -4,6 +4,10 @@ import { getUserToFriendAssignedQuizzes } from "./getUserToFriendAssignedQuizzes
 import { getFriendToUserAssignedQuizzes } from "./getFriendToUserAssignedQuizzes.handler";
 import { resetQuizAnswers } from "./reset.handler";
 import { ZResetQuizAnswersInput } from "./reset.schema";
+import { getProfilePictures } from "./getProfilePictures.handler";
+import { ZGetProfilePictures } from "./getProfilePictures.schema";
+import { getProfilePicturesByGen } from "./getProfilePicturesByGen.handler";
+import { ZGetProfilePicturesByGen } from "./getProfilePicturesByGen.schema";
 
 export const userRouter = router({
   getAssignedSelfQuzzies: protectedProcedure.query(async ({ ctx, input }) => {
@@ -14,6 +18,12 @@ export const userRouter = router({
   }),
   getFriendToUserAssignedQuizzes: protectedProcedure.query(async ({ ctx, input }) => {
     return await getFriendToUserAssignedQuizzes({ ctx, input });
+  }),
+  getProfilePictures: protectedProcedure.input(ZGetProfilePictures).query(async ({ ctx }) => {
+    return await getProfilePictures({ ctx });
+  }),
+  getProfilePicturesByGen: protectedProcedure.input(ZGetProfilePicturesByGen).query(async ({ input, ctx }) => {
+    return await getProfilePicturesByGen({ input, ctx });
   }),
   resetQuizAnswers: protectedProcedure.input(ZResetQuizAnswersInput).mutation(async ({ input, ctx }) => {
     return await resetQuizAnswers({ input, ctx });

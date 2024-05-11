@@ -9,6 +9,7 @@ export type Actions = {
   deleteAccount: () => void;
   updateUserName: (name: string) => void;
   incrementCredits: (optionalValue?: number) => void;
+  decrementCredits: (optionalValue?: number) => void;
   addFriend: (friend: { id: string; userName: string; }) => void;
 };
 
@@ -53,6 +54,14 @@ export const useStore = create<UserStore & Actions>((set, get) => ({
       return;
     }
     const credits = get().credits + (get().creditsToAdd * get().creditsMultiplier);
+    set({ credits: credits });
+  },
+  decrementCredits: (optionalValue) => {
+    if (optionalValue) {
+      set({ credits: get().credits - optionalValue });
+      return;
+    }
+    const credits = get().credits - get().creditsToAdd;
     set({ credits: credits });
   },
   removeCheat: async () => {

@@ -66,9 +66,9 @@ const Combobox = ({ value, setValue, listItems, children }: ComboboxProps) => {
           <CommandEmpty>No profile pic found.</CommandEmpty>
           <CommandGroup>
             <div className="grid grid-cols-2 lg:grid-cols-5">
-              {listItems.map((item) => (
+              {listItems.map((item, _index) => (
                 <CommandItem
-                  key={item.name}
+                  key={item.name + _index}
                   onSelect={(currentValue) => {
                     setValue({
                       name: item.name,

@@ -33,8 +33,8 @@ const ItemCard = ({ product }: { product: Product }) => (
       <Image
         src={product.imageUrl}
         alt={product.name}
-        width={250}
-        height={250}
+        width={100}
+        height={100}
       />
       <div className="space-y-2 w-full">
         <div className="flex justify-between">

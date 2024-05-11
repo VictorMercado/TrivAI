@@ -30,11 +30,7 @@ const shareTechMono = localFont({
 export const metadata: Metadata = {
   title: "TrivAI",
   description:
-    "A trivia website based on stable diffusion image generation," +
-    " is an online platform that challenges users to guess what abstract" +
-    " and distorted images represent, using a process called stable diffusion." +
-    " It can be a fun and engaging way for people to test their observation skills" +
-    " and improve their cognitive abilities.",
+    "A trivAI website powered by AI for quiz generation is an interactive online platform that presents users with a series of questions curated into quizzes, often shared among friends. This platform offers an entertaining and stimulating avenue for individuals to challenge their observation skills and enhance their cognitive abilities.",
 };
 
 interface IProps {

@@ -77,7 +77,7 @@ const QuizController = ({
     }
     if (res?.status === 200) {
       const data: ReturnedAnswer = await res.json();
-      if (data.correct) {
+      if (data.correct && userId) {
         addToast({
           id: Math.random(),
           message: CREDITSPERQUESTION + " Credits added!",
@@ -150,7 +150,7 @@ const QuizController = ({
                 {hasAnswered && returnedAnswer && (
                   <QuestionShowCorrect correct={returnedAnswer.correct} />
                 )}
-                {hasAnswered && userId && (
+                {hasAnswered && (
                   <QuestionNextButton nextAction={handleQuestionsSlice} />
                 )}
               </div>
@@ -164,7 +164,7 @@ const QuizController = ({
                   isLoading={isLoading}
                   answers={answers}
                   handleCheckAnswer={
-                    userId ? handleCheckAnswer : handleQuestionsSlice
+                    handleCheckAnswer
                   }
                 />
               )}

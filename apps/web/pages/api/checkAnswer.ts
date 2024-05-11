@@ -9,14 +9,14 @@ import { sleep } from "@trivai/lib/utils";
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const session: Session | null = await getSessionWithReqRes(req, res);
   // await sleep(2);
-  if (session) {
-    if (req.method == 'PUT') {
-      let { quizId, questionId, userId, answer, completed } = JSON.parse(req.body);
+  if (req.method == 'PUT') {
+    let { quizId, questionId, userId, answer, completed } = JSON.parse(req.body);
 
+    if (userId) {
       let user = await prisma.user.findFirst({
         where: {
           id: userId
-        }, 
+        },
         select: {
           id: true,
           totalScore: true,
@@ -148,10 +148,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         res.status(404).json({ message: "User or Quesiton Not Found" });
         return;
       }
+
+    } else {
+      let question = await prisma.question.findUnique({
+        where: {
+          id: questionId
+        },
+        select: {
+          correctAnswer: true,
+        }
+      });
+      let quiz = await prisma.quiz.findUnique({
+        where: {
+          id: parseInt(quizId)
+        }
+      });
+      if (!quiz) {
+        res.status(404).json({ message: "Quiz Not Found" });
+        return;
+      }
+      if (question?.correctAnswer === answer) {
+        res.status(200).json({ correct: true, correctAnswer: question?.correctAnswer, userAnswer: answer });
+        return;
+      }
+      res.status(200).json({ correct: false, correctAnswer: question?.correctAnswer, userAnswer: answer });
+      return;
     }
-    res.status(405).json({ message: "Method Not Allowed" });
-    return;
   }
-  res.status(403).json({ message: "Forbidden" });
+  res.status(405).json({ message: "Method Not Allowed" });
   return;
 }

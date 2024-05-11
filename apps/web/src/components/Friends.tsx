@@ -33,7 +33,7 @@ const Friends = ({ friends, sessionUserId }: FriendsProps) => {
             totalScore={friend.totalScore}
             credits={friend.credits}
             sessionUserId={sessionUserId}
-            actions
+            // actions
           />
         </Link>
       ))}

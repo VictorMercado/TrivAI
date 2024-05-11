@@ -25,6 +25,24 @@ function generateUniquePokemonUsername() {
   return uniqueUsername;
 }
 
+const getBaseUrl = () => {
+  if (typeof window !== 'undefined') {
+    return '';
+  }
+  // reference for vercel.com
+  if (process.env.VERCEL_URL) {
+    return `https://${process.env.VERCEL_URL}`;
+  }
+
+  // // reference for render.com
+  if (process.env.RENDER_INTERNAL_HOSTNAME) {
+    return `http://${process.env.RENDER_INTERNAL_HOSTNAME}:${process.env.PORT}`;
+  }
+
+  // assume localhost
+  return `http://127.0.0.1:${process.env.PORT ?? 3000}`;
+};
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
@@ -91,7 +109,8 @@ export const authOptions: NextAuthOptions = {
   },
   events: {
     async createUser(message) {
-      // Do something here
+      const AI_URL = process.env.AI_API_URL;
+
       const categories = [
         "CARS",
         "POKEMON",
@@ -120,12 +139,22 @@ export const authOptions: NextAuthOptions = {
         "CARTOONS"
       ];
       const { id } = message.user;
+      try {
+        const userName = generateUniquePokemonUsername();
+        await updateUserName(id as string, userName as string);
+      }
+      catch (err) {
+        console.log(err);
+        const userName = generateUniquePokemonUsername();
+        await updateUserName(id as string, userName as string);
+      }
       let userPreInitializedCategories = categories.filter((category)=> Math.random() < 0.3).map((category) => {
         return {
           name: category,
           userId: id,
         };
       });
+      let randomCategory = categories[Math.floor(Math.random() * categories.length)];
 
       const createdCategories = await prisma.category.createMany({
         data: userPreInitializedCategories,
@@ -138,14 +167,53 @@ export const authOptions: NextAuthOptions = {
           status: "ACCEPTED",
         },
       });
-      try {
-        const userName = generateUniquePokemonUsername();
-        await updateUserName(id as string, userName as string);
-      }
-      catch (err) {
-        console.log(err);
-        const userName = generateUniquePokemonUsername();
-        await updateUserName(id as string, userName as string);
+      const createdCategory = await prisma.category.create({
+        data: {
+          name: randomCategory,
+          userId: "0000000000",
+        },
+      });
+      const quizCategory = await prisma.quizCategory.create({
+        data: {
+          basePrompt: "",
+          userId: "0000000000",
+          categoryId: createdCategory.id,
+          themeId: null,
+        },
+      });
+      const quiz = await prisma.quiz.create({
+        data: {
+          scoreAmt: 5,
+          quizCategoryId: quizCategory.id,
+          ownerId: "0000000000",
+        },
+      });
+      const assignedQuiz = await prisma.userAssignedQuiz.create({
+        data: {
+          userId: "0000000000",
+          assigneeId: id,
+          quizId: quiz.id,
+        },
+      });
+      const systemMessage = "ONLY GIVE ME JSON!! An array of question objects where the text property has the question text, answer1 has an answer, answer2 has an answer, answer3 has an answer, answer4 has an answer and correctAnswer property has the correct answer where the value is one of the properties of answer1, answer2, answer3, answer4.";
+      let prompt = systemMessage + " " + `Give me a ${10} question quiz about ${createdCategory.name}`;
+      const body = {
+        prompt: prompt,
+        webhook: getBaseUrl() + "/api/quizzes/generate/" + quiz.id,
+        quizId: quiz.id,
+        category: createdCategory.name,
+        theme: undefined,
+      };
+      const stringifiedBody = JSON.stringify(body);
+
+      if (AI_URL) {
+        let res = await fetch(AI_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: stringifiedBody,
+        });
       }
     }
   }

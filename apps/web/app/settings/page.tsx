@@ -3,6 +3,7 @@ import { prisma } from "@trivai/prisma";
 import { SettingsActions } from "./_components/SettingsActions";
 import { SettingsForm } from "./_components/SettingsForm";
 import { getUserWithProperties } from "@trivai/lib/server/queries/user";
+import { serverRouter } from "@/app/_trpc/serverRouter";
 
 async function getProfilePictures() {
   return await prisma.profilePicture.findMany({
@@ -23,6 +24,7 @@ export type ProfilePicture = {
 };
 
 export default async function SettingsPage() {
+  const router = await serverRouter();
   const userSession = await getCurrentUser();
 
   if (!userSession) {
@@ -32,13 +34,15 @@ export default async function SettingsPage() {
     userId: userSession?.id,
     properties: ["userName", "email"],
   });
-  const pictures: Array<ProfilePicture> = await getProfilePictures();
+  // console.log(pictures);
+  const userProfilePictures = await router.authViewer.user.getProfilePictures({});
+  const profilePictures = userProfilePictures.map((p) => p.profilePicture);
   return (
     <main className="flex items-center justify-center text-xl">
       <div className="grid grid-cols-1 gap-12 font-bold lg:grid-cols-2">
         <div className="flex flex-col gap-y-10">
           <p>Email: {user?.email}</p>
-          <SettingsForm profilePictures={pictures} />
+          <SettingsForm profilePictures={profilePictures} />
         </div>
         <SettingsActions />
       </div>

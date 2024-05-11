@@ -1,9 +1,9 @@
-import { TCreateThemeInput } from './create.schema';
+import { TCreateInput } from './create.schema';
 import { Context } from "@trivai/trpc/server/context";
 
 type ThemeOptions = {
   ctx: Context;
-  input: TCreateThemeInput;
+  input: TCreateInput;
 };
 
 export const create = async ({ ctx, input }: ThemeOptions) => {
