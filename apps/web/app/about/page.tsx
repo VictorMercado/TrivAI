@@ -7,13 +7,13 @@ export default async function AboutPage() {
       <a href="#feedback">
         <span className="sr-only">FeedBack</span>
       </a>
-      <Image
+      {/* <Image
         className="m-auto"
         src={"https://storage.googleapis.com/trivai-images/trivaichart.png"}
         alt="Trivai Chart that explains how this webapp works"
         width={1000}
         height={1000}
-      />
+      /> */}
       <ClientAbout />
     </main>
   );
