@@ -96,6 +96,7 @@ const Leaderboard = () => {
                     <HoverCardTrigger className="" asChild>
                       <Link href={"/profile/" + row.userName}>
                         <Image
+                          unoptimized
                           style={{
                             borderColor:
                               row.primaryColor || "rgb(var(--color-primary))",

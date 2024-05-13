@@ -74,6 +74,7 @@ const ProfilePictureCard = ({
       </CardHeader>
       <CardContent className="flex flex-col items-center space-y-4">
         <Image
+          unoptimized
           src={product.image}
           alt={product.name}
           width={100}

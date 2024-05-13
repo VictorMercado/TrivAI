@@ -84,6 +84,7 @@ const Combobox = ({ value, setValue, listItems, children }: ComboboxProps) => {
                     )}
                   />
                   <Image
+                    unoptimized
                     src={item.image}
                     alt={item.name}
                     width={24}

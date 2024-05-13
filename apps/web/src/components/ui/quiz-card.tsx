@@ -227,6 +227,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
               <div className="m-auto p-4">
                 {quiz.image ? (
                   <Image
+                    unoptimized
                     src={quiz.image}
                     width={200}
                     height={200}
@@ -255,6 +256,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   <div>
                     {quiz.owner?.image ? (
                       <Image
+                        unoptimized
                         src={quiz.owner.image}
                         width={100}
                         height={100}
@@ -428,7 +430,13 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
             </div>
             <Link href={`/profile/${quiz.owner!.userName}`}>
               {quiz.owner?.image ? (
-                <Image src={quiz.owner.image} width={100} height={100} alt="" />
+                <Image
+                  unoptimized
+                  src={quiz.owner.image}
+                  width={100}
+                  height={100}
+                  alt=""
+                />
               ) : null}
               <div className="w-full text-center">
                 <h1 className={`text-md`}>{quiz.owner!.userName}</h1>

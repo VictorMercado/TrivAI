@@ -69,6 +69,7 @@ const User = ({
     <div className="flex w-full justify-between">
       <div className="flex">
         <Image
+          unoptimized
           src={image}
           alt={name}
           width={80}

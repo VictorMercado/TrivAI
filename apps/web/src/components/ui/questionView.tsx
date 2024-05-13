@@ -132,6 +132,7 @@ const QuestionImage = ({
 }: QuestionImageProps) => {
   return (
     <Image
+      unoptimized
       src={image}
       width={width}
       height={height}

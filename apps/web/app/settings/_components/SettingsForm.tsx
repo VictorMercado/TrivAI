@@ -155,6 +155,7 @@ const SettingsForm = (props: SettingsFormProps) => {
             />
           </div>
           <Image
+            unoptimized
             src={userImage.image}
             alt="User Image"
             width={100}

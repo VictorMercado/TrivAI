@@ -9,6 +9,7 @@ const ProfilePicture = ({ image, size = 36 }: ProfilePictureProps) => {
   return (
     <div className="flex items-center justify-center">
       <Image
+        unoptimized
         src={image}
         alt="Profile Picture"
         className={``}

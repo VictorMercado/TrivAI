@@ -35,7 +35,7 @@ const ErrorPage = ({ error, reset }: ErrorPageProps) => {
   };
 
   return (
-    <div className="h-[60vh] md:flex-1 p-4">
+    <div className="h-[60vh] p-4 md:flex-1">
       <div className="flex size-full flex-col items-center justify-center gap-y-10">
         <div className="flex">
           <div className="relative md:mt-12">
@@ -46,6 +46,7 @@ const ErrorPage = ({ error, reset }: ErrorPageProps) => {
             </div>
           </div>
           <Image
+            unoptimized
             src="/pikaerror.png"
             width={300}
             height={300}
@@ -57,9 +58,7 @@ const ErrorPage = ({ error, reset }: ErrorPageProps) => {
           <p>
             Oops, you discovered an edge case that Victor did not account for,{" "}
           </p>
-          <p>
-            feel free to report this with the left button down below.
-          </p>
+          <p>feel free to report this with the left button down below.</p>
           <p>Or refresh the page with the button on the right.</p>
         </div>
         <div className="flex gap-x-6">
