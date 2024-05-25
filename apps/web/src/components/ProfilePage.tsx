@@ -40,6 +40,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
       prize: true,
       totalScore: true,
       credits: true,
+      primaryColor: true,
       userAnsweredQuizzes: {
         select: {
           id: true,
@@ -80,12 +81,20 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
 
   return (
     <main className="container mx-auto space-y-4 p-4">
-      <div className="flex w-full flex-col space-y-4 border border-primary p-4 lg:space-y-4 lg:p-12">
+      <div
+        className="flex w-full flex-col space-y-4 border border-primary p-4 lg:space-y-4 lg:p-12"
+        style={{
+          borderColor: user.primaryColor || "",
+        }}
+      >
         <div className="grid grid-cols-2 lg:col-span-2 lg:items-center">
           <div className="flex flex-col items-center gap-y-2 lg:flex-row lg:justify-center lg:gap-x-5">
             <Image
               unoptimized
-              className={`border-2 border-primary ${user.userName === "GalacticNet" ? "" : "bg-primary"}`}
+              className={`border-2 ${user.userName === "GalacticNet" ? "" : "bg-primary"}`}
+              style={{
+                borderColor: user.primaryColor || "",
+              }}
               src={user.image === null ? "/default.png" : user.image}
               alt="Profile"
               width={100}
@@ -137,7 +146,13 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
             </div>
           </div>
 
-          <div className="space-y-2 bg-primary/25 p-4 text-primary md:p-6">
+          <div
+            className="space-y-2 bg-primary/25 p-4 md:p-6"
+            style={{
+              color: user.primaryColor || "",
+              backgroundColor: `${user.primaryColor}50` || "",
+            }}
+          >
             <div>Rank: {rank}</div>
             <div>Quizzes Completed: {quizzesCompleted} </div>
             {/* <div>Cheats Used: 20 </div> */}
@@ -150,10 +165,20 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
       </div>
       <div className="flex flex-col">
         <div className="flex justify-between pb-4">
-          <h1 className="w-fit bg-primary/25 p-4 text-xl">
+          <h1
+            style={{
+              backgroundColor: `${user.primaryColor}50` || "",
+            }}
+            className="w-fit p-4 text-xl"
+          >
             Collections: ({userProfilePictures?.length})
           </h1>
-          <h1 className="w-fit bg-primary/25 p-4 text-xl">
+          <h1
+            style={{
+              backgroundColor: `${user.primaryColor}50` || "",
+            }}
+            className="w-fit p-4 text-xl"
+          >
             Quizzes: ({userOwnedQuizzes.length})
           </h1>
         </div>

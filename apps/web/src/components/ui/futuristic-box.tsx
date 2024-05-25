@@ -26,17 +26,17 @@ const FuturisticBox = ({
   return (
     <div
       className={cn(
-        "group pointer-events-none absolute z-10 @container",
+        "group pointer-events-none absolute z-[-1] @container",
         className,
       )}
     >
       <motion.svg
         width={width}
         height={height}
-        fill="none"
+        fill="black"
         viewBox={`0 0 ${width} ${height}`}
         xmlns="http://www.w3.org/2000/svg"
-        className="absolute left-0 top-0 z-10"
+        className="absolute left-0 top-0 "
       >
         {/* bottom left triangle that is for small detail */}
         <motion.path
