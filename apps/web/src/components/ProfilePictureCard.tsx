@@ -43,7 +43,7 @@ const ProfilePictureCard = ({
   const utils = trpc.useUtils();
   const buy = trpc.authViewer.profilePicture.buy.useMutation({
     onSuccess: () => {
-      utils.authViewer.user.getProfilePictures.invalidate();
+      utils.viewer.user.getProfilePictures.invalidate();
       decrementCredits(product.cost);
       addToast({
         id: Math.floor(Math.random() * 100),

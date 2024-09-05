@@ -75,7 +75,7 @@ const ProfilePage = async ({ userName }: ProfileIdPageProps) => {
     },
     0,
   );
-  const userProfilePictures = await router.authViewer.user.getProfilePictures({
+  const userProfilePictures = await router.viewer.user.getProfilePictures({
     userId: user.id,
   });
 
