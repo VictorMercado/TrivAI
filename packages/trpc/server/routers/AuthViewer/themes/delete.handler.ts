@@ -21,7 +21,7 @@ export const deleteTheme = async ({ ctx, input }: GetThemeOptions) => {
     }
   });
   if (!theme) throw new Error('Theme not found');
-  if (theme.category.userId !== session!.user.id) throw new Error('Unauthorized');
+  if (theme.category.userId !== session?.user?.id) throw new Error('Unauthorized');
   return await prisma.theme.delete({
     where: {
       id: input.id,

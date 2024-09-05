@@ -10,10 +10,10 @@ type GetFriendOptions = {
 export const getAll = async ({ ctx }: GetFriendOptions) => {
   const { prisma } = ctx;
   const session = ctx.session;
-  if (!session) {
+  if (!session || !session.user) {
     throw new Error("No session");
   }
-  const userId = session.user?.id;
+  const userId = session.user.id;
   const data = await prisma.user.findUnique({
     where: {
       id : userId,

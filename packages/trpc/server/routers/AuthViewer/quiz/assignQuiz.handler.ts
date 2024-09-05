@@ -13,7 +13,7 @@ export const assignQuiz = async ({ ctx, input }: AssignQuizHandlerProps) => {
   const { prisma, session } = ctx;
   const { quizId, userId, assigneeId } = input;
 
-  if (session!.user.id !== userId) {
+  if (session?.user?.id !== userId) {
     throw new Error("Unauthorized");
   }
   let checkIfExist;

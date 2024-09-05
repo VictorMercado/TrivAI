@@ -7,10 +7,10 @@ type GetRequestedFriendOptions = {
 export const getRequested = async ({ ctx }: GetRequestedFriendOptions) => {
   const { prisma } = ctx;
   const session = ctx.session;
-  if (!session) {
+  if (!session || !session.user) {
     throw new Error("No session");
   }
-  const userId = session.user?.id;
+  const userId = session.user.id;
   // the user that initiated the friend request is the userId
   // the user that received the friend request is the friendId
   // so we want to find all the friend requests that the user has received

@@ -19,7 +19,8 @@
       "@repo/*": ["./*"]
     },
     "types": [
-      "bun-types" // add Bun global
+      "bun-types", // add Bun global
+      "./packages/types/next-auth.d.ts"
     ]
   }
 }

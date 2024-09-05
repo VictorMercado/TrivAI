@@ -17,7 +17,7 @@ export const create = async ({ ctx, input }: GetQuizOptions) => {
 
   const systemMessage = "ONLY GIVE ME JSON!! An array of question objects where the text property has the question text, answer1 has an answer, answer2 has an answer, answer3 has an answer, answer4 has an answer and correctAnswer property has the correct answer where the value is one of the properties of answer1, answer2, answer3, answer4.";
   const AI_URL = process.env.AI_API_URL;
-  if (session!.user.id !== input.ownerId) throw new Error('Unauthorized');
+  if (session?.user?.id !== input.ownerId) throw new Error('Unauthorized');
   let questionLength = input.questionLength || 10;
   let questionType = input.questionType || 'text';
 

@@ -83,7 +83,7 @@ const MultiplayerQuizController = ({
   const allUsersSelectedCount = othersSelectedCount + (selectedId ? 1 : 0);
   const hasAllUsersSelected = allUsersSelectedCount === allUsersCount;
   const mySelectedAnswer = selectedId && selectedAnswer
-    ? { selectedAnswer: selectedAnswer, userId: session!.user.id, selectedId: selectedId }
+    ? { selectedAnswer: selectedAnswer, userId: session!.user!.id, selectedId: selectedId }
     : null;
   const allOthersAnswers = others.map(({ presence }) => {
     if (!presence.selectedId) return null;

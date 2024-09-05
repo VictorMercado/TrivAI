@@ -7,10 +7,10 @@ type GetPendingFriendOptions = {
 export const getPending = async ({ ctx }: GetPendingFriendOptions) => {
   const { prisma } = ctx;
   const session = ctx.session;
-  if (!session) {
+  if (!session || !session.user) {
     throw new Error("No session");
   }
-  const userId = session.user?.id;
+  const userId = session.user.id;
   const friends =  await prisma.userFriend.findMany({
     where: {
       userId,

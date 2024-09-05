@@ -97,14 +97,23 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       // Send properties to the client via cookies, like an access_token and user id from a provider.
-
-      session.user.id = token.id as string;
-      session.user.role = token.role as string;
-      // session.user.accessToken = token.accessToken as string;
-      session.user.userName = token.userName as string;
-      session.user.userImage = token.picture as string;
-      session.user.credits = token.credits as number;
-      return session;
+      return {
+        ...session,
+        user: {
+          ...session.user,
+          id: token.id as string,
+          role: token.role as string,
+          userName: token.userName as string,
+          userImage: token.picture as string,
+          credits: token.credits as number,
+        },
+      }
+      // session?.user?.id = token.id as string;
+      // session.user.role = token.role as string;
+      // // session.user.accessToken = token.accessToken as string;
+      // session.user.userName = token.userName as string;
+      // session.user.userImage = token.picture as string;
+      // session.user.credits = token.credits as number;
     }
   },
   events: {

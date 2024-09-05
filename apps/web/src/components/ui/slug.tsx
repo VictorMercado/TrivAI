@@ -27,7 +27,7 @@ const Slug = ({ className }: SlugProps) => {
               >
                 <span>/</span>
                 {path === "profile" ? (
-                  <Link href={`/profile/${session?.user.userName}`}>
+                  <Link href={`/profile/${session?.user?.userName}`}>
                     <h1 className="coolText">{path.toUpperCase()}</h1>
                   </Link>
                 ) : index !== pathnames.length - 1 ? (

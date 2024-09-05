@@ -10,7 +10,7 @@ type CancelRequestOptions = {
 
 export const cancelRequest = async ({ ctx, input }: CancelRequestOptions) => {
   const { prisma, session } = ctx;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'You must be logged in to decline a friend request',

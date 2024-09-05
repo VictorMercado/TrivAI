@@ -11,7 +11,7 @@ export const getAllByUserId = ({ ctx, input }: GetAllByUserIdOptions) => {
   if (!session) {
     throw new Error("No session");
   }
-  if(session.user.id !== input.userId) {
+  if(session.user?.id !== input.userId) {
     throw new Error("Unauthorized");
   }
   return prisma.quiz.findMany({

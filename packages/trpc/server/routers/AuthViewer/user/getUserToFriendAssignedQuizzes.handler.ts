@@ -17,7 +17,7 @@ type GetUserToFriendAssignedQuizzesOptions = {
 
 export const getUserToFriendAssignedQuizzes = async ({ ctx, input }: GetUserToFriendAssignedQuizzesOptions) => {
   const { prisma, session } = ctx;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "You must be logged in to view your quizzes",

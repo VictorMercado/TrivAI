@@ -13,7 +13,7 @@ export const buy = async ({ ctx, input }: BuyOptions) => {
   const { prisma, session } = ctx;
   let profilePicture;
   let user;
-  if (input.userId !== session?.user.id) {
+  if (input.userId !== session?.user?.id) {
     throw new TRPCError({
       code: "UNAUTHORIZED"
     });

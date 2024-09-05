@@ -94,7 +94,7 @@ const ProfilePictureCard = ({
             size="default"
             className="w-full"
             onClick={() => {
-              if (session?.user.id) {
+              if (session?.user?.id) {
                 handleBuy(session.user.id, product.id);
               } else {
                 addToast({

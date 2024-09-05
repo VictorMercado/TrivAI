@@ -14,7 +14,7 @@ export const deleteCategory = async ({ ctx, input }: DeleteOptions) => {
     },
   });
   if (!category) throw new Error('Category not found');
-  if (category.userId !== session!.user.id) throw new Error('Unauthorized');
+  if (category.userId !== session?.user?.id) throw new Error('Unauthorized');
   return await prisma.category.delete({
     where: {
       id: input.id,

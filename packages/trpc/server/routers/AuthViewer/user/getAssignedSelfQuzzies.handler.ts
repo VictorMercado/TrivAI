@@ -21,7 +21,7 @@ export const getAssignedSelfQuzzies = async ({ ctx, input }: GetAssignedSelfQuiz
   let userAssignedQuizzes;
   let userAssignedQuizIds;
   let userQuizzes;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "You must be logged in to view your quizzes",

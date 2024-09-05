@@ -52,7 +52,7 @@ export const deleteQuiz = async ({ ctx, input }: GetQuizOptions) => {
     code: "NOT_FOUND",
     message: "Quiz not found",
   });
-  if (quiz.ownerId !== session!.user.id) throw new TRPCError({
+  if (quiz.ownerId !== session?.user?.id) throw new TRPCError({
     code: "UNAUTHORIZED",
     message: "Unauthorized",
   });

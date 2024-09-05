@@ -15,7 +15,7 @@ export const update = async ({ ctx, input }: GetQuizOptions) => {
     },
   });
   if (!quiz) throw new Error('Quiz not found');
-  if (quiz.ownerId !== session!.user.id) throw new Error('Unauthorized');
+  if (quiz.ownerId !== session?.user?.id) throw new Error('Unauthorized');
   let updatedQuiz;
   try {
     updatedQuiz = await prisma.quiz.update({
