@@ -64,13 +64,14 @@ function dateFormat(date: Date | null | undefined) {
 
 type QuizCardProps = {
   quiz: TQuizView;
+  destroySelf?: (id : number) => void;
 };
 // TODO:
 // add more stats:
 // - who the quiz is assigned to
 // - when it was created
 // - how many questions are completed
-const QuizCard = ({ quiz }: QuizCardProps) => {
+const QuizCard = ({ quiz, destroySelf }: QuizCardProps) => {
   const router = useRouter();
   const { addToast } = useToast();
   const utils = trpc.useUtils();
@@ -174,6 +175,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
   });
 
   const handleDelete = (id : number, userId : string ) => {
+    if (destroySelf) destroySelf(id);
     deleteQuiz.mutate({id, userId});
   };
 
