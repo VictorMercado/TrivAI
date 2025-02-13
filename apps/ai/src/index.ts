@@ -31,14 +31,16 @@ async function uploadFromMemory(bucketName: string = (process.env.BUCKET_NAME as
   });
 }
 
+// openai llm
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY as string,
   organization: process.env.ORGANIZATION as string,
 })
 
+// google ai llm
 const apiKey: string = process.env.GOOGLE_API_KEY as string;
 export const googleAI = new GoogleGenerativeAI(apiKey);
-const googleModelName = "gemini-pro";
+const googleModelName = "gemini-2.0-flash";
 
 
 
@@ -103,7 +105,7 @@ async function run(prompt: string = "Give me a 5 question quiz about anything.")
   const model = googleAI.getGenerativeModel({ model: googleModelName });
 
   const result = await model.generateContent(prompt);
-  const response = await result.response;
+  const response = result.response;
   const text = response.text();
   return text;
 }

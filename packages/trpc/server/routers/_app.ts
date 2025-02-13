@@ -1,9 +1,11 @@
 import { z } from 'zod';
 import { publicProcedure, router, createCallerFactory, mergeRouters } from '../trpc';
 import { authViewerRouter } from './AuthViewer/_router';
+import { viewerRouter } from './viewer/_router';
 
 export const appRouter = mergeRouters(router({
   authViewer: authViewerRouter,
+  viewer: viewerRouter,
   userList: publicProcedure.query(async (opts) => {
     const { input, ctx } = opts;
     const { prisma } = ctx;

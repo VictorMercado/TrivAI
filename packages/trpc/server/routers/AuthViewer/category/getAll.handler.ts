@@ -9,7 +9,7 @@ export const getAll = async ({ ctx }: GetAllOptions) => {
   const { prisma, session } = ctx; 
   return await prisma.category.findMany({
     where: {
-      userId: session!.user.id,
+      userId: session?.user?.id,
     },
     select: {
       id: true,

@@ -11,7 +11,7 @@ type AcceptRequestOptions = {
 export const acceptRequest = async ({ ctx, input }: AcceptRequestOptions) => {
   const { prisma, session } = ctx;
   let friend;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'You must be logged in to accept a friend request',

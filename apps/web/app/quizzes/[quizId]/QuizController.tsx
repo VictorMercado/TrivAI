@@ -39,7 +39,7 @@ const QuizController = ({
   let router = useRouter();
   let { addToast } = useToast();
   const { data: session } = useSession();
-  const userId = session?.user.id;
+  const userId = session?.user?.id;
   const { totalScore, cheatUsed, incrementScore, incrementCredits } = useStore((state) => state);
   const [questions, setQuestions] =
     useState<Array<TQuestionView>>(activeQuestions);

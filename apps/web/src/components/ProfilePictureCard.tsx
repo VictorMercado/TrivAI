@@ -43,7 +43,7 @@ const ProfilePictureCard = ({
   const utils = trpc.useUtils();
   const buy = trpc.authViewer.profilePicture.buy.useMutation({
     onSuccess: () => {
-      utils.authViewer.user.getProfilePictures.invalidate();
+      utils.viewer.user.getProfilePictures.invalidate();
       decrementCredits(product.cost);
       addToast({
         id: Math.floor(Math.random() * 100),
@@ -94,7 +94,7 @@ const ProfilePictureCard = ({
             size="default"
             className="w-full"
             onClick={() => {
-              if (session?.user.id) {
+              if (session?.user?.id) {
                 handleBuy(session.user.id, product.id);
               } else {
                 addToast({

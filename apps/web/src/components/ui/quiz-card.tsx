@@ -13,7 +13,7 @@ import {
   Users,
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@ui/popover";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger, HoverCardPortal } from "@ui/hover-card";
 import Link from "next/link";
 import { shortenNumber } from "@trivai/lib/utils";
 import { TQuizView } from "@trivai/lib/server/queries/quiz";
@@ -64,13 +64,14 @@ function dateFormat(date: Date | null | undefined) {
 
 type QuizCardProps = {
   quiz: TQuizView;
+  destroySelf?: (id : number) => void;
 };
 // TODO:
 // add more stats:
 // - who the quiz is assigned to
 // - when it was created
 // - how many questions are completed
-const QuizCard = ({ quiz }: QuizCardProps) => {
+const QuizCard = ({ quiz, destroySelf }: QuizCardProps) => {
   const router = useRouter();
   const { addToast } = useToast();
   const utils = trpc.useUtils();
@@ -174,6 +175,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
   });
 
   const handleDelete = (id : number, userId : string ) => {
+    if (destroySelf) destroySelf(id);
     deleteQuiz.mutate({id, userId});
   };
 
@@ -303,7 +305,7 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                   )}
                 </div>
               </div>
-              <div className="z-20 col-span-1 mb-6 grid grid-cols-4 items-center justify-center gap-x-2 px-4  pb-4 text-sm @md:col-span-2 @md:grid @md:grid-cols-4 @lg:pl-20 @lg:pr-8 @lg:text-xl">
+              <div className="z-20 col-span-1 mb-6 grid grid-cols-4 items-center justify-center gap-x-2 px-4 pb-4 text-sm @md:col-span-2 @md:grid @md:grid-cols-4 @lg:pl-20 @lg:pr-8 @lg:text-xl">
                 <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
                   <HoverCardTrigger
                     className="pointer-events-auto col-start-2"
@@ -320,12 +322,14 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                       <p>{shortenNumber(quiz.likes)}</p>
                     </button>
                   </HoverCardTrigger>
-                  <HoverCardContent
-                    side="top"
-                    className="border-red-500 p-2 text-sm text-red-500"
-                  >
-                    <p>Likes</p>
-                  </HoverCardContent>
+                  <HoverCardPortal>
+                    <HoverCardContent
+                      side="top"
+                      className="border-red-500 p-2 text-sm text-red-500"
+                    >
+                      <p>Likes</p>
+                    </HoverCardContent>
+                  </HoverCardPortal>
                 </HoverCard>
                 {/* <HoverCard defaultOpen={false} openDelay={200} closeDelay={200}>
                   <HoverCardTrigger asChild>
@@ -374,12 +378,14 @@ const QuizCard = ({ quiz }: QuizCardProps) => {
                       <p>{shortenNumber(rooms?.length ? rooms?.length : 0)}</p>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent
-                    side="top"
-                    className="text-md border-green-500 p-2 text-sm text-green-500"
-                  >
-                    <p>Multiplayer Rooms</p>
-                  </HoverCardContent>
+                  <HoverCardPortal>
+                    <HoverCardContent
+                      side="top"
+                      className="text-md border-green-500 p-2 text-sm text-green-500"
+                    >
+                      <p>Multiplayer Rooms</p>
+                    </HoverCardContent>
+                  </HoverCardPortal>
                 </HoverCard>
               </div>
             </div>

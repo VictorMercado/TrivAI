@@ -34,8 +34,6 @@ const PokemonComboBox = ({ value , setValue, profilePictures}: PokemonComboBoxPr
       take: options.take,
       skip: options.skip,
     });
-
-
   return (
     <Combobox value={value} setValue={setValue} listItems={profilePictures}>
       {/* <div className="flex flex-col items-center">

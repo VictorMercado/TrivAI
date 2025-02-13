@@ -16,14 +16,14 @@
     "seed-insights": "ts-node --transpile-only ./seed-insights.ts"
   },
   "dependencies": {
-    "@faker-js/faker": "^8.4.0",
-    "@prisma/client": "latest",
-    "@types/node": "^20.11.16",
-    "prisma": "latest",
-    "ts-node": "^10.9.2",
-    "typescript": "^5.3.3",
-    "zod": "^3.22.4",
-    "zod-prisma": "^0.5.4"
+    "@faker-js/faker": "9.0.0",
+    "@prisma/client": "5.19.1",
+    "@types/node": "22.5.4",
+    "prisma": "5.19.1",
+    "ts-node": "10.9.2",
+    "typescript": "5.5.4",
+    "zod": "3.23.8",
+    "zod-prisma": "0.5.4"
   },
   "prisma": {
     "seed": "bun ./seed.js"

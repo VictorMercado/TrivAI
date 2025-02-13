@@ -8,7 +8,7 @@ export async function GET(request: Request, response: Response) {
   // this route will set a cookie with the a merged users id and a generated token
   const session = await getServerSession(authOptions);
   
-  if (!session) {
+  if (!session || !session.user) {
     return new Response(JSON.stringify({ message: 'No session' }), { status: 401 });
   }
   const token = crypto.randomBytes(16).toString('hex');

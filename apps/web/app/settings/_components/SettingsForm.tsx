@@ -61,14 +61,14 @@ const SettingsForm = (props: SettingsFormProps) => {
   const [userImage, setUserImage] = useState<ProfilePicture>({
     name:
       stringExtractor(
-        session?.user.userImage?.split("/")[5]?.split("-")[1],
+        session?.user?.userImage?.split("/")[5]?.split("-")[1],
         ".png",
       ) || "default",
-    image: session?.user.userImage || "/default.png",
+    image: session?.user?.userImage || "/default.png",
   });
 
   const [userName, setUserName] = useState<string>(
-    session?.user.userName || "",
+    session?.user?.userName || "",
   );
   const { addToast } = useToast();
 
@@ -80,10 +80,10 @@ const SettingsForm = (props: SettingsFormProps) => {
       document.documentElement.style.getPropertyValue("--color-secondary") ||
       "255 255 255";
     try {
-      const res = await fetch(`/api/user/${session?.user.userName}`, {
+      const res = await fetch(`/api/user/${session?.user?.userName}`, {
         method: "PATCH",
         body: JSON.stringify({
-          id: session?.user.id,
+          id: session?.user?.id,
           userName: userName,
           image: userImage.image,
           primaryColor: rgbToHex(primaryColor),

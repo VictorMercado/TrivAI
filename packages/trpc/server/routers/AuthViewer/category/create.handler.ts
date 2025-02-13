@@ -9,7 +9,7 @@ type CreateOptions = {
 
 export const create = async ({ ctx, input }: CreateOptions) => {
   const { prisma, session } = ctx;
-  if (session!.user.id !== input.userId) throw new Error('Unauthorized');
+  if (session?.user?.id !== input.userId) throw new Error('Unauthorized'); 
 
   let category; 
   try {

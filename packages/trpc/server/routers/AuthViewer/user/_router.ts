@@ -1,11 +1,9 @@
 import { protectedProcedure, router } from "@trivai/trpc/server/trpc";
-import { getAssignedSelfQuzzies } from "./getAssignedSelfQuzzies.handler"; 
+import { getAssignedSelfQuzzies } from "./getAssignedSelfQuzzies.handler";
 import { getUserToFriendAssignedQuizzes } from "./getUserToFriendAssignedQuizzes.handler";
 import { getFriendToUserAssignedQuizzes } from "./getFriendToUserAssignedQuizzes.handler";
 import { resetQuizAnswers } from "./reset.handler";
 import { ZResetQuizAnswersInput } from "./reset.schema";
-import { getProfilePictures } from "./getProfilePictures.handler";
-import { ZGetProfilePictures } from "./getProfilePictures.schema";
 import { getProfilePicturesByGen } from "./getProfilePicturesByGen.handler";
 import { ZGetProfilePicturesByGen } from "./getProfilePicturesByGen.schema";
 
@@ -18,9 +16,6 @@ export const userRouter = router({
   }),
   getFriendToUserAssignedQuizzes: protectedProcedure.query(async ({ ctx, input }) => {
     return await getFriendToUserAssignedQuizzes({ ctx, input });
-  }),
-  getProfilePictures: protectedProcedure.input(ZGetProfilePictures).query(async ({ ctx, input }) => {
-    return await getProfilePictures({ ctx, input });
   }),
   getProfilePicturesByGen: protectedProcedure.input(ZGetProfilePicturesByGen).query(async ({ input, ctx }) => {
     return await getProfilePicturesByGen({ input, ctx });

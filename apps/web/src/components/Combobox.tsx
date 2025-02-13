@@ -18,6 +18,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@components/ui/popover";
+import { CommandList } from "cmdk";
 
 export type ProfilePicture = {
   name: string;
@@ -64,37 +65,39 @@ const Combobox = ({ value, setValue, listItems, children }: ComboboxProps) => {
         <Command>
           <CommandInput placeholder="Search profile pic on this page" />
           <CommandEmpty>No profile pic found.</CommandEmpty>
-          <CommandGroup>
-            <div className="grid grid-cols-2 lg:grid-cols-5">
-              {listItems.map((item, _index) => (
-                <CommandItem
-                  key={item.name + _index}
-                  onSelect={(currentValue) => {
-                    setValue({
-                      name: item.name,
-                      image: item.image,
-                    });
-                    setOpen(false);
-                  }}
-                >
-                  <Check
-                    className={cn(
-                      "mr-2 h-4 w-4",
-                      value.name === item.name ? "opacity-100" : "opacity-0",
-                    )}
-                  />
-                  <Image
-                    unoptimized
-                    src={item.image}
-                    alt={item.name}
-                    width={24}
-                    height={24}
-                  />
-                  <span className="ml-2">{item.name}</span>
-                </CommandItem>
-              ))}
-            </div>
-          </CommandGroup>
+          <CommandList>
+            <CommandGroup>
+              <div className="grid grid-cols-2 lg:grid-cols-5">
+                {listItems.map((item, _index) => (
+                  <CommandItem
+                    key={item.name + _index}
+                    onSelect={(currentValue) => {
+                      setValue({
+                        name: item.name,
+                        image: item.image,
+                      });
+                      setOpen(false);
+                    }}
+                  >
+                    <Check
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        value.name === item.name ? "opacity-100" : "opacity-0",
+                      )}
+                    />
+                    <Image
+                      unoptimized
+                      src={item.image}
+                      alt={item.name}
+                      width={24}
+                      height={24}
+                    />
+                    <span className="ml-2">{item.name}</span>
+                  </CommandItem>
+                ))}
+              </div>
+            </CommandGroup>
+          </CommandList>
         </Command>
       </PopoverContent>
     </Popover>

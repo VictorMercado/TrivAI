@@ -29,6 +29,7 @@
   }
 
   :root {
+    interpolate-size: allow-keywords;
     /* 
     --color-background: 220 220 220;
     --color-text-base: 0 0 0; */
@@ -268,5 +269,4 @@
   font-weight: 600;
   line-height: 1.5rem;
   vertical-align: top;
-  border-top: 1px solid #d2d6dc;
 }

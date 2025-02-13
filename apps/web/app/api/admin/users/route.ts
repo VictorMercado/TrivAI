@@ -4,7 +4,7 @@ import { getSession } from "@trivai/auth/lib/getSession";
 
 export async function POST(request: Request) {
   const session: Session | null = await getSession();
-  if (!session) {
+  if (!session || !session.user) {
     return new Response(JSON.stringify({ message: "Forbidden" }), { status: 403 });
   }
   if (session.user.role !== "ADMIN") {

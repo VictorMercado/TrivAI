@@ -29,7 +29,7 @@ export const deleteFriend = async ({ ctx, input }: DeleteFriendOptions) => {
   //     message: 'Friend request not found',
   //   });
   // }
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'You must be logged in to decline a friend request',

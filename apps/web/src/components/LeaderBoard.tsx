@@ -80,12 +80,12 @@ const Leaderboard = () => {
           {/* <!-- row 1 --> */}
           {users.map((row, index) => (
             <tr
-              className={`border border-black ${
+              className={`border-black border-b-gray-800 ${
                 row.userName === user?.userName ? "text-primary" : ""
               }`}
               key={row.id}
             >
-              <th className="border-b-gray-800 ">{index + 1}</th>
+              <th className="border-b-black">{index + 1}</th>
               <td className="border-b-gray-800">
                 <div className="flex">
                   <HoverCard

@@ -11,7 +11,7 @@ type DeclineRequestOptions = {
 export const declineRequest = async ({ ctx, input }: DeclineRequestOptions) => {
   const { prisma, session } = ctx;
   let friend;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: 'UNAUTHORIZED',
       message: 'You must be logged in to decline a friend request',

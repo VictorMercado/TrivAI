@@ -15,7 +15,7 @@ import { useLocalStorage } from '@src/hooks/useLocalStorage';
 const LetterModel = React.memo(({userSession = true} : {userSession: boolean}) => {
   const {data: session} = useSession();
   let userFirstLetter : string;
-    if (session?.user.name && userSession) {
+    if (session?.user?.name && userSession) {
         userFirstLetter = session?.user.name[0];
     } else {
         userFirstLetter = 'TrivAI';

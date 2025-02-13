@@ -42,7 +42,7 @@ const Store = ({ }) => {
 
   let userProfilePictures; 
   if (session?.user) {
-    userProfilePictures = trpc.authViewer.user.getProfilePictures.useQuery({
+    userProfilePictures = trpc.viewer.user.getProfilePictures.useQuery({
       userId: session.user.id,
     });
   }

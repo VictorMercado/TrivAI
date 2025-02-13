@@ -11,7 +11,7 @@ const routeContextSchema = z.object({
 
 export async function DELETE(request: Request, context: z.infer<typeof routeContextSchema>) {
   const session: Session | null = await getSession();
-  if (!session) {
+  if (!session || !session.user) {
     return new Response(JSON.stringify({ message: "Forbidden" }), { status: 403 });
   }
   if (session.user.role !== "ADMIN") {

@@ -11,7 +11,7 @@ type TResetQuizAnswersOptions = {
 
 export const resetQuizAnswers = async ({ ctx, input }: TResetQuizAnswersOptions) => {
   const { prisma, session } = ctx;
-  if (!session) {
+  if (!session || !session.user) {
     throw new TRPCError({
       code: "UNAUTHORIZED",
       message: "You must be logged in to reset a quiz",

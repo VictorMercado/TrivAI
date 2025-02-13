@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { Button } from "@ui/button";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@ui/hover-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger, HoverCardPortal } from "@ui/hover-card";
 import { cn } from "@trivai/lib/utils";
 import { Suspense } from "react";
 import { siteRoutes } from "@src/config/site.tsx";
@@ -43,9 +43,11 @@ const SiteNav = ({ className }: SiteNavProps) => {
                 </Button>
               </Link>
             </HoverCardTrigger>
-            <HoverCardContent className="rounded-none">
-              {route.name}
-            </HoverCardContent>
+            <HoverCardPortal>
+              <HoverCardContent>
+                {route.name}
+              </HoverCardContent>
+            </HoverCardPortal>
           </HoverCard>
         );
       })}
