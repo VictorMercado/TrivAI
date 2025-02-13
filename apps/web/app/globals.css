@@ -29,6 +29,7 @@
   }
 
   :root {
+    interpolate-size: allow-keywords;
     /* 
     --color-background: 220 220 220;
     --color-text-base: 0 0 0; */

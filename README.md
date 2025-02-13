@@ -1,38 +1,94 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+🎉 TrivAI – The Ultimate Quiz Experience! 🎉
 
-## Getting Started
+TrivAI is a web-based platform designed for creating, assigning, and playing multiplayer quizzes with friends. Whether it’s testing academic knowledge, pop culture trivia, or just some fun random facts, TrivAI makes learning and competition exciting!
 
-First, run the development server:
+🚀 Create. Assign. Play. Compete. 🚀
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+🌟 Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+✅ Custom Quiz Creation – Design quizzes on any topic with multiple question types.
+✅ Multiplayer Mode – Collaborate with your friends in real-time quiz sessions.
+✅ Group Assignments – Share quizzes with friends or study groups.
+✅ Interactive Gameplay – A smooth and engaging user experience.
+✅ Leaderboard & Stats – Track scores and see who reigns supreme.
+✅ Customization – Personalize quizzes with themes and unique settings.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+🎮 How It Works
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
+1️⃣ Sign Up/Login – Create an account to get started.
+2️⃣ Create a Quiz – Add questions, set timers, and customize difficulty.
+3️⃣ Assign & Invite – Share quizzes with friends or a group.
+4️⃣ Play & Compete – Join multiplayer sessions or take quizzes at your own pace.
+5️⃣ Track Progress – View stats and leaderboards to see who’s on top!
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+💡 Why TrivAI?
+	•	Encourages social learning through collaboration and competition.
+	•	Provides a seamless quiz-making and playing experience.
+	•	Perfect for classrooms, game nights, and friendly challenges!
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+🛠️ Tech Stack
+	•	Frontend: React.js / Next.js
+	•	Backend: Bun.js / Elysia.js
+	•	Database: MySQL
+	•	Authentication: OAuth / JWT / Auth.js
+	•	Hosting: Railway(DB) and Vercel(Web/API)
 
-## Learn More
+Installation & Setup
 
-To learn more about Next.js, take a look at the following resources:
+1.  **Clone the Repository:**
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+    ```bash
+    git clone [your_repository_url]
+    cd TrivAI
+    ```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+2.  **Install Dependencies:**
 
-## Deploy on Vercel
+    ```bash
+    # Example using npm (Node Package Manager) - adjust as needed
+    npm install
+    ```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+3.  **Configure the Application:**
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+    *   Set up your database connection (if applicable) in the `.env` file. (Example `.env` file below)
+    *   Configure API keys (if needed)
+
+    ```
+    # .env example
+    DATABASE_URL=your_database_url
+    API_KEY=your_api_key
+    ```
+    *   Start the database with bash or turbo
+
+    ```bash
+    # Example using docker compose
+    docker-compose up -d
+    <!-- or -->
+    turbo db-up
+    ```
+
+
+4.  **Run the Application:**
+
+    ```bash
+    # Example using turbo
+    turbo dev
+    ```
+
+5.  **Access the platform in your browser:** `http://localhost:3000` (or the appropriate port)
+
+
+🚧 Roadmap
+
+🔹 AI-powered quiz suggestions & auto-generated questions.
+🔹 Multiplayer race mode.
+🔹 Enhanced real-time features with WebSockets.
+🔹 Mobile app version for on-the-go quizzing.
+
+📬 Get Involved
+
+We’d love your feedback and contributions! Feel free to open issues or submit PRs.
+
+📧 Contact: [your.email@example.com]
+🌍 Website: TrivAI.com
