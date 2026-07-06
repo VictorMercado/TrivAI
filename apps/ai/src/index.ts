@@ -147,6 +147,7 @@ async function hitWebhook(body: string) {
       break;
     }
     catch (e) {
+      console.log(e);
       console.log("rerunning");
       continue;
     }
