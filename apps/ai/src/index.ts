@@ -40,7 +40,7 @@ const openai = new OpenAI({
 // google ai llm
 const apiKey: string = process.env.GOOGLE_API_KEY as string;
 export const googleAI = new GoogleGenerativeAI(apiKey);
-const googleModelName = "gemini-2.0-flash";
+const googleModelName = "gemini-3.5-flash";
 
 
 
