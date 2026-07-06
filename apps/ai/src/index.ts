@@ -136,6 +136,7 @@ async function hitWebhook(body: string) {
       response = await run(parsedBody.prompt);
       match = backticksRegex.exec(response);
       if (match === null) {
+        console.log(response);
         throw new Error("No response");
       }
       response = match[1];
